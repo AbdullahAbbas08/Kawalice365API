@@ -10,6 +10,13 @@ namespace TravelAPI.Models
         public string FirstName { get; set; }
 
         [Required, StringLength(255)]
-        public string LastName { get; set; }
+        public string LastName { get; set; }   
+        [MaxLength(11),Required]
+        public string  Mobile { get; set; }
+        [Required]
+        public string  Address { get; set; }
+        public string  Description { get; set; }
+        [Required]
+        public string  LogoPath { get; set; }
     }
 }

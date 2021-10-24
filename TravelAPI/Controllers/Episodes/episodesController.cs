@@ -141,6 +141,41 @@ namespace BalarinaAPI.Controllers.Episodes
         }
         #endregion
 
+        #region Get All Episodes API Key
+        /// <summary>
+        /// get all episodes with API Key
+        /// </summary>
+        /// <returns>
+        /// list of episode that cantain EpisodeId ,EpisodeTitle,EpisodeDescription,YoutubeUrl,EpisodeVisible,CreationDate,LikeRate,DislikeRate
+        /// EpisodeViews,seasonID,EpisodePublishDate and EpisodeIamgePath + LivePathImages
+        /// </returns>
+        [ApiAuthentication]
+        [HttpGet]
+        [Route("getallepisodesbyseasonid")]
+        public async Task<ActionResult<List<Episode>>> getallepisodesbyseasonid(int ID)
+        {
+            try
+            {
+                //Get All Episodes 
+                var ResultEpisodes = await unitOfWork.Episode.GetObjects(x=>x.SessionId == ID);
+                ResultEpisodes.ToList();
+
+                foreach (var item in ResultEpisodes)
+                {
+                    item.EpisodeIamgePath = helper.LivePathImages + item.EpisodeIamgePath;
+                }
+                return ResultEpisodes.ToList();
+            }
+            catch (Exception ex)
+            {
+                helper.LogError(ex);
+                return StatusCode(StatusCodes.Status500InternalServerError);
+                // Log error in db
+            }
+        }
+        #endregion
+
+
         #region Insert New Episode 
         /// <summary>
         /// insert new episode 

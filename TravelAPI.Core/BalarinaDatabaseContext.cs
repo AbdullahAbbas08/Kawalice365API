@@ -30,6 +30,10 @@ namespace BalarinaAPI.Core.Model
         public virtual DbSet<Seasons> Sessions { get; set; }
         public virtual DbSet<Sliders> Sliders { get; set; } 
         public virtual DbSet<SuperStarModel> SuperStarModel { get; set; } 
+        public virtual DbSet<ADTARGETS> ADTARGETS { get; set; } 
+        public virtual DbSet<ADSTYLES> ADSTYLES { get; set; } 
+        public virtual DbSet<ADPLACEHOLDER> ADPLACEHOLDER { get; set; } 
+        public virtual DbSet<ADS> ADS  { get; set; } 
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
