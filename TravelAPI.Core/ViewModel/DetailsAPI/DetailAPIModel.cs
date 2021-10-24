@@ -27,6 +27,7 @@ namespace BalarinaAPI.Core.ViewModel.DetailsAPI
         public string EpisodeDescription { get; set; }
         public string EpisodeIamgePath { get; set; }
         public DateTime EpisodePublishDate { get; set; }
+        public DateTime ProgramStartDate { get; set; }
         public int EpisodeViews { get; set; }
         public string YoutubeUrl { get; set; }
     }

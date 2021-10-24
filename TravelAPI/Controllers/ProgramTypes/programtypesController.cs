@@ -35,7 +35,7 @@ namespace BalarinaAPI.Controllers.ProgramTypes
 
         #endregion
 
-         #region CRUD OPERATIONS 
+        #region CRUD OPERATIONS 
 
            #region Get All ProgramsTypes
         [ApiAuthentication]
@@ -180,14 +180,26 @@ namespace BalarinaAPI.Controllers.ProgramTypes
            #region Delete Program type
         [Authorize]
         [HttpDelete("{ID}")]
-        public async Task<ActionResult<ProgramType>> deleteprogramtypeAsync(int ID)
+        public async Task<ActionResult<ProgramType>> deleteprogramtype(int ID)
         {
             try
             {
+                #region check if program type exist or not
+                var programTypeObj = await unitOfWork.ProgramType.FindObjectAsync(ID);
+                if (programTypeObj == null)
+                    return BadRequest("Program Type Not Found");
+                #endregion
+
+                #region Apply Operation In Db
                 bool result = await unitOfWork.ProgramType.DeleteObject(ID);
                 if (!result)
                     return NotFound("Program type Not Exist");
                 unitOfWork.Complete();
+                #endregion 
+
+                #region Delete image File From Specified Directory 
+                helper.DeleteFiles(programTypeObj.ProgramTypeImgPath);
+                #endregion
 
                 return Ok("program type id deleted successfully ");
             }

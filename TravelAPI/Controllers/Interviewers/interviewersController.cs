@@ -282,8 +282,8 @@ namespace BalarinaAPI.Controllers.Interviewers
         {
             try
             {
-                #region Check ID If Exist
-                var checkIDIfExist = unitOfWork.Interviewer.FindObjectAsync(ID);
+                #region Check interviewer ID If Exist or not 
+                var checkIDIfExist = await unitOfWork.Interviewer.FindObjectAsync(ID);
                 if (checkIDIfExist == null)
                     return BadRequest("Interviewer ID Not Found");
                 #endregion
@@ -299,6 +299,10 @@ namespace BalarinaAPI.Controllers.Interviewers
 
                 #region save changes in db
                 unitOfWork.Complete();
+                #endregion
+
+                #region Delete image File From Specified Directory 
+                helper.DeleteFiles(checkIDIfExist.InterviewerPicture);
                 #endregion
 
 

@@ -25,10 +25,12 @@ namespace TravelAPI.Repositories
             dbContext.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
 
         }
+
         public async Task<IEnumerable<T>> GetObjects()
         {
             return await dbContext.Set<T>().AsQueryable().ToListAsync();
         }
+
         public async Task<IEnumerable<T>> GetObjects(Expression<Func<T, bool>> match)
         {
             return  await dbContext.Set<T>().AsQueryable().Where(match).ToListAsync(); 

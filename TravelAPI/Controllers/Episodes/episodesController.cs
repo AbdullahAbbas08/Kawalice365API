@@ -951,6 +951,7 @@ namespace BalarinaAPI.Controllers.Episodes
                                   program.ProgramName,
                                   program.ProgramImg,
                                   program.ProgramDescription,
+                                  program.ProgramStartDate,
                                   category.CategoryId,
                                   category.CategoryTitle,
                                   programType.ProgramTypeId,
@@ -977,7 +978,7 @@ namespace BalarinaAPI.Controllers.Episodes
                 int EPISODECOUNT = SeasonCount.Count();
                 #endregion
 
-                #region
+                #region Fill list to return as a result 
                 foreach (var item in Result)
                 {
                     DetailAPIModel detailAPI = new DetailAPIModel()
@@ -988,6 +989,7 @@ namespace BalarinaAPI.Controllers.Episodes
                         EpisodeIamgePath = helper.LivePathImages + item.EpisodeIamgePath,
                         EpisodeId = item.EpisodeId,
                         EpisodePublishDate = item.EpisodePublishDate,
+                        ProgramStartDate = item.ProgramStartDate,
                         EpisodeTitle = item.EpisodeTitle,
                         EpisodeViews = item.EpisodeViews,
                         InterviewerId = item.InterviewerId,

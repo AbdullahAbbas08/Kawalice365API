@@ -463,10 +463,20 @@ namespace BalarinaAPI.Controllers.Programs
         {
             try
             {
+                #region Check Program If Exist or not 
+                var ProgramObj = await unitOfWork.Program.FindObjectAsync(ID);
+                if (ProgramObj == null)
+                    return BadRequest("Program ID Not Found ");
+                #endregion
+
                 bool result = await unitOfWork.Program.DeleteObject(ID);
                 if (!result)
                     return NotFound("Program Not Exist");
                 unitOfWork.Complete();
+
+                #region Delete image File From Specified Directory 
+                helper.DeleteFiles(ProgramObj.ProgramImg);
+                #endregion
 
                 return Ok("program id deleted successfully ");
             }
