@@ -1,5 +1,6 @@
 ﻿using BalarinaAPI.Core.Model;
 using BalarinaAPI.Core.Models;
+using System.Threading.Tasks;
 using TravelAPI.Core;
 using TravelAPI.Interfaces;
 using TravelAPI.Repositories;
@@ -20,6 +21,11 @@ namespace TravelAPI.EF
         public IBaseRepository<Seasons> Season  { get; private set; }
         public IBaseRepository<Sliders> Slider  { get; private set; }
 
+        public IBaseRepository<ADTARGETS> ADTARGETS { get; private set; }
+        public IBaseRepository<ADSTYLES> ADSTYLES { get; private set; }
+        public IBaseRepository<ADPLACEHOLDER> ADPLACEHOLDER { get; private set; }
+        public IBaseRepository<ADS> ADS { get; private set; }
+
 
         public UnitOfWork(BalarinaDatabaseContext _context)
         {
@@ -33,6 +39,10 @@ namespace TravelAPI.EF
             this.ProgramType = new BaseRepository<ProgramType>(_context);
             this.Season = new BaseRepository<Seasons>(_context);
             this.Slider = new BaseRepository<Sliders>(_context);
+            this.ADTARGETS = new BaseRepository<ADTARGETS>(_context);
+            this.ADS = new BaseRepository<ADS>(_context);
+            this.ADPLACEHOLDER = new BaseRepository<ADPLACEHOLDER>(_context);
+            this.ADSTYLES = new BaseRepository<ADSTYLES>(_context);
         }
 
         public void Dispose()
@@ -40,9 +50,9 @@ namespace TravelAPI.EF
             _context.Dispose();
         }
 
-        public int Complete()
+        public async Task<int> Complete()
         {
-            return _context.SaveChanges();
+            return await _context.SaveChangesAsync();
         }
     }
 }

@@ -222,7 +222,7 @@ namespace BalarinaAPI.Controllers
                 #endregion
 
                 #region save changes in db
-                unitOfWork.Complete();
+                await unitOfWork.Complete();
                 #endregion
 
                 return Ok("Category Created Successfully ");
@@ -310,7 +310,7 @@ namespace BalarinaAPI.Controllers
                 #endregion
 
                 #region save changes into db
-                unitOfWork.Complete();
+                await unitOfWork.Complete();
                 #endregion
 
 
@@ -370,7 +370,7 @@ namespace BalarinaAPI.Controllers
                         bool _result = unitOfWork.category.Update(item);
                         if (!_result)
                             return BadRequest("update order operation failed !! ");
-                        unitOfWork.Complete();
+                        await unitOfWork.Complete();
                     }
                 }
                 else if(OldOrder > NewOrder)
@@ -382,7 +382,7 @@ namespace BalarinaAPI.Controllers
                         bool _result = unitOfWork.category.Update(item);
                         if (!_result)
                             return BadRequest("update order operation failed !! ");
-                        unitOfWork.Complete();
+                        await unitOfWork.Complete();
                     }
                 }
                  else
@@ -437,7 +437,7 @@ namespace BalarinaAPI.Controllers
                 #endregion
 
                 #region save changes in db
-                unitOfWork.Complete();
+                await unitOfWork.Complete();
                 #endregion
 
                 return Ok("Category ID Deleted Successfully");

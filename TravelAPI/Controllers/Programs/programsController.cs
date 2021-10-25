@@ -223,7 +223,7 @@ namespace BalarinaAPI.Controllers.Programs
                 if (!result)
                     return BadRequest("Create Operation Failed");
 
-                unitOfWork.Complete();
+                await unitOfWork.Complete();
 
                 return Ok("Program Created Successfully");
             }
@@ -282,7 +282,7 @@ namespace BalarinaAPI.Controllers.Programs
 
                 #region update operation
                 bool result = unitOfWork.category.Update(categoryObj);
-                unitOfWork.Complete();
+                await unitOfWork.Complete();
                 #endregion
 
                 #region check operation is updated successed
@@ -442,7 +442,7 @@ namespace BalarinaAPI.Controllers.Programs
                 if (!result)
                     return BadRequest("UPDATE OPERATION FAILED ");
 
-                unitOfWork.Complete();
+                await unitOfWork.Complete();
 
                 return Ok("UPDATE OPERATION Successfully");
             }
@@ -472,7 +472,7 @@ namespace BalarinaAPI.Controllers.Programs
                 bool result = await unitOfWork.Program.DeleteObject(ID);
                 if (!result)
                     return NotFound("Program Not Exist");
-                unitOfWork.Complete();
+                await unitOfWork.Complete();
 
                 #region Delete image File From Specified Directory 
                 helper.DeleteFiles(ProgramObj.ProgramImg);
@@ -782,7 +782,7 @@ namespace BalarinaAPI.Controllers.Programs
                         bool _result = unitOfWork.Program.Update(item);
                         if (!_result)
                             return BadRequest("update order operation failed !! ");
-                        unitOfWork.Complete();
+                        await unitOfWork.Complete();
                     }
                 }
                 else if (OldOrder > NewOrder)
@@ -794,7 +794,7 @@ namespace BalarinaAPI.Controllers.Programs
                         bool _result = unitOfWork.Program.Update(item);
                         if (!_result)
                             return BadRequest("update order operation failed !! ");
-                        unitOfWork.Complete();
+                        await unitOfWork.Complete();
                     }
                 }
                 else

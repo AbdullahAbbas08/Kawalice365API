@@ -251,7 +251,7 @@ namespace BalarinaAPI.Controllers.Episodes
                 #endregion
 
                 #region save changes in db
-                unitOfWork.Complete();
+                await unitOfWork.Complete();
                 #endregion
 
                 return Ok("Episode Created Successfully ");
@@ -342,7 +342,7 @@ namespace BalarinaAPI.Controllers.Episodes
                 #endregion
 
                 #region save changes into db
-                unitOfWork.Complete();
+                await unitOfWork.Complete();
                 #endregion
 
                 return Ok("Episode Updated Successfully ");
@@ -379,7 +379,7 @@ namespace BalarinaAPI.Controllers.Episodes
                 #endregion
 
                 #region save changes in db
-                unitOfWork.Complete();
+                await unitOfWork.Complete();
                 #endregion
 
                 #region Delete image File From Specified Directory 

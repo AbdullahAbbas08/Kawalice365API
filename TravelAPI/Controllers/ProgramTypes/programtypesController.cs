@@ -100,7 +100,7 @@ namespace BalarinaAPI.Controllers.ProgramTypes
                 if (!result)
                     return BadRequest("Create Operation Failed");
 
-                unitOfWork.Complete();
+                await unitOfWork.Complete();
 
                 return Ok("Program type Created Successfully");
             }
@@ -163,7 +163,7 @@ namespace BalarinaAPI.Controllers.ProgramTypes
                 if (!result)
                     return BadRequest("UPDATE OPERATION FAILED ");
 
-                unitOfWork.Complete();
+                await unitOfWork.Complete();
 
                 return Ok("UPDATE OPERATION Successfully ");
             }
@@ -194,7 +194,7 @@ namespace BalarinaAPI.Controllers.ProgramTypes
                 bool result = await unitOfWork.ProgramType.DeleteObject(ID);
                 if (!result)
                     return NotFound("Program type Not Exist");
-                unitOfWork.Complete();
+                await unitOfWork.Complete();
                 #endregion 
 
                 #region Delete image File From Specified Directory 

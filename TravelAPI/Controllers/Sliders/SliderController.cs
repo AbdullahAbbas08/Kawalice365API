@@ -123,7 +123,7 @@ namespace BalarinaAPI.Controllers.sliders
                 #endregion
 
                 #region save changes into db
-                unitOfWork.Complete();
+                await unitOfWork.Complete();
                 #endregion
 
                 return Ok("Slider Updated Successfully ");
@@ -181,7 +181,7 @@ namespace BalarinaAPI.Controllers.sliders
                         bool _result = unitOfWork.Slider.Update(item);
                         if (!_result)
                             return BadRequest("update order operation failed !! ");
-                        unitOfWork.Complete();
+                        await unitOfWork.Complete();
                     }
                 }
                 else if (OldOrder > NewOrder)
@@ -193,7 +193,7 @@ namespace BalarinaAPI.Controllers.sliders
                         bool _result = unitOfWork.Slider.Update(item);
                         if (!_result)
                             return BadRequest("update order operation failed !! ");
-                        unitOfWork.Complete();
+                        await unitOfWork.Complete();
                     }
                 }
                 else

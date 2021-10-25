@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 #nullable disable
 
@@ -15,7 +16,9 @@ namespace BalarinaAPI.Core.Model
         [Required]
         public string ImagePath  { get; set; }
 
+        [JsonIgnore]
         public virtual ADSTYLES ADStyles  { get; set; }
+        [JsonIgnore]
         public virtual ADTARGETS ADTargets { get; set; }
     }
 }

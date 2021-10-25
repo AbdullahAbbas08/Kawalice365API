@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -47,6 +48,41 @@ namespace TravelAPI.Core.Helper
                 return false;
             }
         }
+        #endregion
+
+        #region Function take image and return image name that store in db 
+        /// <summary>
+        /// generate unique name of image and save image in specified path 
+        /// </summary>
+        /// <param name="categoryImage"></param>
+        /// <returns>
+        /// unique name of iamge concatenating with extension of image 
+        /// </returns>
+        public string UploadImage(IFormFile categoryImage)
+        {
+            try
+            {
+                var pathToSave = PathImage;
+                if (categoryImage.Length > 0)
+                {
+                    var fileName = Guid.NewGuid().ToString() + Path.GetExtension(categoryImage.FileName);
+                    var fullPath = Path.Combine(pathToSave, fileName);
+
+
+                    using (var stream = new FileStream(fullPath, FileMode.Create))
+                        categoryImage.CopyTo(stream);
+                    return fileName;
+                }
+                else
+                    return "error";
+            }
+            catch (Exception ex)
+            {
+                LogError(ex);
+                return "error";
+            }
+        }
+
         #endregion
     }
 

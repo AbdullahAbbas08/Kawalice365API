@@ -35,6 +35,17 @@ namespace BalarinaAPI.Core.Services
             if (await _userManager.FindByNameAsync(model.Username) is not null)
                 return new AuthModel { Message = "Username is already registered!" };
 
+            if(string.IsNullOrEmpty( model.Address))
+                return new AuthModel { Message = "Address Cannot be Empty" };
+
+            if (string.IsNullOrEmpty(model.Description))
+                return new AuthModel { Message = "Description Cannot be Empty" };
+
+            if (string.IsNullOrEmpty(model.LogoPath))
+                return new AuthModel { Message = "Logo Image Cannot be Empty" };
+
+
+
             var user = new ApplicationUser
             {
                 UserName = model.Username,

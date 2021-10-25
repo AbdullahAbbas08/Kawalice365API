@@ -23,5 +23,12 @@ namespace BalarinaAPI.Core.ViewModel
 
         [Required, StringLength(256)]
         public string Password { get; set; }
+
+        public string Mobile { get; set; }
+        [Required]
+        public string Address { get; set; }
+        public string Description { get; set; }
+        [Required]
+        public string LogoPath { get; set; }
     }
 }

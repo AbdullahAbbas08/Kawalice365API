@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 #nullable disable
 
@@ -15,6 +16,7 @@ namespace BalarinaAPI.Core.Model
         public float ADWidth { get; set; }
         [Required]
         public float ADHeight  { get; set; }
+        [JsonIgnore]
         public virtual ICollection<ADPLACEHOLDER> ADPLACEHOLDERS { get; set; }
     }
 }

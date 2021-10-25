@@ -100,7 +100,7 @@ namespace BalarinaAPI.Controllers.Season
 
                 #region update operation
                 bool result = unitOfWork.Program.Update(programObj);
-                unitOfWork.Complete();
+                await unitOfWork.Complete();
 
                 #endregion
 
@@ -147,7 +147,7 @@ namespace BalarinaAPI.Controllers.Season
                 if (!result)
                     return BadRequest("Create Operation Failed");
 
-                unitOfWork.Complete();
+                await unitOfWork.Complete();
 
                 return Ok("season Inserted Successfully ");
             }
@@ -195,7 +195,7 @@ namespace BalarinaAPI.Controllers.Season
                 if (!result)
                     return BadRequest("UPDATE OPERATION FAILED ");
 
-                unitOfWork.Complete();
+                await unitOfWork.Complete();
 
                 return Ok("Season Update Successfully ");
             }
@@ -219,7 +219,7 @@ namespace BalarinaAPI.Controllers.Season
                 bool result = await unitOfWork.Season.DeleteObject(ID);
                 if (!result)
                     return BadRequest("season Not Exist");
-                unitOfWork.Complete();
+                await unitOfWork.Complete();
 
                 return Ok("season Deleted Successfully ");
             }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 using TravelAPI.Models;
 
 #nullable disable
@@ -26,6 +27,7 @@ namespace BalarinaAPI.Core.Model
         [Required]
         public DateTime PublishEndDate { get; set; }
 
+        [JsonIgnore]
         public virtual ADPLACEHOLDER ADPLACEHOLDER { get; set; }
 
         [ForeignKey("ClientID")]

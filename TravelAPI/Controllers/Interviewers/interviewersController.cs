@@ -186,7 +186,7 @@ namespace BalarinaAPI.Controllers.Interviewers
                 #endregion
 
                 #region save changes in db
-                unitOfWork.Complete();
+                await unitOfWork.Complete();
                 #endregion
 
                 return Ok("INTERVIEWER CREATED SUCCESSFIILY ");
@@ -262,7 +262,7 @@ namespace BalarinaAPI.Controllers.Interviewers
                 #endregion
 
                 #region save changes into db
-                unitOfWork.Complete();
+                await unitOfWork.Complete();
                 #endregion
 
                 return Ok("INTERVIEWER UPDATED SUCCESSFULLY");
@@ -298,7 +298,7 @@ namespace BalarinaAPI.Controllers.Interviewers
                 #endregion
 
                 #region save changes in db
-                unitOfWork.Complete();
+                await unitOfWork.Complete();
                 #endregion
 
                 #region Delete image File From Specified Directory 
