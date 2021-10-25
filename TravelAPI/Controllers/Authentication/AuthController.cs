@@ -21,7 +21,7 @@ namespace BalarinaAPI.Controllers.Authentication
         }
 
         [HttpPost("register")]
-        public async Task<IActionResult> RegisterAsync([FromBody] RegisterModel model)
+        public async Task<IActionResult> RegisterAsync( [FromQuery] RegisterModel model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);

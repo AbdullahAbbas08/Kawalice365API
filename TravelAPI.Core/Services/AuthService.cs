@@ -1,6 +1,7 @@
 ﻿using BalarinaAPI.Core.Helper;
 using BalarinaAPI.Core.ViewModel;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System;
@@ -27,7 +28,7 @@ namespace BalarinaAPI.Core.Services
             _jwt = jwt.Value;
         }
 
-        public async Task<AuthModel> RegisterAsync(RegisterModel model)
+        public async Task<AuthModel> RegisterAsync( RegisterModel model)
         {
             if (await _userManager.FindByEmailAsync(model.Email) is not null)
                 return new AuthModel { Message = "Email is already registered!" };
@@ -51,7 +52,11 @@ namespace BalarinaAPI.Core.Services
                 UserName = model.Username,
                 Email = model.Email,
                 FirstName = model.FirstName,
-                LastName = model.LastName
+                LastName = model.LastName,
+                LogoPath = model.LogoPath,
+                Address = model.Address,
+                Description = model.Description,
+                Mobile = model.Mobile,
             };
 
             var result = await _userManager.CreateAsync(user, model.Password);
