@@ -52,35 +52,17 @@ namespace BalarinaAPI.Controllers.Episodes
         [Authorize]
         [HttpGet]
         [Route("getallepisodes")]
-        public async Task<ActionResult<List<EpisodeModelOutput>>> getallepisodes()
+        public async Task<ActionResult<List<Episode>>> getallepisodes()
         {
             try
             {
-                List<EpisodeModelOutput> episodes = new List<EpisodeModelOutput>();
-                //Get All Episodes 
                 var ResultEpisodes = await unitOfWork.Episode.GetObjects();
                 ResultEpisodes.ToList();
                 foreach (var item in ResultEpisodes)
                 {
-                    EpisodeModelOutput episode = new EpisodeModelOutput()
-                    {
-                        seasonID = item.EpisodeId,
-                        CreationDate = item.CreationDate,
-                        DislikeRate = (int)item.DislikeRate,
-                        EpisodeDescription = item.EpisodeDescription,
-                        EpisodeId = item.EpisodeId,
-                        EpisodePublishDate = item.EpisodePublishDate,
-                        EpisodeTitle = item.EpisodeTitle,
-                        EpisodeViews = item.EpisodeViews,
-                        EpisodeVisible = item.EpisodeVisible,
-                        LikeRate = (int)item.LikeRate,
-                        YoutubeUrl = item.YoutubeUrl,
-                        EpisodeIamgePath = helper.LivePathImages + item.EpisodeIamgePath
-                    };
-                    episodes.Add(episode);
+                    item.EpisodeIamgePath = helper.LivePathImages + item.EpisodeIamgePath;       
                 }
-                return episodes;
-
+                return ResultEpisodes.ToList();
             }
             catch (Exception ex)
             {
@@ -102,35 +84,18 @@ namespace BalarinaAPI.Controllers.Episodes
         [ApiAuthentication]
         [HttpGet]
         [Route("getallepisodesapikey")]
-        public async Task<ActionResult<List<EpisodeModelOutput>>> getallepisodesapikey()
+        public async Task<ActionResult<List<Episode>>> getallepisodesapikey()
         {
             try
             {
-                List<EpisodeModelOutput> episodes = new List<EpisodeModelOutput>();
-                //Get All Episodes 
                 var ResultEpisodes = await unitOfWork.Episode.GetObjects();
                 ResultEpisodes.ToList();
+
                 foreach (var item in ResultEpisodes)
                 {
-                    EpisodeModelOutput episode = new EpisodeModelOutput()
-                    {
-                        seasonID = item.EpisodeId,
-                        CreationDate = item.CreationDate,
-                        DislikeRate = (int)item.DislikeRate,
-                        EpisodeDescription = item.EpisodeDescription,
-                        EpisodeId = item.EpisodeId,
-                        EpisodePublishDate = item.EpisodePublishDate,
-                        EpisodeTitle = item.EpisodeTitle,
-                        EpisodeViews = item.EpisodeViews,
-                        EpisodeVisible = item.EpisodeVisible,
-                        LikeRate = (int)item.LikeRate,
-                        YoutubeUrl = item.YoutubeUrl,
-                        EpisodeIamgePath = helper.LivePathImages + item.EpisodeIamgePath
-                    };
-                    episodes.Add(episode);
+                    item.EpisodeIamgePath = helper.LivePathImages + item.EpisodeIamgePath;
                 }
-                return episodes;
-
+                return ResultEpisodes.ToList();
             }
             catch (Exception ex)
             {
@@ -435,6 +400,7 @@ namespace BalarinaAPI.Controllers.Episodes
                                     (episode.EpisodePublishDate <= inputs.DateTo || inputs.DateTo is null)
                               select new
                               {
+                                  season.SessionId,
                                   episode.EpisodeId,
                                   episode.EpisodeTitle,
                                   episode.EpisodeViews,
@@ -456,6 +422,7 @@ namespace BalarinaAPI.Controllers.Episodes
                 {
                     EpisodesRelatedForRecentlyModel model = new EpisodesRelatedForRecentlyModel()
                     {
+                        SessionId = item.SessionId,
                         CategoryId = item.CategoryId,
                         CategoryTitle = item.CategoryTitle,
                         EpisodeId = item.EpisodeId,
@@ -552,6 +519,7 @@ namespace BalarinaAPI.Controllers.Episodes
                               (episode.EpisodePublishDate <= inputs.DateTo || inputs.DateTo is null)
                               select new
                               {
+                                  season.SessionId,
                                   episode.EpisodeId,
                                   episode.EpisodeTitle,
                                   episode.EpisodeViews,
@@ -574,6 +542,7 @@ namespace BalarinaAPI.Controllers.Episodes
                 {
                     EpisodesRelatedForRecentlyModel model = new EpisodesRelatedForRecentlyModel()
                     {
+                        SessionId = item.SessionId,
                         CategoryId = item.CategoryId,
                         CategoryTitle = item.CategoryTitle,
                         EpisodeId = item.EpisodeId,
@@ -683,6 +652,7 @@ namespace BalarinaAPI.Controllers.Episodes
                                    (episode.EpisodeId != inputs.EpisodeID)
                              select new
                              {
+                                 season.SessionId,
                                  episode.EpisodeId,
                                  episode.EpisodeTitle,
                                  episode.EpisodeViews,
@@ -704,6 +674,7 @@ namespace BalarinaAPI.Controllers.Episodes
                 {
                     EpisodesRelatedForRecentlyModel model = new EpisodesRelatedForRecentlyModel()
                     {
+                        SessionId = item.SessionId,
                         CategoryId = item.CategoryId,
                         CategoryTitle = item.CategoryTitle,
                         EpisodeId = item.EpisodeId,

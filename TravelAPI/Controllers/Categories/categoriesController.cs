@@ -88,15 +88,13 @@ namespace BalarinaAPI.Controllers
         [ApiAuthentication]
         [HttpGet]
         [Route("getallprogramsbycatidapikey")]
-        public async Task<ActionResult<List<ProgramFilterModel>>> getallprogramsbycatidapikeyAsync(int CategoryID) 
+        public async Task<ActionResult<List<Program>>> getallprogramsbycatidapikeyAsync(int CategoryID) 
         {
             //check If Category ID If Exist
             var _CategoryID = unitOfWork.category.FindObjectAsync(CategoryID);
             if (_CategoryID == null)
                 return BadRequest("Category ID Not Exist !!");
 
-            // Create ProgramsList to return It
-            List<ProgramFilterModel> _programsList = new List<ProgramFilterModel>();
             try
             {
                 //Get All Programs 
@@ -104,26 +102,10 @@ namespace BalarinaAPI.Controllers
                 #region Fill ProgramsList and Handle Image Path For all Program
                 foreach (var item in ResultPrograms)
                 {
-                    // Create Category Object
-                    ProgramFilterModel _program = new ProgramFilterModel()
-                    {
-                        CategoryId          = item.CategoryId,
-                        InterviewerId       = item.InterviewerId,
-                        ProgramDescription  = item.ProgramDescription,
-                        ProgramId           = item.ProgramId,
-                        ProgramImg          = helper.LivePathImages+item.ProgramImg,
-                        ProgramName         = item.ProgramName,
-                        ProgramOrder        = item.ProgramOrder,
-                        ProgramStartDate    = item.ProgramStartDate,
-                        ProgramTypeId       = item.ProgramTypeId,
-                        ProgramVisible      = (bool)item.ProgramVisible,
-                        CreationDate        = item.CreationDate
-                    };
-                    // Finally Add It Into Programs List
-                    _programsList.Add(_program);
+                    item.ProgramImg = helper.LivePathImages + item.ProgramImg;
                 }
                 #endregion
-                return _programsList;
+                return ResultPrograms.ToList();
             }
             catch (Exception ex)
             {

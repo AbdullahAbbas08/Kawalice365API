@@ -45,6 +45,8 @@ namespace BalarinaAPI.Core.Services
             if (string.IsNullOrEmpty(model.LogoPath))
                 return new AuthModel { Message = "Logo Image Cannot be Empty" };
 
+            if((model.Mobile).Length <11)
+                return new AuthModel { Message = "Mobile Number Invalid " };
 
 
             var user = new ApplicationUser
@@ -56,7 +58,7 @@ namespace BalarinaAPI.Core.Services
                 LogoPath = model.LogoPath,
                 Address = model.Address,
                 Description = model.Description,
-                Mobile = model.Mobile,
+                PhoneNumber = model.Mobile,
             };
 
             var result = await _userManager.CreateAsync(user, model.Password);

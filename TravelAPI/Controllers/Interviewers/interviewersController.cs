@@ -45,10 +45,8 @@ namespace BalarinaAPI.Controllers.Interviewers
         [ApiAuthentication]
         [HttpGet]
         [Route("getalliterviewersapikey")]
-        public async Task<ActionResult<List<InterviewerModel>>> getalliterviewersapikey()
+        public async Task<ActionResult<List<Interviewer>>> getalliterviewersapikey()
         {
-            // Create Categories list to return It
-            List<InterviewerModel> Interviewers = new List<InterviewerModel>();
             try
             {
                 //Get All Interviewer 
@@ -57,28 +55,10 @@ namespace BalarinaAPI.Controllers.Interviewers
                 #region Fill InterviewerList and Handle Image Path For all Categories
                 foreach (var item in ResultInterviewers)
                 {
-                    // Create Interviewer Object
-                    InterviewerModel _interviewer = new InterviewerModel()
-                    {
-                        InterviewerId = item.InterviewerId,
-                        InterviewerName = item.InterviewerName,
-                        InterviewerPicture =helper.LivePathImages+ item.InterviewerPicture,
-                        CreationDate = DateTime.Now,
-                        InterviewerDescription = item.InterviewerDescription,
-                        FacebookUrl = item.FacebookUrl,
-                        InstgramUrl = item.InstgramUrl,
-                        LinkedInUrl = item.LinkedInUrl,
-                        TiktokUrl = item.TiktokUrl,
-                        TwitterUrl = item.TwitterUrl,
-                        WebsiteUrl = item.WebsiteUrl,
-                        YoutubeUrl = item.YoutubeUrl,
-                    };
-
-                    // Finally Add It Into Interviewers List
-                    Interviewers.Add(_interviewer);
+                    item.InterviewerPicture = helper.LivePathImages + item.InterviewerPicture;
                 }
                 #endregion
-                return Interviewers;
+                return ResultInterviewers.ToList();
             }
             catch (Exception ex)
             {
@@ -93,10 +73,8 @@ namespace BalarinaAPI.Controllers.Interviewers
         [Authorize]
         [HttpGet]
         [Route("getalliterviewers")]
-        public async Task<ActionResult<List<InterviewerModel>>> getalliterviewersAsync()
+        public async Task<ActionResult<List<Interviewer>>> getalliterviewers()
         {
-            // Create Categories list to return It
-            List<InterviewerModel> Interviewers = new List<InterviewerModel>();
             try
             {
                 //Get All Interviewer 
@@ -105,28 +83,10 @@ namespace BalarinaAPI.Controllers.Interviewers
                 #region Fill InterviewerList and Handle Image Path For all Categories
                 foreach (var item in ResultInterviewers)
                 {
-                    // Create Interviewer Object
-                    InterviewerModel _interviewer = new InterviewerModel()
-                    {
-                        InterviewerId = item.InterviewerId,
-                        InterviewerName = item.InterviewerName,
-                        InterviewerPicture =helper.LivePathImages+ item.InterviewerPicture,
-                        CreationDate = DateTime.Now,
-                        InterviewerDescription = item.InterviewerDescription,
-                        FacebookUrl = item.FacebookUrl,
-                        InstgramUrl = item.InstgramUrl,
-                        LinkedInUrl = item.LinkedInUrl,
-                        TiktokUrl = item.TiktokUrl,
-                        TwitterUrl = item.TwitterUrl,
-                        WebsiteUrl = item.WebsiteUrl,
-                        YoutubeUrl = item.YoutubeUrl,
-                    };
-
-                    // Finally Add It Into Interviewers List
-                    Interviewers.Add(_interviewer);
+                    item.InterviewerPicture = helper.LivePathImages + item.InterviewerPicture;
                 }
                 #endregion
-                return Interviewers;
+                return ResultInterviewers.ToList();
             }
             catch (Exception ex)
             {
@@ -278,7 +238,7 @@ namespace BalarinaAPI.Controllers.Interviewers
         #region Delete Interviewer
         [Authorize]
         [HttpDelete("{ID}")]
-        public async Task<ActionResult<Category>> deleteinterviewerAsync(int ID)
+        public async Task<ActionResult<Category>> deleteinterviewer(int ID)
         {
             try
             {

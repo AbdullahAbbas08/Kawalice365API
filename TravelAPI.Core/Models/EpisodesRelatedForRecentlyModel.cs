@@ -8,6 +8,7 @@ namespace BalarinaAPI.Core.Model
 {
     public partial class EpisodesRelatedForRecentlyModel
     {
+        public int      SessionId           { get; set; }  
         public int      EpisodeId           { get; set; }
         public string   EpisodeTitle        { get; set; }
         public string   EpisodeImg        { get; set; }

@@ -81,7 +81,7 @@ namespace BalarinaAPI.Controllers.Programs
                              }).OrderBy(x=>x.ProgramOrder);
                 //.Include(x => x.Category).Include(x => x.Interviewer).Include(x => x.ProgramType).OrderBy(x => x.ProgramOrder).ToList();
 
-                             #region Fill ProgramsList and Handle Image Path For all Program
+                #region Fill ProgramsList and Handle Image Path For all Program
                 foreach (var item in Result)
                 {
                     // Create Category Object

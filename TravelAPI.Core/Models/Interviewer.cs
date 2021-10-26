@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 #nullable disable
 
@@ -24,7 +25,7 @@ namespace BalarinaAPI.Core.Model
         public string WebsiteUrl { get; set; }
         public DateTime? CreationDate { get; set; }
         public string TiktokUrl { get; set; }
-
+        [JsonIgnore]
         public virtual ICollection<Program> Programs { get; set; }
     }
 }
