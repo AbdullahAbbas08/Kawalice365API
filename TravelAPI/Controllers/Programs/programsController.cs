@@ -128,11 +128,39 @@ namespace BalarinaAPI.Controllers.Programs
             try
             {
                 //Get All Programs 
-                var ResultPrograms = await unitOfWork.Program.GetObjects(); 
-                    ResultPrograms.OrderBy(x => x.ProgramOrder).ToList();
+                var ResultPrograms = await unitOfWork.Program.GetObjects();
+                var ResultCategory = await unitOfWork.category.GetObjects();
+                var ResultInterviewer = await unitOfWork.Interviewer.GetObjects();
+                var ResulProgramType = await unitOfWork.ProgramType.GetObjects();
+
+                var Result = (from program in ResultPrograms
+                              join category in ResultCategory
+                              on program.CategoryId equals category.CategoryId
+                              join interviewer in ResultInterviewer
+                              on program.InterviewerId equals interviewer.InterviewerId
+                              join programtype in ResulProgramType
+                              on program.ProgramTypeId equals programtype.ProgramTypeId
+                              select new
+                              {
+                                  category.CategoryId,
+                                  category.CategoryTitle,
+                                  program.ProgramDescription,
+                                  program.ProgramId,
+                                  program.ProgramImg,
+                                  program.ProgramName,
+                                  program.ProgramOrder,
+                                  program.ProgramVisible,
+                                  program.ProgramStartDate,
+                                  program.CreationDate,
+                                  interviewer.InterviewerId,
+                                  interviewer.InterviewerName,
+                                  programtype.ProgramTypeId,
+                                  programtype.ProgramTypeTitle,
+                              }).OrderBy(x => x.ProgramOrder);
+                //.Include(x => x.Category).Include(x => x.Interviewer).Include(x => x.ProgramType).OrderBy(x => x.ProgramOrder).ToList();
 
                 #region Fill ProgramsList and Handle Image Path For all Program
-                foreach (var item in ResultPrograms)
+                foreach (var item in Result)
                 {
                     // Create Category Object
                     ProgramFilterModel _program = new ProgramFilterModel()
@@ -141,13 +169,16 @@ namespace BalarinaAPI.Controllers.Programs
                         InterviewerId = item.InterviewerId,
                         ProgramDescription = item.ProgramDescription,
                         ProgramId = item.ProgramId,
-                        ProgramImg =helper.LivePathImages+ item.ProgramImg,
+                        ProgramImg = helper.LivePathImages + item.ProgramImg,
                         ProgramName = item.ProgramName,
                         ProgramOrder = item.ProgramOrder,
                         ProgramStartDate = item.ProgramStartDate,
                         ProgramTypeId = item.ProgramTypeId,
                         ProgramVisible = (bool)item.ProgramVisible,
-                        CreationDate = item.CreationDate
+                        CreationDate = item.CreationDate,
+                        CategoryName = item.CategoryTitle,
+                        InterviewerName = item.InterviewerName,
+                        ProgramTypeName = item.ProgramTypeTitle,
                     };
                     // Finally Add It Into Programs List
                     _programsList.Add(_program);
@@ -241,6 +272,8 @@ namespace BalarinaAPI.Controllers.Programs
         [Route("getallprogramsbycategoryid")]
         public async Task<ActionResult<List<ProgramFilterModel>>> getallprogramsbycategoryid(int ID)
         {
+            // Create ProgramsList to return It
+            List<ProgramFilterModel> _programsList = new List<ProgramFilterModel>();
             try
             {
                 #region Check Category ID Exist or Not
@@ -250,11 +283,39 @@ namespace BalarinaAPI.Controllers.Programs
                 #endregion
 
                 //Get All Programs 
-                List<ProgramFilterModel> _programsList = new List<ProgramFilterModel>();
-                var ResultPrograms = await unitOfWork.Program.GetObjects(x => x.CategoryId == ID); ResultPrograms.ToList();
+                var ResultPrograms = await unitOfWork.Program.GetObjects(x=>x.CategoryId == ID);
+                var ResultCategory = await unitOfWork.category.GetObjects();
+                var ResultInterviewer = await unitOfWork.Interviewer.GetObjects();
+                var ResulProgramType = await unitOfWork.ProgramType.GetObjects();
+
+                var Result = (from program in ResultPrograms
+                              join category in ResultCategory
+                              on program.CategoryId equals category.CategoryId
+                              join interviewer in ResultInterviewer
+                              on program.InterviewerId equals interviewer.InterviewerId
+                              join programtype in ResulProgramType
+                              on program.ProgramTypeId equals programtype.ProgramTypeId
+                              select new
+                              {
+                                  category.CategoryId,
+                                  category.CategoryTitle,
+                                  program.ProgramDescription,
+                                  program.ProgramId,
+                                  program.ProgramImg,
+                                  program.ProgramName,
+                                  program.ProgramOrder,
+                                  program.ProgramVisible,
+                                  program.ProgramStartDate,
+                                  program.CreationDate,
+                                  interviewer.InterviewerId,
+                                  interviewer.InterviewerName,
+                                  programtype.ProgramTypeId,
+                                  programtype.ProgramTypeTitle,
+                              }).OrderBy(x => x.ProgramOrder);
+                //.Include(x => x.Category).Include(x => x.Interviewer).Include(x => x.ProgramType).OrderBy(x => x.ProgramOrder).ToList();
 
                 #region Fill ProgramsList and Handle Image Path For all Program
-                foreach (var item in ResultPrograms)
+                foreach (var item in Result)
                 {
                     // Create Category Object
                     ProgramFilterModel _program = new ProgramFilterModel()
@@ -269,27 +330,15 @@ namespace BalarinaAPI.Controllers.Programs
                         ProgramStartDate = item.ProgramStartDate,
                         ProgramTypeId = item.ProgramTypeId,
                         ProgramVisible = (bool)item.ProgramVisible,
-                        CreationDate = item.CreationDate,  
+                        CreationDate = item.CreationDate,
+                        CategoryName = item.CategoryTitle,
+                        InterviewerName = item.InterviewerName,
+                        ProgramTypeName = item.ProgramTypeTitle,
                     };
                     // Finally Add It Into Programs List
                     _programsList.Add(_program);
                 }
                 #endregion
-
-                #region Increase Category Views 
-                categoryObj.CategoryViews += 1;
-                #endregion
-
-                #region update operation
-                bool result = unitOfWork.category.Update(categoryObj);
-                await unitOfWork.Complete();
-                #endregion
-
-                #region check operation is updated successed
-                if (!result)
-                    return BadRequest("Create Operation Failed");
-                #endregion
-
                 return _programsList;
             }
             catch (Exception ex)
@@ -298,6 +347,8 @@ namespace BalarinaAPI.Controllers.Programs
                 return StatusCode(StatusCodes.Status500InternalServerError);
                 // Log error in db
             }
+
+
         }
         #endregion
 

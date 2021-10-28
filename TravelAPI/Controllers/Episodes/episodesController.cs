@@ -381,6 +381,8 @@ namespace BalarinaAPI.Controllers.Episodes
 
                 #region declare list to fetch output 
                 List<EpisodesRelatedForRecentlyModel> episodesRelatedForRecently = new List<EpisodesRelatedForRecentlyModel>();
+                List<EpisodesRelatedForRecentlyModel> episodesRelatedForRecentlyOrdered = new List<EpisodesRelatedForRecentlyModel>();
+
                 #endregion
 
                 #region Apply Query in db 
@@ -445,17 +447,18 @@ namespace BalarinaAPI.Controllers.Episodes
 
                 if (inputs.IsRecently == "desc" || inputs.IsRecently == "DESC")
                 {
-                    episodesRelatedForRecently.OrderBy(o => o.EpisodePublishDate);
+                    episodesRelatedForRecentlyOrdered =episodesRelatedForRecently.OrderByDescending(o => o.EpisodePublishDate).ToList();
+
                 }
-                else
+                else  
                 {
-                    episodesRelatedForRecently.OrderByDescending(o => o.EpisodePublishDate);
+                    episodesRelatedForRecentlyOrdered =  episodesRelatedForRecently.OrderBy(o => o.EpisodePublishDate).ToList();
                 }
 
 
                 #endregion
 
-                return episodesRelatedForRecently;
+                return episodesRelatedForRecentlyOrdered;
             }
             catch (Exception ex)
             {
@@ -565,7 +568,7 @@ namespace BalarinaAPI.Controllers.Episodes
                 if (inputs.IsRecently == "DESC" || inputs.IsRecently == "desc")
                 {
                     episodesRelatedForRecentlyOrdered = episodesRelatedForRecently.OrderByDescending(o => o.EpisodeViews).ToList();
-                }
+                } 
 
                 if (inputs.IsRecently == "ASC" || inputs.IsRecently == "asc")
                 {
@@ -619,7 +622,7 @@ namespace BalarinaAPI.Controllers.Episodes
                 {
                     EpisodeKeywordModel episodeKeyword = new EpisodeKeywordModel()
                     {
-                        EpisodeID = item.KeywordId
+                        KeywordId = item.KeywordId
                     };
                     episodeKeywordsList.Add(episodeKeyword);
                 }
@@ -627,6 +630,7 @@ namespace BalarinaAPI.Controllers.Episodes
 
                 #region declare list to fetch output 
                 List<EpisodesRelatedForRecentlyModel> episodesRelatedForRecently = new List<EpisodesRelatedForRecentlyModel>();
+                List<EpisodesRelatedForRecentlyModel> episodesRelatedForRecentlyOrdered = new List<EpisodesRelatedForRecentlyModel>();
                 #endregion
 
                 #region Apply Query in db 
@@ -636,7 +640,7 @@ namespace BalarinaAPI.Controllers.Episodes
                              join programType in ProgramTypes
                              on program.ProgramTypeId equals programType.ProgramTypeId
                              join season in Seasons
-                               on program.ProgramId equals season.ProgramId
+                             on program.ProgramId equals season.ProgramId
                              join episode in Episodes
                              on season.SessionId equals episode.SessionId
                              join episodeKeyword in EpisodeKeyword
@@ -648,7 +652,7 @@ namespace BalarinaAPI.Controllers.Episodes
                                    (program.ProgramId == inputs.ProgramID || inputs.ProgramID is null) &&
                                    (episode.EpisodePublishDate >= inputs.DateFrom || inputs.DateFrom is null) &&
                                    (episode.EpisodePublishDate <= inputs.DateTo || inputs.DateTo is null) &&
-                                   (episodeKeywordsList.Exists(a => a.EpisodeID == episodeKeyword.KeywordId)) &&
+                                   (episodeKeywordsList.Exists(a => a.KeywordId == episodeKeyword.KeywordId)) &&
                                    (episode.EpisodeId != inputs.EpisodeID)
                              select new
                              {
@@ -697,11 +701,11 @@ namespace BalarinaAPI.Controllers.Episodes
                 #region check IsRecently condition
                 if (inputs.IsRecently == "no")
                 {
-                    episodesRelatedForRecently.OrderBy(o => o.EpisodePublishDate);
+                    episodesRelatedForRecentlyOrdered =  episodesRelatedForRecently.OrderBy(o => o.EpisodePublishDate).ToList();
                 }
                 else if (inputs.IsRecently == "yes")
                 {
-                    episodesRelatedForRecently.OrderByDescending(o => o.EpisodePublishDate);
+                    episodesRelatedForRecentlyOrdered = episodesRelatedForRecently.OrderByDescending(o => o.EpisodePublishDate).ToList();
                 }
                 else
                 {
@@ -921,7 +925,7 @@ namespace BalarinaAPI.Controllers.Episodes
         [ApiAuthentication]
         [HttpGet]
         [Route("detailapi")]
-        public async Task<ActionResult<List<DetailAPIModel>>> detailapiAsync(int EPISODEID)
+        public async Task<ActionResult<List<DetailAPIModel>>> detailapi(int EPISODEID)
         {
             try
             {
@@ -1014,6 +1018,15 @@ namespace BalarinaAPI.Controllers.Episodes
                     }; 
                     DetailAPIModelList.Add(detailAPI);
                 }
+                #endregion
+
+                #region Increase Episode Views 
+                episodeObj.EpisodeViews += 1;
+                #endregion
+
+                #region update operation
+                bool result = unitOfWork.Episode.Update(episodeObj);
+                await unitOfWork.Complete();
                 #endregion
 
                 return Ok(DetailAPIModelList);

@@ -95,6 +95,38 @@ namespace BalarinaAPI.Controllers.Advertisement
         }
         #endregion
 
+        #region Get All Advertisement Related with PlaceholderID
+        /// <summary>
+        /// Reteive All Data in Advertisement related with PlaceholderID
+        /// </summary>
+        /// <returns>
+        /// List Of Advertisement Object that Contains AdId , AdTitle , ImagePath , URL , Views , PlaceHolderID , ClientID , PublishStartDate and PublishEndDate  
+        /// </returns>
+        [ApiAuthentication]
+        [HttpGet]
+        [Route("getalladsbyplaceid")]
+        public async Task<ActionResult<IEnumerable<ADS>>> getalladsbyplaceid(int ID)
+        {
+            try
+            { 
+                var ADSs = await unitOfWork.ADS.GetObjects(x=>x.PlaceHolderID == ID);
+                var Result = from  _ADS in ADSs
+                             where _ADS.PublishStartDate <= DateTime.Now  && _ADS.PublishEndDate >DateTime.Now
+                             select new { _ADS.AdId,_ADS.AdTitle, _ADS, _ADS.ImagePath, _ADS.URL, _ADS.Views, _ADS.ClientID};
+                foreach (var item in ADSs)
+                {
+                    item.ImagePath = helper.LivePathImages + item.ImagePath;
+                }
+                return ADSs.ToList();
+            }
+            catch (Exception ex)
+            {
+                helper.LogError(ex);
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
+        #endregion
+
         #region Find Advertisement By ID ApiAuthentication
         /// <summary>
         /// Reteive All Data in Advertisement 

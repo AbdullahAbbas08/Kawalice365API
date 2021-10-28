@@ -28,6 +28,7 @@ namespace BalarinaAPI.Core.Model
         public DateTime PublishEndDate { get; set; }
 
         [JsonIgnore]
+        [ForeignKey("PlaceHolderID")]
         public virtual ADPLACEHOLDER ADPLACEHOLDER { get; set; }
 
         [ForeignKey("ClientID")]

@@ -8,6 +8,7 @@ namespace BalarinaAPI.Core.ViewModel
 {
     public  class EpisodeKeywordModel
     {
-        public int? EpisodeID { get; set; }
+        public int? KeywordId { get; set; }
     }
 }
+ 
