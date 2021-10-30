@@ -19,7 +19,7 @@ namespace BalarinaAPI.Core.Model
         }
 
 
-        public virtual DbSet<Category> Categories { get; set; }
+        public virtual DbSet<Category2> Categories { get; set; }
         public virtual DbSet<Episode> Episodes { get; set; }
         public virtual DbSet<EpisodesKeyword> EpisodesKeywords { get; set; }
         public virtual DbSet<EpisodesRelatedForRecentlyModel> EpisodesRelatedForRecentlyModels { get; set; }
@@ -33,16 +33,12 @@ namespace BalarinaAPI.Core.Model
         public virtual DbSet<ADTARGETS> ADTARGETS { get; set; } 
         public virtual DbSet<ADSTYLES> ADSTYLES { get; set; } 
         public virtual DbSet<ADPLACEHOLDER> ADPLACEHOLDER { get; set; } 
-        public virtual DbSet<ADS> ADS  { get; set; } 
+        public virtual DbSet<ADS> ADS  { get; set; }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            if (!optionsBuilder.IsConfigured)
-            {
-                optionsBuilder.UseSqlServer("Data Source=DESKTOP-QK89E21\\SQLEXPRESS;Initial Catalog=BalarinaDatabase;User ID=travesta;Password=travesta123456");
-            }
-        }
-
+        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        //{
+        //    optionsBuilder.UseLazyLoadingProxies();
+        //}
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             //modelBuilder.Entity<AspNetRole>(entity =>
@@ -295,10 +291,10 @@ namespace BalarinaAPI.Core.Model
                     .HasDefaultValueSql("((1))")
                     .HasComment("(0) non-Visible - (1) Visible");
 
-                entity.HasOne(d => d.Category)
-                    .WithMany(p => p.Programs)
-                    .HasForeignKey(d => d.CategoryId)
-                    .HasConstraintName("FK_Programs_Categories");
+                //entity.HasOne(d => d.Category)
+                //    .WithMany(p => p.Programs)
+                //    .HasForeignKey(d => d.CategoryId)
+                //    .HasConstraintName("FK_Programs_Categories");
 
                 entity.HasOne(d => d.Interviewer)
                     .WithMany(p => p.Programs)

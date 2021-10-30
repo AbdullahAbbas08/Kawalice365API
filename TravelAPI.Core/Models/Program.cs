@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
 #nullable disable
@@ -26,7 +27,10 @@ namespace BalarinaAPI.Core.Model
         public int ProgramViews { get; set; }
         public DateTime CreationDate { get; set; }
 
-        public virtual Category Category { get; set; }
+        [ForeignKey("CategoryId")]
+        public virtual Category2 Category2 { get; set; } 
+
+       // public virtual Category Category { get; set; }
         public virtual Interviewer Interviewer { get; set; }
         public virtual ProgramType ProgramType { get; set; }
         [JsonIgnore]

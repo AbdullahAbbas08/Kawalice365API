@@ -53,7 +53,7 @@ namespace BalarinaAPI.Controllers
         [ApiAuthentication]
         [HttpGet]
         [Route("getallcategorieswithapikey")]
-        public async Task<ActionResult<List<Category>>> getallcategorieswithapikey()
+        public async Task<ActionResult<List<Category2>>> getallcategorieswithapikey()
         {
             try
             {
@@ -127,7 +127,7 @@ namespace BalarinaAPI.Controllers
         [Authorize]
         [HttpGet]
         [Route("getallcategories")]
-        public async Task<ActionResult<List<Category>>> getallcategoriesAsync()
+        public async Task<ActionResult<List<Category2>>> getallcategoriesAsync()
         {
             try
             {
@@ -183,7 +183,7 @@ namespace BalarinaAPI.Controllers
                 #endregion
 
                 #region Fill Category object with values to insert
-                Category _category = new Category()
+                Category2 _category = new Category2()
                 {
                     CategoryTitle = model.CategoryTitle,
                     CategoryDescription = model.CategoryDescription,
@@ -269,7 +269,7 @@ namespace BalarinaAPI.Controllers
                 #endregion
 
                 #region fill category object with values to insert 
-                Category _category = new Category()
+                Category2 _category = new Category2()
                 {
                     CategoryId = model.CategoryID,
                     CategoryTitle = model.CategoryTitle,
