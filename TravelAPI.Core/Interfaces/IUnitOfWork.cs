@@ -8,7 +8,7 @@ namespace TravelAPI.Core
 {
     public interface IUnitOfWork : IDisposable
     {
-        IBaseRepository<Category2>  category          { get; }
+        IBaseRepository<Category>  category          { get; }
         IBaseRepository<Episode> Episode { get; }
         IBaseRepository<EpisodesKeyword> EpisodesKeyword { get; }
         IBaseRepository<Interviewer> Interviewer { get; }

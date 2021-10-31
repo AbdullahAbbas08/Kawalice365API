@@ -19,7 +19,7 @@ namespace BalarinaAPI.Core.Model
         }
 
 
-        public virtual DbSet<Category2> Categories { get; set; }
+        public virtual DbSet<Category> categories { get; set; }
         public virtual DbSet<Episode> Episodes { get; set; }
         public virtual DbSet<EpisodesKeyword> EpisodesKeywords { get; set; }
         public virtual DbSet<EpisodesRelatedForRecentlyModel> EpisodesRelatedForRecentlyModels { get; set; }

@@ -10,7 +10,6 @@ namespace BalarinaAPI.Core.Model
     {
         public Category()
         {
-            //Programs = new HashSet<Program>();
         }
         public int CategoryId { get; set; }
         public string CategoryTitle { get; set; }
@@ -21,7 +20,5 @@ namespace BalarinaAPI.Core.Model
         public int CategoryOrder { get; set; }
         public int CategoryViews  { get; set; }
 
-        //[JsonIgnore]
-        //public virtual ICollection<Program> Programs { get; set; }
     }
 }

@@ -42,38 +42,7 @@ namespace BalarinaAPI.Controllers
 
         #region CREUD OPERATION
 
-        #region Get All Categories with API Key
-        /// <summary>
-        /// get all categories with API Key
-        /// </summary>
-        /// <returns>
-        /// List Of Category that contain CategoryId,CategoryTitle,CreationDate,CategoryDescription,CategoryVisible,CategoryOrder,CategoryViews
-        /// and CategoryImg concatenating with LivePathImages
-        /// </returns>
-        [ApiAuthentication]
-        [HttpGet]
-        [Route("getallcategorieswithapikey")]
-        public async Task<ActionResult<List<Category2>>> getallcategorieswithapikey()
-        {
-            try
-            {
-                var ResultCategories = await unitOfWork.category.GetObjects();
-                ResultCategories.OrderBy(x=>x.CategoryOrder).ToList();
-
-                foreach (var item in ResultCategories)
-                {
-                    item.CategoryImg = helper.LivePathImages + item.CategoryImg;
-                }
-                return Ok(ResultCategories);
-            }
-            catch (Exception ex)
-            {
-                helper.LogError(ex);
-                return StatusCode(StatusCodes.Status500InternalServerError);
-                // Log error in db
-            }
-        }
-        #endregion
+             //Get All Category Exist in Episodes Controller
 
         #region Get All Programs Related With Category ID 
         /// <summary>
@@ -88,7 +57,7 @@ namespace BalarinaAPI.Controllers
         [ApiAuthentication]
         [HttpGet]
         [Route("getallprogramsbycatidapikey")]
-        public async Task<ActionResult<List<Program>>> getallprogramsbycatidapikeyAsync(int CategoryID) 
+        public async Task<ActionResult<List<Program>>> getallprogramsbycatidapikeyAsync(int CategoryID)
         {
             //check If Category ID If Exist
             var _CategoryID = unitOfWork.category.FindObjectAsync(CategoryID);
@@ -116,38 +85,6 @@ namespace BalarinaAPI.Controllers
         }
         #endregion
 
-        #region Get All Categories
-        /// <summary>
-        /// get all categories with Bearer Toacken
-        /// </summary>
-        /// <returns>
-        /// List Of Category that contain CategoryId,CategoryTitle,CreationDate,CategoryDescription,CategoryVisible,CategoryOrder,CategoryViews
-        /// and CategoryImg concatenating with LivePathImages
-        /// </returns>
-        [Authorize]
-        [HttpGet]
-        [Route("getallcategories")]
-        public async Task<ActionResult<List<Category2>>> getallcategoriesAsync()
-        {
-            try
-            {
-                var ResultCategories = await unitOfWork.category.GetObjects();
-                ResultCategories.OrderBy(x => x.CategoryOrder).ToList();
-
-                foreach (var item in ResultCategories)
-                {
-                    item.CategoryImg = helper.LivePathImages + item.CategoryImg;
-                }
-                return Ok(ResultCategories);
-            }
-            catch (Exception ex)
-            {
-                helper.LogError(ex);
-                return StatusCode(StatusCodes.Status500InternalServerError);
-                // Log error in db
-            }
-        }
-        #endregion
 
         #region Insert New Category 
         /// <summary>
@@ -183,7 +120,7 @@ namespace BalarinaAPI.Controllers
                 #endregion
 
                 #region Fill Category object with values to insert
-                Category2 _category = new Category2()
+                Category _category = new Category()
                 {
                     CategoryTitle = model.CategoryTitle,
                     CategoryDescription = model.CategoryDescription,
@@ -269,7 +206,7 @@ namespace BalarinaAPI.Controllers
                 #endregion
 
                 #region fill category object with values to insert 
-                Category2 _category = new Category2()
+                Category _category = new Category()
                 {
                     CategoryId = model.CategoryID,
                     CategoryTitle = model.CategoryTitle,

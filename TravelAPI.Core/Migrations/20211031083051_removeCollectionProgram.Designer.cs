@@ -4,14 +4,16 @@ using BalarinaAPI.Core.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace BalarinaAPI.Core.Migrations
 {
     [DbContext(typeof(BalarinaDatabaseContext))]
-    partial class BalarinaDbContextModelSnapshot : ModelSnapshot
+    [Migration("20211031083051_removeCollectionProgram")]
+    partial class removeCollectionProgram
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -180,7 +182,40 @@ namespace BalarinaAPI.Core.Migrations
 
                     b.HasKey("CategoryId");
 
-                    b.ToTable("categories");
+                    b.ToTable("Category");
+                });
+
+            modelBuilder.Entity("BalarinaAPI.Core.Model.Category2", b =>
+                {
+                    b.Property<int>("CategoryId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .UseIdentityColumn();
+
+                    b.Property<string>("CategoryDescription")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CategoryImg")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("CategoryOrder")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CategoryTitle")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("CategoryViews")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("CategoryVisible")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("CreationDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("CategoryId");
+
+                    b.ToTable("Categories");
                 });
 
             modelBuilder.Entity("BalarinaAPI.Core.Model.Episode", b =>
@@ -844,7 +879,7 @@ namespace BalarinaAPI.Core.Migrations
 
             modelBuilder.Entity("BalarinaAPI.Core.Model.Program", b =>
                 {
-                    b.HasOne("BalarinaAPI.Core.Model.Category", "Category")
+                    b.HasOne("BalarinaAPI.Core.Model.Category2", "Category2")
                         .WithMany()
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -868,7 +903,7 @@ namespace BalarinaAPI.Core.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Category");
+                    b.Navigation("Category2");
 
                     b.Navigation("Interviewer");
 

@@ -1109,5 +1109,76 @@ namespace BalarinaAPI.Controllers.Episodes
         }
         #endregion
 
+
+        #region Get All Categories
+
+            #region Get All Categories with API Key
+            /// <summary>
+            /// get all categories with API Key
+            /// </summary>
+            /// <returns>
+            /// List Of Category that contain CategoryId,CategoryTitle,CreationDate,CategoryDescription,CategoryVisible,CategoryOrder,CategoryViews
+            /// and CategoryImg concatenating with LivePathImages
+            /// </returns>
+            [ApiAuthentication]
+            [HttpGet]
+            [Route("getallcategorieswithapikey")]
+            public async Task<ActionResult<List<Category>>> getallcategorieswithapikey()
+            {
+                try
+                {
+                    var ResultCategories = await unitOfWork.category.GetObjects();
+                    var ResultCategories2 =  ResultCategories.OrderBy(x => x.CategoryOrder).ToList(); 
+
+                    foreach (var item in ResultCategories2)
+                    {
+                        item.CategoryImg = helper.LivePathImages + item.CategoryImg;
+                    }
+                    return Ok(ResultCategories2);
+                }
+                catch (Exception ex)
+                {
+                    helper.LogError(ex);
+                    return StatusCode(StatusCodes.Status500InternalServerError);
+                    // Log error in db
+                }
+            }
+            #endregion
+
+            #region Get All Categories
+            /// <summary>
+            /// get all categories with Bearer Toacken
+            /// </summary>
+            /// <returns>
+            /// List Of Category that contain CategoryId,CategoryTitle,CreationDate,CategoryDescription,CategoryVisible,CategoryOrder,CategoryViews
+            /// and CategoryImg concatenating with LivePathImages
+            /// </returns>
+            [Authorize]
+            [HttpGet]
+            [Route("getallcategories")]
+            public async Task<ActionResult<List<Category>>> getallcategories()
+            {
+                try 
+                {
+                    var ResultCategories = await unitOfWork.category.GetObjects();
+                    var ResultCategories2 = ResultCategories.OrderBy(x => x.CategoryOrder).ToList();
+
+                    foreach (var item in ResultCategories2)
+                    {
+                        item.CategoryImg = helper.LivePathImages + item.CategoryImg;
+                    }
+                    return Ok(ResultCategories2);
+                }
+                catch (Exception ex)
+                {
+                    helper.LogError(ex);
+                    return StatusCode(StatusCodes.Status500InternalServerError);
+                    // Log error in db
+                }
+            }
+            #endregion
+
+        #endregion
+
     }
 }

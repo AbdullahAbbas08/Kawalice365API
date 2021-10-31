@@ -10,7 +10,7 @@ namespace TravelAPI.EF
     public class UnitOfWork : IUnitOfWork
     {
         private readonly BalarinaDatabaseContext _context;
-        public IBaseRepository<Category2> category { get; private set; }
+        public IBaseRepository<Category> category { get; private set; }
 
         public IBaseRepository<Episode> Episode { get; private set; }
         public IBaseRepository<EpisodesKeyword> EpisodesKeyword { get; private set; }
@@ -30,7 +30,7 @@ namespace TravelAPI.EF
         public UnitOfWork(BalarinaDatabaseContext _context)
         {
             this._context = _context;
-            this.category = new BaseRepository<Category2>(_context);
+            this.category = new BaseRepository<Category>(_context);
             this.Episode = new BaseRepository<Episode>(_context);
             this.EpisodesKeyword = new BaseRepository<EpisodesKeyword>(_context);
             this.Interviewer = new BaseRepository<Interviewer>(_context);

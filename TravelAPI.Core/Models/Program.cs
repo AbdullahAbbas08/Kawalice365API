@@ -28,7 +28,7 @@ namespace BalarinaAPI.Core.Model
         public DateTime CreationDate { get; set; }
 
         [ForeignKey("CategoryId")]
-        public virtual Category2 Category2 { get; set; } 
+        public virtual Category Category  { get; set; } 
 
        // public virtual Category Category { get; set; }
         public virtual Interviewer Interviewer { get; set; }
