@@ -496,7 +496,6 @@ namespace BalarinaAPI.Controllers.Episodes
                 var ProgramTypes = await unitOfWork.ProgramType.GetObjects(); ProgramTypes.ToList();
                 var Episodes = await unitOfWork.Episode.GetObjects(); Episodes.ToList();
                 var Seasons = await unitOfWork.Season.GetObjects(); Seasons.ToList();
-
                 #endregion
 
                 #region declare list to fetch output 
@@ -576,7 +575,6 @@ namespace BalarinaAPI.Controllers.Episodes
                 }
 
                 #endregion
-
 
                 return episodesRelatedForRecentlyOrdered;
             }
@@ -1123,18 +1121,22 @@ namespace BalarinaAPI.Controllers.Episodes
             [ApiAuthentication]
             [HttpGet]
             [Route("getallcategorieswithapikey")]
-            public async Task<ActionResult<List<Category>>> getallcategorieswithapikey()
+            public async Task<ActionResult<List<(string, List<Category>)>>> getallcategorieswithapikey()
             {
                 try
                 {
-                    var ResultCategories = await unitOfWork.category.GetObjects();
-                    var ResultCategories2 =  ResultCategories.OrderBy(x => x.CategoryOrder).ToList(); 
+                List<(string, List<Category>)> Results = new List<(string, List<Category>)>();
 
-                    foreach (var item in ResultCategories2)
-                    {
-                        item.CategoryImg = helper.LivePathImages + item.CategoryImg;
-                    }
-                    return Ok(ResultCategories2);
+                    var ResultCategories = await unitOfWork.category.GetObjects();
+                    var ResultCategories2 =  ResultCategories.OrderBy(x => x.CategoryOrder).ToList();
+
+                Results.Add((helper.LivePathImages, ResultCategories2));
+
+                    //foreach (var item in ResultCategories2)
+                    //{
+                    //    item.CategoryImg = helper.LivePathImages + item.CategoryImg;
+                    //}
+                return Ok(ResultCategories2);
                 }
                 catch (Exception ex)
                 {

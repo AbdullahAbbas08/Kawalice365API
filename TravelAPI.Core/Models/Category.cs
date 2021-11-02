@@ -11,14 +11,13 @@ namespace BalarinaAPI.Core.Model
         public Category()
         {
         }
-        public int CategoryId { get; set; }
-        public string CategoryTitle { get; set; }
-        public string CategoryImg { get; set; }
-        public DateTime CreationDate { get; set; }
-        public string CategoryDescription { get; set; }
-        public bool CategoryVisible { get; set; }
-        public int CategoryOrder { get; set; }
-        public int CategoryViews  { get; set; }
-
+        public int      CategoryId          { get; set; }
+        public string   CategoryTitle       { get; set; }
+        public string   CategoryImg         { get; set; }
+        public DateTime CreationDate        { get; set; }
+        public string   CategoryDescription { get; set; }
+        public bool     CategoryVisible     { get; set; }
+        public int      CategoryOrder       { get; set; }
+        public int      CategoryViews       { get; set; }
     }
 }

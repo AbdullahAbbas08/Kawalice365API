@@ -5,7 +5,9 @@
         public double TrendingDays  { get; set; }
         public int    MostViewedMonth { get; set; }
         public int    ShowMoreMonth { get; set; }
+        public int      Top         { get; set; }
     }
 
 }
 
+ 

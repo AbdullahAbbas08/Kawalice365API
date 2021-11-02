@@ -41,35 +41,7 @@ namespace BalarinaAPI.Controllers.Interviewers
 
         #region CRUD Operations For Interviewers
 
-        #region Get All Interviewer With API Key
-        [ApiAuthentication]
-        [HttpGet]
-        [Route("getalliterviewersapikey")]
-        public async Task<ActionResult<List<Interviewer>>> getalliterviewersapikey()
-        {
-            try
-            {
-                //Get All Interviewer 
-                var ResultInterviewers = await unitOfWork.Interviewer.GetObjects(); ResultInterviewers.ToList();
-
-                #region Fill InterviewerList and Handle Image Path For all Categories
-                foreach (var item in ResultInterviewers)
-                {
-                    item.InterviewerPicture = helper.LivePathImages + item.InterviewerPicture;
-                }
-                #endregion
-                return ResultInterviewers.ToList();
-            }
-            catch (Exception ex)
-            {
-                helper.LogError(ex);
-                return StatusCode(StatusCodes.Status500InternalServerError);
-                // Log error in db
-            }
-        }
-        #endregion
-
-        #region Get All Interviewer
+        #region Get All Interviewer 
         [Authorize]
         [HttpGet]
         [Route("getalliterviewers")]
@@ -84,6 +56,64 @@ namespace BalarinaAPI.Controllers.Interviewers
                 foreach (var item in ResultInterviewers)
                 {
                     item.InterviewerPicture = helper.LivePathImages + item.InterviewerPicture;
+                    item.InterviewerCover = helper.LivePathImages + item.InterviewerCover;
+                }
+                #endregion
+                return ResultInterviewers.ToList();
+            }
+            catch (Exception ex)
+            {
+                helper.LogError(ex);
+                return StatusCode(StatusCodes.Status500InternalServerError);
+                // Log error in db
+            }
+        }
+        #endregion
+
+        #region findinterviewer
+        [ApiAuthentication]
+        [HttpGet]
+        [Route("findinterviewer")]
+        public async Task<ActionResult<Interviewer>> findinterviewer(int ID)
+        {
+            try
+            {
+                //Get All Interviewer 
+                var ResultInterviewer = await unitOfWork.Interviewer.FindObjectAsync(ID);
+
+                if (ResultInterviewer == null)
+                    return BadRequest("interviewer ID not found ");
+
+                ResultInterviewer.InterviewerPicture = helper.LivePathImages + ResultInterviewer.InterviewerPicture;
+                ResultInterviewer.InterviewerCover = helper.LivePathImages + ResultInterviewer.InterviewerCover;
+              
+                return ResultInterviewer;
+            }
+            catch (Exception ex)
+            {
+                helper.LogError(ex);
+                return StatusCode(StatusCodes.Status500InternalServerError);
+                // Log error in db
+            }
+        }
+        #endregion
+
+        #region Get All Interviewer api key
+        [ApiAuthentication]
+        [HttpGet]
+        [Route("getalliterviewersapikey")]
+        public async Task<ActionResult<List<Interviewer>>> getalliterviewerswithapikey()
+        {
+            try
+            {
+                //Get All Interviewer 
+                var ResultInterviewers = await unitOfWork.Interviewer.GetObjects(); ResultInterviewers.ToList();
+
+                #region Fill InterviewerList and Handle Image Path For all Categories
+                foreach (var item in ResultInterviewers)
+                {
+                    item.InterviewerPicture = helper.LivePathImages + item.InterviewerPicture;
+                    item.InterviewerCover = helper.LivePathImages + item.InterviewerCover;
                 }
                 #endregion
                 return ResultInterviewers.ToList();

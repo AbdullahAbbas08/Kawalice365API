@@ -105,19 +105,30 @@ namespace BalarinaAPI.Controllers.Advertisement
         [ApiAuthentication]
         [HttpGet]
         [Route("getalladsbyplaceid")]
-        public async Task<ActionResult<IEnumerable<ADS>>> getalladsbyplaceid(int ID)
+        public async Task<ActionResult<ADS>> getalladsbyplaceid(int ID)
         {
             try
             { 
                 var ADSs = await unitOfWork.ADS.GetObjects(x=>x.PlaceHolderID == ID);
+
                 var Result = from  _ADS in ADSs
-                             where _ADS.PublishStartDate <= DateTime.Now  && _ADS.PublishEndDate >DateTime.Now
+                             where  _ADS.PublishStartDate <= DateTime.Now  && 
+                                    _ADS.PublishEndDate >= DateTime.Now
                              select new { _ADS.AdId,_ADS.AdTitle, _ADS, _ADS.ImagePath, _ADS.URL, _ADS.Views, _ADS.ClientID};
                 foreach (var item in ADSs)
                 {
                     item.ImagePath = helper.LivePathImages + item.ImagePath;
                 }
-                return ADSs.ToList();
+                var ADSsOrdered = ADSs.OrderBy(x => x.Views).ToList();
+
+                #region Update View Of ADS 
+                ADSsOrdered[0].Views += 1;
+                unitOfWork.ADS.Update(ADSsOrdered[0]);
+                await unitOfWork.Complete();
+                #endregion
+              
+
+                return ADSsOrdered[0];
             }
             catch (Exception ex)
             {

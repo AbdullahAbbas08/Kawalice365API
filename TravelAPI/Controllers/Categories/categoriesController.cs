@@ -4,21 +4,16 @@ using BalarinaAPI.Core.ViewModel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using TravelAPI.Core;
 using TravelAPI.Core.Helper;
 
-namespace BalarinaAPI.Controllers
+namespace BalarinaAPI.Controllers.Categories
 {
-    //[Authorize(AuthenticationSchemes ="Bearer")]
     [Route("api/[controller]")]
     [ApiController]
     public class categoriesController : ControllerBase
@@ -26,23 +21,20 @@ namespace BalarinaAPI.Controllers
         #region variables
         private readonly IUnitOfWork unitOfWork;
         private readonly Helper helper;
-        private readonly ILogger<categoriesController> _logger;
         #endregion
 
         #region Constructor
-        public categoriesController(IUnitOfWork _unitOfWork, IOptions<Helper> _helper , ILogger<categoriesController> logger)
+        public categoriesController(IUnitOfWork _unitOfWork, IOptions<Helper> _helper)
         {
             unitOfWork = _unitOfWork;
             this.helper = _helper.Value;
-            _logger = logger;
-            _logger.LogDebug(1, "NLog injected into categories Controller");
         }
-
         #endregion
+
 
         #region CREUD OPERATION
 
-             //Get All Category Exist in Episodes Controller
+        //Get All Category Exist in Episodes Controller
 
         #region Get All Programs Related With Category ID 
         /// <summary>
@@ -95,13 +87,15 @@ namespace BalarinaAPI.Controllers
         /// <returns>
         /// status of operation - Created Successfully  - or Status500InternalServerError
         /// </returns>
-        [Authorize]
+        //[Authorize]
         [HttpPost]
         [Route("createcategory")]
         public async Task<ActionResult<CategoryModelInput>> createcategoryAsync([FromQuery] CategoryModelInput model)
         {
             try
             {
+                var CategoryImage = HttpContext.Request.Form.Files["CategoryImage"];
+
                 #region Check values of Category is not null or empty
                 if (string.IsNullOrEmpty(model.CategoryTitle))
                     return BadRequest("Category Title cannot be null or empty");
@@ -109,14 +103,15 @@ namespace BalarinaAPI.Controllers
                 if (string.IsNullOrEmpty(model.CategoryDescription))
                     return BadRequest("Category Description cannot be null or empty");
 
+                if (CategoryImage != null)
+                    model.CategoryImg = CategoryImage;
+
                 if (model.CategoryImg == null)
                     return BadRequest("Category Image cannot be null ");
 
                 if (model.CategoryOrder < 0)
                     return BadRequest("Category Order cannot be less than 0 ");
 
-                if(model.CategoryImg ==null)
-                    return BadRequest("Category Image cannot be null ");
                 #endregion
 
                 #region Fill Category object with values to insert
@@ -127,7 +122,7 @@ namespace BalarinaAPI.Controllers
                     CategoryOrder = model.CategoryOrder,
                     CreationDate = DateTime.Now,
                     CategoryVisible = model.CategoryVisible,
-                    CategoryImg = UploadImage(model.CategoryImg)
+                    CategoryImg = helper.UploadImage(model.CategoryImg)
                 };
                 #endregion
 
@@ -169,10 +164,10 @@ namespace BalarinaAPI.Controllers
         public async Task<ActionResult<CategoryModelInput>> putcategory([FromQuery] CategoryToUpdate model)
         {
             try
-             { 
+            {
                 #region check category id exist
                 var _categoryObj = await unitOfWork.category.FindObjectAsync(model.CategoryID);
-                
+
                 if (_categoryObj == null)
                     return NotFound("Category ID Not Found");
                 #endregion
@@ -180,10 +175,10 @@ namespace BalarinaAPI.Controllers
                 #region Check values of Category is not null or empty
 
                 if (string.IsNullOrEmpty(model.CategoryTitle))
-                        model.CategoryTitle = _categoryObj.CategoryTitle;
-               
+                    model.CategoryTitle = _categoryObj.CategoryTitle;
+
                 if (string.IsNullOrEmpty(model.CategoryDescription))
-                        model.CategoryDescription = _categoryObj.CategoryDescription;
+                    model.CategoryDescription = _categoryObj.CategoryDescription;
 
                 if (model.CategoryVisible != true || model.CategoryVisible != false)
                     model.CategoryVisible = _categoryObj.CategoryVisible;
@@ -195,14 +190,14 @@ namespace BalarinaAPI.Controllers
                 }
                 if (model.CategoryImgPath == null)
                 {
-                    model.CategoryImgPath = UploadImage(model.CategoryImg);
+                    model.CategoryImgPath =helper.UploadImage(model.CategoryImg);
                 }
                 if (model.CategoryViews == null)
                     model.CategoryViews = _categoryObj.CategoryViews;
                 #endregion
 
                 #region Handle Order Update 
-                    await UpdateOrder(model, _categoryObj.CategoryOrder);
+                await UpdateOrder(model, _categoryObj.CategoryOrder);
                 #endregion
 
                 #region fill category object with values to insert 
@@ -214,7 +209,7 @@ namespace BalarinaAPI.Controllers
                     CategoryOrder = model.CategoryOrder,
                     CreationDate = DateTime.Now,
                     CategoryVisible = model.CategoryVisible,
-                    CategoryImg = model.CategoryImgPath ,
+                    CategoryImg = model.CategoryImgPath,
                     CategoryViews = (int)model.CategoryViews
                 };
                 #endregion
@@ -257,7 +252,7 @@ namespace BalarinaAPI.Controllers
             try
             {
                 #region check category id exist
-                var _categoryObj =await unitOfWork.category.FindObjectAsync(model.CategoryID);
+                var _categoryObj = await unitOfWork.category.FindObjectAsync(model.CategoryID);
                 if (_categoryObj == null)
                     return NotFound("Category ID Not Found");
                 #endregion
@@ -273,7 +268,7 @@ namespace BalarinaAPI.Controllers
                 #region Handle Order Update
                 //Get Max Order
                 var _categories = await unitOfWork.category.GetObjects();
-                    _categories.OrderBy(Obj => Obj.CategoryOrder).ToList();
+                _categories.OrderBy(Obj => Obj.CategoryOrder).ToList();
                 //int _MaxOrder = _categories.Count();
 
                 var category = await unitOfWork.category.FindObjectAsync(model.CategoryID);
@@ -292,7 +287,7 @@ namespace BalarinaAPI.Controllers
                         await unitOfWork.Complete();
                     }
                 }
-                else if(OldOrder > NewOrder)
+                else if (OldOrder > NewOrder)
                 {
                     var _SubCategories = _categories.Where(obj => obj.CategoryOrder >= NewOrder && obj.CategoryOrder < OldOrder).OrderBy(o => o.CategoryOrder).ToList();
                     foreach (var item in _SubCategories)
@@ -304,7 +299,7 @@ namespace BalarinaAPI.Controllers
                         await unitOfWork.Complete();
                     }
                 }
-                 else
+                else
                 {
                     return BadRequest("order Incorrect ");
                 }
@@ -313,11 +308,11 @@ namespace BalarinaAPI.Controllers
 
                 return StatusCode(StatusCodes.Status200OK);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 helper.LogError(ex);
-                return StatusCode(StatusCodes.Status500InternalServerError); 
-            }   
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
         }
         #endregion
 
@@ -336,23 +331,23 @@ namespace BalarinaAPI.Controllers
             try
             {
                 #region Check ID If Exist
-                        var checkIDIfExist = await unitOfWork.category.FindObjectAsync(ID);
-                        if (checkIDIfExist == null)
-                            return NotFound("Category ID Not Found");
+                var checkIDIfExist = await unitOfWork.category.FindObjectAsync(ID);
+                if (checkIDIfExist == null)
+                    return NotFound("Category ID Not Found");
                 #endregion
 
                 #region Delete Operation
-                        bool result = await unitOfWork.category.DeleteObject(ID);
+                bool result = await unitOfWork.category.DeleteObject(ID);
                 #endregion
 
                 #region check Delete Operation  successed
 
-                        if (!result)
-                            return NotFound("Category Not Exist");
+                if (!result)
+                    return NotFound("Category Not Exist");
                 #endregion
 
                 #region Delete image File From Specified Directory 
-                    helper.DeleteFiles(checkIDIfExist.CategoryImg);
+                helper.DeleteFiles(checkIDIfExist.CategoryImg);
                 #endregion
 
                 #region save changes in db
@@ -368,41 +363,6 @@ namespace BalarinaAPI.Controllers
             }
         }
         #endregion
-
-        #endregion
-
-        #region Function take image and return image name that store in db 
-        /// <summary>
-        /// generate unique name of image and save image in specified path 
-        /// </summary>
-        /// <param name="categoryImage"></param>
-        /// <returns>
-        /// unique name of iamge concatenating with extension of image 
-        /// </returns>
-        private string UploadImage(IFormFile categoryImage)
-        {
-            try
-            {
-                var pathToSave = helper.PathImage;
-                if (categoryImage.Length > 0)
-                {
-                    var fileName = Guid.NewGuid().ToString() + Path.GetExtension(categoryImage.FileName);
-                    var fullPath = Path.Combine(pathToSave, fileName);
-
-
-                    using (var stream = new FileStream(fullPath, FileMode.Create))
-                        categoryImage.CopyTo(stream);
-                    return fileName;
-                }
-                else
-                    return "error";
-            }
-            catch(Exception ex)
-            {
-                helper.LogError(ex);
-                return "error";
-            }
-        }
 
         #endregion
 

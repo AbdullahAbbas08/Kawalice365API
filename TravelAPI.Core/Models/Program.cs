@@ -18,6 +18,7 @@ namespace BalarinaAPI.Core.Model
         public string ProgramDescription { get; set; }
         public string ProgramName { get; set; }
         public string ProgramImg { get; set; }
+        public string ProgramPromoUrl { get; set; }
         public bool? ProgramVisible { get; set; }
         public int CategoryId { get; set; }
         public DateTime ProgramStartDate { get; set; }

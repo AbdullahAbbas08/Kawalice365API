@@ -9,6 +9,7 @@ namespace BalarinaAPI.Core.Model
     {
         [Key]
         public int ADPlaceholderID { get; set; }
+        public int ADPlaceholderCode { get; set; }
         public int AdStyleID  { get; set; }
         public int AdTargetId   { get; set; }
         [Required]

@@ -31,6 +31,11 @@ namespace TravelAPI.Repositories
             return await dbContext.Set<T>().AsQueryable().ToListAsync();
         }
 
+        public async Task<IEnumerable<T>> GetObjects(int Number)
+        {
+            return await dbContext.Set<T>().Take(Number).AsQueryable().ToListAsync();
+        }
+
         public async Task<IEnumerable<T>> GetObjects(Expression<Func<T, bool>> match)
         {
             return  await dbContext.Set<T>().AsQueryable().Where(match).ToListAsync(); 
@@ -78,7 +83,6 @@ namespace TravelAPI.Repositories
             return true;
 
         }
-
     }
 }
 
