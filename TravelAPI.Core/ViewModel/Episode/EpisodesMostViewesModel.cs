@@ -8,8 +8,10 @@ namespace BalarinaAPI.Core.ViewModel.Episode
 {
     public class EpisodesMostViewesModel
     {
+        public int? InterviewerID { get; set; }
         public int? CategoryID { get; set; }
         public int? ProgramTypeID { get; set; }
         public int? ProgramID { get; set; }
     }
 }
+ 

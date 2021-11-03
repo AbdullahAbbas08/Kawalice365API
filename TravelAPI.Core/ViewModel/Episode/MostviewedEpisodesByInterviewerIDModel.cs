@@ -9,7 +9,6 @@ namespace BalarinaAPI.Core.ViewModel.Episode
     public class MostviewedEpisodesByInterviewerIDModel
     {
             public int? ID { get; set; }
-            public int Top { get; set; }
             public string Order { get; set; }
     }
 }

@@ -26,15 +26,17 @@ namespace BalarinaAPI.Controllers.Interviewers
         #region variables
         private readonly IUnitOfWork unitOfWork;
         private readonly Helper helper;
+        private readonly TrendingDuration trendingDuration; 
         private readonly BalarinaDatabaseContext dbContext;
 
         #endregion
 
         #region Constructor
-        public interviewersController(IUnitOfWork _unitOfWork, IOptions<Helper> _helper , BalarinaDatabaseContext _dbContext)
+        public interviewersController(IUnitOfWork _unitOfWork, IOptions<Helper> _helper , IOptions<TrendingDuration> _trendingDuration, BalarinaDatabaseContext _dbContext)
         {
             unitOfWork = _unitOfWork;
             this.helper = _helper.Value;
+            this.trendingDuration = _trendingDuration.Value;
             dbContext = _dbContext;
         }
         #endregion
@@ -180,7 +182,7 @@ namespace BalarinaAPI.Controllers.Interviewers
                 Interviewer _interviewer = new Interviewer()
                 {
                     InterviewerName = model.InterviewerName,
-                    InterviewerPicture = UploadImage(model._InterviewerPicture),
+                    InterviewerPicture =helper.UploadImage(model._InterviewerPicture),
                     CreationDate = DateTime.Now,
                     InterviewerDescription = model.InterviewerDescription,
                     FacebookUrl = model.FacebookUrl,
@@ -247,7 +249,7 @@ namespace BalarinaAPI.Controllers.Interviewers
                 }
                 if (model.InterviewerPicturePath == null)
                 {
-                    model.InterviewerPicturePath = UploadImage(model.InterviewerPicture);
+                    model.InterviewerPicturePath =helper.UploadImage(model.InterviewerPicture);
                 }
                 #endregion
 
@@ -341,38 +343,20 @@ namespace BalarinaAPI.Controllers.Interviewers
         [ApiAuthentication]
         [HttpGet]
         [Route("getprogramsbyinterviewerid")]
-        public async Task<ActionResult<List<ProgramFilterModel>>> getprogramsbycategoryidAsync(int ID)
+        public async Task<ActionResult<RetrieveData<Program>>> getprogramsbycategoryidAsync(int ID)
         {
             // Create ProgramsList to return It
             List<ProgramFilterModel> _programsList = new List<ProgramFilterModel>();
             try
             {
                 //Get All Programs 
-                var ResultPrograms =await unitOfWork.Program.GetObjects(x => x.InterviewerId == ID); ResultPrograms.ToList();
+                var ResultPrograms =await unitOfWork.Program.GetObjects(x => x.InterviewerId == ID); 
 
-                #region Fill ProgramsList and Handle Image Path For all Program
-                foreach (var item in ResultPrograms)
-                {
-                    // Create Category Object
-                    ProgramFilterModel _program = new ProgramFilterModel();
+                RetrieveData<Program> Collection = new RetrieveData<Program>();
+                Collection.Url = helper.LivePathImages;
+                Collection.DataList = ResultPrograms.ToList();
 
-                    #region fill Category Object
-                    _program.ProgramId = item.ProgramId;
-                    _program.ProgramName = item.ProgramName;
-                    _program.ProgramOrder = item.ProgramOrder;
-                    _program.ProgramDescription = item.ProgramDescription;
-                    _program.ProgramStartDate = item.ProgramStartDate;
-                    _program.ProgramVisible = (bool)item.ProgramVisible;
-                    _program.ProgramImg =helper.LivePathImages+ item.ProgramImg;
-                    _program.CreationDate = item.CreationDate;
-                    _program.CategoryId = item.CategoryId;
-                    _program.InterviewerId = item.InterviewerId;
-                    // Finally Add It Into Programs List
-                    _programsList.Add(_program);
-                    #endregion
-                }
-                #endregion
-                return _programsList;
+                return Collection;
             }
             catch (Exception ex)
             {
@@ -383,85 +367,87 @@ namespace BalarinaAPI.Controllers.Interviewers
         }
         #endregion
 
-        #region Get All Episodes Related with interviewer ID  API Key Authentication
-        [ApiAuthentication]
-        [HttpGet]
-        [Route("getepisodesbyinterviewerid")]
-        public async Task<ActionResult<List<EpisodeModelOutput>>> getepisodesbyintervieweridAsync(int ID)
-        {
-            // Create EpisodeList to return It
-            List<EpisodeModelOutput> _episodeList = new List<EpisodeModelOutput>();
-            try
-            {
-                //Get All Programs 
-                var ResultPrograms = await unitOfWork.Program.GetObjects(x => x.InterviewerId == ID); ResultPrograms.ToList();
-                var ResultSeasons =  await unitOfWork.Season.GetObjects(); ResultSeasons.ToList();
-                var ResultEpisodes = await unitOfWork.Episode.GetObjects(); ResultEpisodes.ToList();
-                var EpisodesRelatedWithInterviewer = from program in ResultPrograms
-                                                     join season in ResultSeasons
-                                                     on program.ProgramId equals season.ProgramId
-                                                     join episode in ResultEpisodes
-                                                     on season.SessionId equals episode.SessionId
-                                                     select new
-                                                     {
-                                                         episode.EpisodeId,
-                                                         episode.EpisodeTitle,
-                                                         episode.EpisodeViews,
-                                                         episode.EpisodePublishDate,
-                                                         episode.CreationDate,
-                                                         episode.LikeRate,
-                                                         episode.DislikeRate,
-                                                         episode.EpisodeDescription,
-                                                         episode.YoutubeUrl,
-                                                         episode.EpisodeIamgePath
-                                                     };
-                #region prepare Episode List  to return it 
-                foreach (var item in EpisodesRelatedWithInterviewer)
-                {
-                    #region Create fill Category Object  
-                    EpisodeModelOutput _episode = new EpisodeModelOutput()
-                    {
-                        EpisodeId = item.EpisodeId,
-                        EpisodeTitle = item.EpisodeTitle,
-                        EpisodeViews = item.EpisodeViews,
-                        EpisodeDescription = item.EpisodeDescription,
-                        CreationDate = item.CreationDate,
-                        EpisodePublishDate = item.EpisodePublishDate,
-                        YoutubeUrl = item.YoutubeUrl,
-                        LikeRate = (int)item.LikeRate,
-                        DislikeRate = (int)item.DislikeRate,
-                        EpisodeIamgePath = helper.LivePathImages+item.EpisodeIamgePath,
+        //#region Get All Episodes Related with interviewer ID  API Key Authentication
+        //[ApiAuthentication]
+        //[HttpGet]
+        //[Route("getepisodesbyinterviewerid")]
+        //public async Task<ActionResult<List<EpisodeModelOutput>>> getepisodesbyintervieweridAsync(int ID)
+        //{
+        //    // Create EpisodeList to return It
+        //    List<EpisodeModelOutput> _episodeList = new List<EpisodeModelOutput>();
+        //    try
+        //    {
+        //        //Get All Programs 
+        //        var ResultPrograms = await unitOfWork.Program.GetObjects(x => x.InterviewerId == ID); ResultPrograms.ToList();
+        //        var ResultSeasons =  await unitOfWork.Season.GetObjects(); ResultSeasons.ToList();
+        //        var ResultEpisodes = await unitOfWork.Episode.GetObjects(); ResultEpisodes.ToList();
+        //        var EpisodesRelatedWithInterviewer = from program in ResultPrograms
+        //                                             join season in ResultSeasons
+        //                                             on program.ProgramId equals season.ProgramId
+        //                                             join episode in ResultEpisodes
+        //                                             on season.SessionId equals episode.SessionId
+        //                                             select new
+        //                                             {
+        //                                                 episode.EpisodeId,
+        //                                                 episode.EpisodeTitle,
+        //                                                 episode.EpisodeViews,
+        //                                                 episode.EpisodePublishDate,
+        //                                                 episode.CreationDate,
+        //                                                 episode.LikeRate,
+        //                                                 episode.DislikeRate,
+        //                                                 episode.EpisodeDescription,
+        //                                                 episode.YoutubeUrl,
+        //                                                 episode.EpisodeIamgePath
+        //                                             };
+        //        #region prepare Episode List  to return it 
+        //        foreach (var item in EpisodesRelatedWithInterviewer)
+        //        {
+        //            #region Create fill Category Object  
+        //            EpisodeModelOutput _episode = new EpisodeModelOutput()
+        //            {
+        //                EpisodeId = item.EpisodeId,
+        //                EpisodeTitle = item.EpisodeTitle,
+        //                EpisodeViews = item.EpisodeViews,
+        //                EpisodeDescription = item.EpisodeDescription,
+        //                CreationDate = item.CreationDate,
+        //                EpisodePublishDate = item.EpisodePublishDate,
+        //                YoutubeUrl = item.YoutubeUrl,
+        //                LikeRate = (int)item.LikeRate,
+        //                DislikeRate = (int)item.DislikeRate,
+        //                EpisodeIamgePath = helper.LivePathImages+item.EpisodeIamgePath,
                         
-                    };
+        //            };
 
-                    // Finally Add It Into Programs List
-                    _episodeList.Add(_episode);
-                    #endregion
-                }
-                #endregion
-                return _episodeList;
-            }
-            catch (Exception ex)
-            {
-                helper.LogError(ex);
-                return StatusCode(StatusCodes.Status500InternalServerError);
-                // Log error in db
-            }
-        }
-        #endregion
+        //            // Finally Add It Into Programs List
+        //            _episodeList.Add(_episode);
+        //            #endregion
+        //        }
+        //        #endregion
+        //        return _episodeList;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        helper.LogError(ex);
+        //        return StatusCode(StatusCodes.Status500InternalServerError);
+        //        // Log error in db
+        //    }
+        //}
+        //#endregion
 
         #region Get Most Viewed Episodes Related with interviewer ID  API Key Authentication
         [ApiAuthentication]
         [HttpGet]
         [Route("mostviewedepisodesbyinterviewerid")]
-        public async Task<ActionResult<List<EpisodeModelOutput>>> mostviewedepisodesbyintervieweridAsync([FromQuery] MostviewedEpisodesByInterviewerIDModel input)
+        public async Task<ActionResult<List<EpisodesRelatedForRecentlyModel>>> mostviewedepisodesbyintervieweridAsync([FromQuery] MostviewedEpisodesByInterviewerIDModel input)
         {
             // Create EpisodeList to return It
-            List<EpisodeModelOutput> _episodeList = new List<EpisodeModelOutput>();
+            List<EpisodesRelatedForRecentlyModel> _episodeList = new List<EpisodesRelatedForRecentlyModel>();
             try
             {
                 //Get All Programs 
                 var ResultPrograms = await unitOfWork.Program.GetObjects(x => x.InterviewerId == input.ID); ResultPrograms.ToList();
+                var categories = await unitOfWork.category.GetObjects(); categories.ToList();
+                var programtypes = await unitOfWork.ProgramType.GetObjects(); programtypes.ToList();
                 var ResultSeasons =  await unitOfWork.Season.GetObjects(); ResultSeasons.ToList();
                 var ResultEpisodes = await unitOfWork.Episode.GetObjects(); ResultEpisodes.ToList();
 
@@ -470,68 +456,90 @@ namespace BalarinaAPI.Controllers.Interviewers
                                                      on program.ProgramId equals season.ProgramId
                                                      join episode in ResultEpisodes
                                                      on season.SessionId equals episode.SessionId
+                                                     join category in categories
+                                                     on program.CategoryId equals category.CategoryId
+                                                     join programType in programtypes
+                                                     on program.ProgramTypeId equals programType.ProgramTypeId
                                                      select new
                                                      {
+                                                         category.CategoryId,
+                                                         category.CategoryTitle,
+
+                                                         season.SessionId,
+
                                                          episode.EpisodeId,
                                                          episode.EpisodeTitle,
                                                          episode.EpisodeViews,
                                                          episode.EpisodePublishDate,
-                                                         episode.CreationDate,
-                                                         episode.LikeRate,
-                                                         episode.DislikeRate,
                                                          episode.EpisodeDescription,
                                                          episode.YoutubeUrl,
-                                                         episode.EpisodeIamgePath
+                                                         episode.EpisodeIamgePath,
+
+                                                         program.ProgramId,
+                                                         program.ProgramName,
+                                                         program.ProgramImg,
+
+                                                         programType.ProgramTypeId,
+                                                         programType.ProgramTypeTitle
                                                      };
                 if (input.Order == "DESC" || input.Order == "desc")
                 {
-                    var MostView = EpisodesRelatedWithInterviewer.OrderByDescending(o => o.EpisodeViews).Take(input.Top).ToList();
+                    var MostView = EpisodesRelatedWithInterviewer.OrderByDescending(o => o.EpisodeViews).Take(trendingDuration.Top).ToList();
                     #region prepare Episode List  to return it 
                     foreach (var item in MostView)
                     {
                         #region Create fill Category Object  
-                        EpisodeModelOutput _episode = new EpisodeModelOutput()
+                        EpisodesRelatedForRecentlyModel model = new EpisodesRelatedForRecentlyModel()
                         {
+                            SessionId = item.SessionId,
+                            CategoryId = item.CategoryId,
+                            CategoryTitle = item.CategoryTitle,
                             EpisodeId = item.EpisodeId,
+                            EpisodePublishDate = item.EpisodePublishDate,
                             EpisodeTitle = item.EpisodeTitle,
                             EpisodeViews = item.EpisodeViews,
-                            EpisodeDescription = item.EpisodeDescription,
-                            CreationDate = item.CreationDate,
-                            EpisodePublishDate = item.EpisodePublishDate,
-                            YoutubeUrl = item.YoutubeUrl,
-                            LikeRate = (int)item.LikeRate,
-                            DislikeRate = (int)item.DislikeRate,
-                            EpisodeIamgePath = helper.LivePathImages+item.EpisodeIamgePath
+                            ProgramId = item.ProgramId,
+                            ProgramImg = helper.LivePathImages + item.ProgramImg,
+                            ProgramName = item.ProgramName,
+                            ProgramTypeId = item.ProgramTypeId,
+                            ProgramTypeTitle = item.ProgramTypeTitle,
+                            EpisodeUrl = item.YoutubeUrl,
+                            EpisodeImg = helper.LivePathImages + item.EpisodeIamgePath
                         };
 
                         // Finally Add It Into Programs List
-                        _episodeList.Add(_episode);
+                        _episodeList.Add(model);
                         #endregion
                     }
                     #endregion
                 }
                 else
                 {
-                    var MostView = EpisodesRelatedWithInterviewer.OrderBy(o => o.EpisodeViews).Take(input.Top).ToList();
+                    var MostView = EpisodesRelatedWithInterviewer.OrderBy(o => o.EpisodeViews).Take(trendingDuration.Top).ToList();
                     #region prepare Episode List  to return it 
                     foreach (var item in MostView)
                     {
                         #region Create fill Category Object  
-                        EpisodeModelOutput _episode = new EpisodeModelOutput()
+                        EpisodesRelatedForRecentlyModel model = new EpisodesRelatedForRecentlyModel()
                         {
+                            SessionId = item.SessionId,
+                            CategoryId = item.CategoryId,
+                            CategoryTitle = item.CategoryTitle,
                             EpisodeId = item.EpisodeId,
+                            EpisodePublishDate = item.EpisodePublishDate,
                             EpisodeTitle = item.EpisodeTitle,
                             EpisodeViews = item.EpisodeViews,
-                            EpisodeDescription = item.EpisodeDescription,
-                            CreationDate = item.CreationDate,
-                            EpisodePublishDate = item.EpisodePublishDate,
-                            YoutubeUrl = item.YoutubeUrl,
-                            LikeRate = (int)item.LikeRate,
-                            DislikeRate = (int)item.DislikeRate,
-                            EpisodeIamgePath = helper.LivePathImages+item.EpisodeIamgePath
+                            ProgramId = item.ProgramId,
+                            ProgramImg = helper.LivePathImages + item.ProgramImg,
+                            ProgramName = item.ProgramName,
+                            ProgramTypeId = item.ProgramTypeId,
+                            ProgramTypeTitle = item.ProgramTypeTitle,
+                            EpisodeUrl = item.YoutubeUrl,
+                            EpisodeImg = helper.LivePathImages + item.EpisodeIamgePath
                         };
+
                         // Finally Add It Into Programs List
-                        _episodeList.Add(_episode);
+                        _episodeList.Add(model);
                         #endregion
                     }
                     #endregion
@@ -566,6 +574,7 @@ namespace BalarinaAPI.Controllers.Interviewers
                 #region Fetch All Seasons from db
                 var SeasonList = await unitOfWork.Season.GetObjects(); SeasonList.ToList();
                 #endregion
+
                 #region Iterate on Seasons to calculate Top Views 
                 foreach (var SeasonItem in SeasonList)
                 {
@@ -586,12 +595,14 @@ namespace BalarinaAPI.Controllers.Interviewers
                     #endregion
                 }
                 #endregion
+
                 #region Soert Season with Views
                 foreach (KeyValuePair<int, int> item in SeasonIDWithCount.OrderBy(views => views.Value))
                 {
                     SeasonSorted.Add((item.Key, item.Value));
                 }
                 #endregion
+
                 #region get seasons Objects Sorted
                 List<(Seasons, int)> seasons = new List<(Seasons, int)>();
                 int count = SeasonSorted.Count;
@@ -605,6 +616,7 @@ namespace BalarinaAPI.Controllers.Interviewers
                 #region Fetch All program from db
                 var ProgramList =await unitOfWork.Program.GetObjects(X => X.InterviewerId == input.InterviewerID); ProgramList.ToList();
                 #endregion
+
                 #region Iterate on program to calculate Top Views 
                 foreach (var ProgramItem in ProgramList)
                 {
@@ -620,11 +632,13 @@ namespace BalarinaAPI.Controllers.Interviewers
                     ProgramSorted.Add((ProgramItem,SumSeasonViews));
                 }
                 #endregion            
+
                 #region Reverse Sorted program List if Order = 'D' OR 'd'
                 if (input.Order == "desc" || input.Order == "DESC")
                     ProgramSorted.Reverse();
 
                 #endregion
+
                 #region Fetch Top Number Of Programs Views
                 if (ProgramSorted.Count > input.Top)
                 {
@@ -685,40 +699,6 @@ namespace BalarinaAPI.Controllers.Interviewers
         }
         #endregion
 
-        #region Function take image and return image name that store in db 
-        /// <summary>
-        /// generate unique name of image and save image in specified path 
-        /// </summary>
-        /// <param name="categoryImage"></param>
-        /// <returns>
-        /// unique name of iamge concatenating with extension of image 
-        /// </returns>
-        private string UploadImage(IFormFile categoryImage)
-        {
-            try
-            {
-                var pathToSave = helper.PathImage;
-                if (categoryImage.Length > 0)
-                {
-                    var fileName = Guid.NewGuid().ToString() + Path.GetExtension(categoryImage.FileName);
-                    var fullPath = Path.Combine(pathToSave, fileName);
-
-
-                    using (var stream = new FileStream(fullPath, FileMode.Create))
-                        categoryImage.CopyTo(stream);
-                    return fileName;
-                }
-                else
-                    return "error";
-            }
-            catch (Exception ex)
-            {
-                helper.LogError(ex);
-                return "error";
-            }
-        }
-
-        #endregion
 
         #region Get All Iterviewer Sorted by Views API Key Authentication
         /// <summary>

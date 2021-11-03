@@ -79,7 +79,7 @@ namespace TravelAPI.Core.Helper
             catch (Exception ex)
             {
                 LogError(ex);
-                return "error";
+                return "error in Upload Iamge ";
             }
         }
 

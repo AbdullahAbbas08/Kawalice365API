@@ -15,7 +15,7 @@ using TravelAPI.Core;
 using TravelAPI.Core.Helper;
 using TravelAPI.Models;
 
-namespace BalarinaAPI.Controllers.Advertisement 
+namespace BalarinaAPI.Controllers.Advertisement
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -28,7 +28,7 @@ namespace BalarinaAPI.Controllers.Advertisement
         #endregion
 
         #region Constructor
-        public ADSController(IUnitOfWork _unitOfWork, IOptions<Helper> _helper , UserManager<ApplicationUser> userManager)
+        public ADSController(IUnitOfWork _unitOfWork, IOptions<Helper> _helper, UserManager<ApplicationUser> userManager)
         {
             unitOfWork = _unitOfWork;
             this.helper = _helper.Value;
@@ -113,21 +113,21 @@ namespace BalarinaAPI.Controllers.Advertisement
                 //var Collection = new Dictionary<string, ADS>(); 
                 var ADPLACEHOLDERs = await unitOfWork.ADPLACEHOLDER.GetObjects(x => x.ADPlaceholderCode == Code);
                 var PlacementObj = ADPLACEHOLDERs.SingleOrDefault();
-                var ADSs = await unitOfWork.ADS.GetOrderedObjects( x=>x.PlaceHolderID == PlacementObj.ADPlaceholderID &&
-                                                            x.PublishStartDate<=DateTime.Now                   && 
-                                                            x.PublishEndDate >= DateTime.Now ,a=>a.Views);
+                var ADSs = await unitOfWork.ADS.GetOrderedObjects(x => x.PlaceHolderID == PlacementObj.ADPlaceholderID &&
+                                                           x.PublishStartDate <= DateTime.Now &&
+                                                           x.PublishEndDate >= DateTime.Now, a => a.Views);
 
                 //Collection.Add(helper.LivePathImages, ADSs.FirstOrDefault());
                 RetrieveData<ADS> Collection = new RetrieveData<ADS>();
                 Collection.Url = helper.LivePathImages;
-                Collection.DataList = ADSs.ToList();
+                Collection.DataList.Add(ADSs.FirstOrDefault());
 
                 #region Update View Of ADS 
                 ADSs.FirstOrDefault().Views += 1;
                 unitOfWork.ADS.Update(ADSs.FirstOrDefault());
                 await unitOfWork.Complete();
                 #endregion
-              
+
                 return Collection;
             }
             catch (Exception ex)
@@ -161,7 +161,7 @@ namespace BalarinaAPI.Controllers.Advertisement
                 Collection.Url = helper.LivePathImages;
                 Collection.DataList[0] = _ADS;
                 return Collection;
-            }  
+            }
             catch (Exception ex)
             {
                 helper.LogError(ex);
@@ -181,7 +181,7 @@ namespace BalarinaAPI.Controllers.Advertisement
         /// status of operation - Created Successfully - or Status500InternalServerError
         /// </returns>
         [Authorize]
-        [HttpPost] 
+        [HttpPost]
         [Route("createads")]
         public async Task<ActionResult<ADSInput>> createads([FromQuery] ADSInput model)
         {
@@ -218,14 +218,14 @@ namespace BalarinaAPI.Controllers.Advertisement
                 #region Fill ADTARGET object with values to insert
                 ADS _ADVS = new ADS()
                 {
-                   AdTitle = model.AdTitle,
-                   ImagePath = helper.UploadImage(model.Image),
-                   ClientID = model.ClientID,
-                   PlaceHolderID = model.PlaceHolderID,
-                   PublishStartDate = model.PublishStartDate,
-                   PublishEndDate = model.PublishEndDate,
-                   URL = model.URL,
-                   Views = model.Views,       
+                    AdTitle = model.AdTitle,
+                    ImagePath = helper.UploadImage(model.Image),
+                    ClientID = model.ClientID,
+                    PlaceHolderID = model.PlaceHolderID,
+                    PublishStartDate = model.PublishStartDate,
+                    PublishEndDate = model.PublishEndDate,
+                    URL = model.URL,
+                    Views = model.Views,
                 };
                 #endregion
 
@@ -270,7 +270,7 @@ namespace BalarinaAPI.Controllers.Advertisement
             try
             {
                 #region Check if ADS ID Exist or not 
-                var ADSObj =await unitOfWork.ADS.FindObjectAsync(model.AdId);
+                var ADSObj = await unitOfWork.ADS.FindObjectAsync(model.AdId);
                 if (ADSObj == null)
                     return BadRequest("ADS ID NOT FOUND");
                 #endregion
@@ -283,14 +283,25 @@ namespace BalarinaAPI.Controllers.Advertisement
                 if (model.URL == null)
                     model.URL = ADSObj.URL;
 
+                if (model.PlaceHolderID == null)
+                   model.PlaceHolderID = ADSObj.PlaceHolderID;
+
+
+
                 var placeholderID = unitOfWork.ADPLACEHOLDER.FindObjectAsync((int)model.PlaceHolderID);
                 if (placeholderID == null)
-                    model.PlaceHolderID = ADSObj.PlaceHolderID;
+                    return BadRequest(" placement id not found ");
 
                 var user = await _userManager.FindByIdAsync(model.ClientID);
 
                 if (user is null)
                     model.ClientID = ADSObj.ClientID;
+
+                if (model.PublishStartDate == null)
+                    model.PublishStartDate = ADSObj.PublishStartDate;
+
+                if (model.PublishEndDate == null)
+                    model.PublishEndDate = ADSObj.PublishEndDate;
 
                 if (!DateTime.TryParse((model.PublishStartDate).ToString(), out _))
                     return BadRequest("Publish Start Date Not Invalid");
@@ -298,11 +309,9 @@ namespace BalarinaAPI.Controllers.Advertisement
                 if (!DateTime.TryParse((model.PublishEndDate).ToString(), out _))
                     return BadRequest("Publish End Date Not Invalid");
 
-                if (model.PublishStartDate == null)
-                    model.PublishStartDate = ADSObj.PublishStartDate;
-
-                if (model.PublishEndDate == null)
-                    model.PublishEndDate = ADSObj.PublishEndDate;
+                if(model.Views == null)
+                    model.Views = ADSObj.Views;
+               
 
                 if (model.ImagePath == null && model.Image == null)
                 {
@@ -319,11 +328,11 @@ namespace BalarinaAPI.Controllers.Advertisement
                 {
                     AdId = model.AdId,
                     AdTitle = model.AdTitle,
-                    ImagePath = helper.UploadImage(model.Image),
+                    ImagePath = model.ImagePath,
                     ClientID = model.ClientID,
                     PlaceHolderID = (int)model.PlaceHolderID,
-                    PublishStartDate =(DateTime)model.PublishStartDate,
-                    PublishEndDate = (DateTime)model.PublishEndDate,
+                    PublishStartDate = (DateTime) model.PublishStartDate,
+                    PublishEndDate = (DateTime) model.PublishEndDate,
                     URL = model.URL,
                     Views = (int)model.Views,
                 };
