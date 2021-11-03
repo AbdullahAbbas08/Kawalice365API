@@ -28,11 +28,12 @@ namespace BalarinaAPI.Core.Model
         public int ProgramViews { get; set; }
         public DateTime CreationDate { get; set; }
 
+        [JsonIgnore]
         [ForeignKey("CategoryId")]
-        public virtual Category Category  { get; set; } 
-
-       // public virtual Category Category { get; set; }
+        public virtual Category Category  { get; set; }
+        [JsonIgnore]
         public virtual Interviewer Interviewer { get; set; }
+        [JsonIgnore]
         public virtual ProgramType ProgramType { get; set; }
         [JsonIgnore]
         public virtual ICollection<Seasons> Sessions { get; set; }

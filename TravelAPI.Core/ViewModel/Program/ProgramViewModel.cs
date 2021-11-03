@@ -13,6 +13,7 @@ namespace BalarinaAPI.Core.ViewModel
         public string ProgramDescription { get; set; }
         public string ProgramName { get; set; }
         public IFormFile ProgramImg { get; set; }
+        public IFormFile ProgramPromoUrl { get; set; }
         public bool? ProgramVisible { get; set; }
         public int CategoryId { get; set; }
         public DateTime? ProgramStartDate { get; set; }

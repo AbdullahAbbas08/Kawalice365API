@@ -48,25 +48,22 @@ namespace BalarinaAPI.Controllers.Categories
         /// </returns>
         [ApiAuthentication]
         [HttpGet]
-        [Route("getallprogramsbycatidapikey")]
-        public async Task<ActionResult<List<Program>>> getallprogramsbycatidapikeyAsync(int CategoryID)
+        [Route("getallprogramsbycatid")]
+        public async Task<ActionResult<RetrieveData<Program>>> getallprogramsbycatid(int CategoryID)
         {
-            //check If Category ID If Exist
-            var _CategoryID = unitOfWork.category.FindObjectAsync(CategoryID);
-            if (_CategoryID == null)
-                return BadRequest("Category ID Not Exist !!");
-
             try
             {
+                //check If Category ID If Exist
+                var _CategoryID = unitOfWork.category.FindObjectAsync(CategoryID);
+                if (_CategoryID == null)
+                    return BadRequest("Category ID Not Exist !!");
                 //Get All Programs 
                 var ResultPrograms = await unitOfWork.Program.GetObjects(x => x.CategoryId == CategoryID); ResultPrograms.ToList();
-                #region Fill ProgramsList and Handle Image Path For all Program
-                foreach (var item in ResultPrograms)
-                {
-                    item.ProgramImg = helper.LivePathImages + item.ProgramImg;
-                }
-                #endregion
-                return ResultPrograms.ToList();
+
+                RetrieveData<Program> Collection = new RetrieveData<Program>();
+                Collection.Url = helper.LivePathImages;
+                Collection.DataList = ResultPrograms.ToList();
+                return Collection;
             }
             catch (Exception ex)
             {

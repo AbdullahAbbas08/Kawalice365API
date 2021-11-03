@@ -21,6 +21,7 @@ namespace BalarinaAPI.Core.Model
         [Required]
         public int Views { get; set; }
         public int PlaceHolderID { get; set; }
+
         public string ClientID { get; set; }
         [Required]
         public DateTime PublishStartDate { get; set; }
@@ -31,6 +32,7 @@ namespace BalarinaAPI.Core.Model
         [ForeignKey("PlaceHolderID")]
         public virtual ADPLACEHOLDER ADPLACEHOLDER { get; set; }
 
+        [JsonIgnore]
         [ForeignKey("ClientID")]
         public virtual ApplicationUser ApplicationUser { get; set; }
 

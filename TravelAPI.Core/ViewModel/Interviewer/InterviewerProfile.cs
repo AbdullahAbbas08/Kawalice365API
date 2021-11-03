@@ -1,18 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Text.Json.Serialization;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-#nullable disable
-
-namespace BalarinaAPI.Core.Model
+namespace BalarinaAPI.Core.ViewModel.Interviewer
 {
-    public partial class Interviewer
+    public class InterviewerProfile
     {
-        public Interviewer()
-        {
-            Programs = new HashSet<Program>();
-        }
         public int InterviewerId { get; set; }
         public string InterviewerName { get; set; }
         public string InterviewerPicture { get; set; }
@@ -27,7 +22,7 @@ namespace BalarinaAPI.Core.Model
         public DateTime? CreationDate { get; set; }
         public DateTime? BirthDate { get; set; }
         public string TiktokUrl { get; set; }
-        [JsonIgnore]
-        public virtual ICollection<Program> Programs { get; set; }
+        public string ProgramTypesAsString  { get; set; } 
     }
 }
+ 

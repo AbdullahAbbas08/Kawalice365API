@@ -1,5 +1,6 @@
 ﻿using BalarinaAPI.Authentication;
 using BalarinaAPI.Core.Model;
+using BalarinaAPI.Core.ViewModel;
 using BalarinaAPI.Core.ViewModel.ADS;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -37,7 +38,7 @@ namespace BalarinaAPI.Controllers.Advertisement
 
         #region CRUD OPERATIONS
 
-        #region Get All Advertisement Authorize
+        #region Get All Advertisement 
         /// <summary>
         /// Reteive All Data in Advertisement 
         /// </summary>
@@ -47,16 +48,16 @@ namespace BalarinaAPI.Controllers.Advertisement
         [Authorize]
         [HttpGet]
         [Route("getallads")]
-        public async Task<ActionResult<IEnumerable<ADS>>> getallads()
+        public async Task<ActionResult<RetrieveData<ADS>>> getallads()
         {
             try
             {
                 var ADSs = await unitOfWork.ADS.GetObjects();
-                foreach (var item in ADSs)
-                {
-                    item.ImagePath = helper.LivePathImages + item.ImagePath;
-                }
-                return ADSs.ToList();
+
+                RetrieveData<ADS> Collection = new RetrieveData<ADS>();
+                Collection.Url = helper.LivePathImages;
+                Collection.DataList = ADSs.ToList();
+                return Collection;
             }
             catch (Exception ex)
             {
@@ -76,16 +77,16 @@ namespace BalarinaAPI.Controllers.Advertisement
         [ApiAuthentication]
         [HttpGet]
         [Route("getalladsapikey")]
-        public async Task<ActionResult<IEnumerable<ADS>>> getalladsapikey()
+        public async Task<ActionResult<RetrieveData<ADS>>> getalladsapikey()
         {
             try
             {
                 var ADSs = await unitOfWork.ADS.GetObjects();
-                foreach (var item in ADSs)
-                {
-                    item.ImagePath = helper.LivePathImages + item.ImagePath;
-                }
-                return ADSs.ToList();
+
+                RetrieveData<ADS> Collection = new RetrieveData<ADS>();
+                Collection.Url = helper.LivePathImages;
+                Collection.DataList = ADSs.ToList();
+                return Collection;
             }
             catch (Exception ex)
             {
@@ -105,30 +106,29 @@ namespace BalarinaAPI.Controllers.Advertisement
         [ApiAuthentication]
         [HttpGet]
         [Route("getalladsbyplaceid")]
-        public async Task<ActionResult<ADS>> getalladsbyplaceid(int ID)
+        public async Task<ActionResult<RetrieveData<ADS>>> getalladsbyplaceid(int Code)
         {
             try
-            { 
-                var ADSs = await unitOfWork.ADS.GetObjects(x=>x.PlaceHolderID == ID);
+            {
+                //var Collection = new Dictionary<string, ADS>(); 
+                var ADPLACEHOLDERs = await unitOfWork.ADPLACEHOLDER.GetObjects(x => x.ADPlaceholderCode == Code);
+                var PlacementObj = ADPLACEHOLDERs.SingleOrDefault();
+                var ADSs = await unitOfWork.ADS.GetOrderedObjects( x=>x.PlaceHolderID == PlacementObj.ADPlaceholderID &&
+                                                            x.PublishStartDate<=DateTime.Now                   && 
+                                                            x.PublishEndDate >= DateTime.Now ,a=>a.Views);
 
-                var Result = from  _ADS in ADSs
-                             where  _ADS.PublishStartDate <= DateTime.Now  && 
-                                    _ADS.PublishEndDate >= DateTime.Now
-                             select new { _ADS.AdId,_ADS.AdTitle, _ADS, _ADS.ImagePath, _ADS.URL, _ADS.Views, _ADS.ClientID};
-                foreach (var item in ADSs)
-                {
-                    item.ImagePath = helper.LivePathImages + item.ImagePath;
-                }
-                var ADSsOrdered = ADSs.OrderBy(x => x.Views).ToList();
+                //Collection.Add(helper.LivePathImages, ADSs.FirstOrDefault());
+                RetrieveData<ADS> Collection = new RetrieveData<ADS>();
+                Collection.Url = helper.LivePathImages;
+                Collection.DataList = ADSs.ToList();
 
                 #region Update View Of ADS 
-                ADSsOrdered[0].Views += 1;
-                unitOfWork.ADS.Update(ADSsOrdered[0]);
+                ADSs.FirstOrDefault().Views += 1;
+                unitOfWork.ADS.Update(ADSs.FirstOrDefault());
                 await unitOfWork.Complete();
                 #endregion
               
-
-                return ADSsOrdered[0];
+                return Collection;
             }
             catch (Exception ex)
             {
@@ -148,7 +148,7 @@ namespace BalarinaAPI.Controllers.Advertisement
         [ApiAuthentication]
         [HttpGet]
         [Route("findads")]
-        public async Task<ActionResult<ADS>> findads(int ID)
+        public async Task<ActionResult<RetrieveData<ADS>>> findads(int ID)
         {
             try
             {
@@ -157,9 +157,10 @@ namespace BalarinaAPI.Controllers.Advertisement
                 if (_ADS == null)
                     return BadRequest("ADS ID NOT FOUND ");
 
-                _ADS.ImagePath = helper.LivePathImages + _ADS.ImagePath;
-
-                return _ADS;
+                RetrieveData<ADS> Collection = new RetrieveData<ADS>();
+                Collection.Url = helper.LivePathImages;
+                Collection.DataList[0] = _ADS;
+                return Collection;
             }  
             catch (Exception ex)
             {

@@ -4,14 +4,16 @@ using BalarinaAPI.Core.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace BalarinaAPI.Core.Migrations
 {
     [DbContext(typeof(BalarinaDatabaseContext))]
-    partial class BalarinaDbContextModelSnapshot : ModelSnapshot
+    [Migration("20211103114807_addbirthdate")]
+    partial class addbirthdate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

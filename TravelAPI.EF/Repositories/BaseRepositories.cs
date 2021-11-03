@@ -25,20 +25,25 @@ namespace TravelAPI.Repositories
             dbContext.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
 
         }
-
         public async Task<IEnumerable<T>> GetObjects()
         {
             return await dbContext.Set<T>().AsQueryable().ToListAsync();
         }
-
-        public async Task<IEnumerable<T>> GetObjects(int Number)
+        public async Task<IEnumerable<T>> GetObjects(int Top)
         {
-            return await dbContext.Set<T>().Take(Number).AsQueryable().ToListAsync();
+            return await dbContext.Set<T>().Take(Top).AsQueryable().ToListAsync();
         }
-
         public async Task<IEnumerable<T>> GetObjects(Expression<Func<T, bool>> match)
         {
-            return  await dbContext.Set<T>().AsQueryable().Where(match).ToListAsync(); 
+            return await dbContext.Set<T>().Where(match).AsQueryable().ToListAsync();
+        }
+        public async Task<IEnumerable<T>> GetOrderedObjects(Expression<Func<T, int>> Order)
+        {
+            return await dbContext.Set<T>().OrderBy(Order).AsQueryable().ToListAsync();
+        }
+        public async Task<IEnumerable<T>> GetOrderedObjects(Expression<Func<T, bool>> match, Expression<Func<T, int>> Order)
+        {
+            return await dbContext.Set<T>().Where(match).OrderBy(Order).AsQueryable().ToListAsync();
         }
         public async Task<T> FindObjectAsync(int ID)
         {
@@ -83,6 +88,7 @@ namespace TravelAPI.Repositories
             return true;
 
         }
+
     }
 }
 

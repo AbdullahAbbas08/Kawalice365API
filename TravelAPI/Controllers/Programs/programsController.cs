@@ -224,6 +224,9 @@ namespace BalarinaAPI.Controllers.Programs
                 if (model.ProgramImg == null)
                     return BadRequest("program Image cannot be null ");
 
+                if (model.ProgramPromoUrl == null)
+                    return BadRequest("program Promo Image cannot be null ");
+
                 if (model.ProgramOrder < 0)
                     return BadRequest("program Order cannot be less than 0 ");
 
@@ -242,7 +245,8 @@ namespace BalarinaAPI.Controllers.Programs
                     ProgramTypeId = model.ProgramTypeId,
 
                     ProgramDescription = model.ProgramDescription,
-                    ProgramImg = UploadImage(model.ProgramImg),
+                    ProgramImg = helper.UploadImage(model.ProgramImg),
+                    ProgramPromoUrl = helper.UploadImage(model.ProgramPromoUrl),
                     ProgramName = model.ProgramName,
                     ProgramOrder = model.ProgramOrder,
                     ProgramStartDate = (DateTime) model.ProgramStartDate,
@@ -457,6 +461,7 @@ namespace BalarinaAPI.Controllers.Programs
                 }
                 #endregion
 
+
                 if (model.ProgramVisible != true || model.ProgramVisible != false)
                     model.ProgramVisible = _programObject.ProgramVisible;
 
@@ -632,6 +637,7 @@ namespace BalarinaAPI.Controllers.Programs
                 #region Fetch All Seasons from db
                 var SeasonList = await  unitOfWork.Season.GetObjects(); SeasonList.ToList();
                 #endregion
+
                 #region Iterate on Seasons to calculate Top Views 
                 foreach (var SeasonItem in SeasonList)
                 {
@@ -652,12 +658,14 @@ namespace BalarinaAPI.Controllers.Programs
                     #endregion
                 }
                 #endregion
+
                 #region Soert Season with Views
                 foreach (KeyValuePair<int, int> item in SeasonIDWithCount.OrderBy(views => views.Value))
                 {
                     SeasonSorted.Add((item.Key, item.Value));
                 }
                 #endregion
+
                 #region get seasons Objects Sorted
                 List<(Seasons,int)> seasons = new List<(Seasons,int)>();
                 int count = SeasonSorted.Count;
@@ -671,6 +679,7 @@ namespace BalarinaAPI.Controllers.Programs
                 #region Fetch All program from db
                 var ProgramList = await unitOfWork.Program.GetObjects(); ProgramList.ToList();
                 #endregion
+
                 #region Iterate on program to calculate Top Views 
                 foreach (var ProgramItem in ProgramList)
                 {
@@ -686,11 +695,13 @@ namespace BalarinaAPI.Controllers.Programs
                     ProgramSorted.Add((ProgramItem, SumSeasonViews));
                 }
                 #endregion            
+
                 #region Reverse Sorted program List if Order = 'D' OR 'd'
                 if (input.Order == "desc" || input.Order == "DESC")
                     ProgramSorted.Reverse();
 
                 #endregion
+
                 #region Fetch Top Number Of Programs Views
                 if (ProgramSorted.Count > input.Top)
                 {

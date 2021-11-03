@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace BalarinaAPI.Core.Migrations
 {
@@ -12,6 +13,7 @@ namespace BalarinaAPI.Core.Migrations
                 type: "int",
                 nullable: false,
                 defaultValue: 0);
+
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

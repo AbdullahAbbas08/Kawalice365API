@@ -52,17 +52,15 @@ namespace BalarinaAPI.Controllers.Episodes
         [Authorize]
         [HttpGet]
         [Route("getallepisodes")]
-        public async Task<ActionResult<List<Episode>>> getallepisodes()
+        public async Task<ActionResult<RetrieveData<Episode>>> getallepisodes()
         {
             try
             {
+                var Collection = new RetrieveData<Episode>();
                 var ResultEpisodes = await unitOfWork.Episode.GetObjects();
-                ResultEpisodes.ToList();
-                foreach (var item in ResultEpisodes)
-                {
-                    item.EpisodeIamgePath = helper.LivePathImages + item.EpisodeIamgePath;       
-                }
-                return ResultEpisodes.ToList();
+                Collection.Url = helper.LivePathImages;
+                Collection.DataList = ResultEpisodes.ToList();
+                return Ok(Collection);
             }
             catch (Exception ex)
             {
@@ -84,18 +82,15 @@ namespace BalarinaAPI.Controllers.Episodes
         [ApiAuthentication]
         [HttpGet]
         [Route("getallepisodesapikey")]
-        public async Task<ActionResult<List<Episode>>> getallepisodesapikey()
+        public async Task<ActionResult<RetrieveData<Episode>>> getallepisodesapikey()
         {
             try
             {
+                var Collection = new RetrieveData<Episode>();
                 var ResultEpisodes = await unitOfWork.Episode.GetObjects();
-                ResultEpisodes.ToList();
-
-                foreach (var item in ResultEpisodes)
-                {
-                    item.EpisodeIamgePath = helper.LivePathImages + item.EpisodeIamgePath;
-                }
-                return ResultEpisodes.ToList();
+                Collection.Url = helper.LivePathImages;
+                Collection.DataList = ResultEpisodes.ToList();
+                return Ok(Collection);
             }
             catch (Exception ex)
             {
@@ -106,7 +101,7 @@ namespace BalarinaAPI.Controllers.Episodes
         }
         #endregion
 
-        #region Get All Episodes API Key
+        #region Get All Episodes by season id
         /// <summary>
         /// get all episodes with API Key
         /// </summary>
@@ -117,19 +112,16 @@ namespace BalarinaAPI.Controllers.Episodes
         [ApiAuthentication]
         [HttpGet]
         [Route("getallepisodesbyseasonid")]
-        public async Task<ActionResult<List<Episode>>> getallepisodesbyseasonid(int ID)
+        public async Task<ActionResult<RetrieveData<Episode>>> getallepisodesbyseasonid(int ID)
         {
             try
             {
                 //Get All Episodes 
+                var Collection = new RetrieveData<Episode>();
                 var ResultEpisodes = await unitOfWork.Episode.GetObjects(x=>x.SessionId == ID);
-                ResultEpisodes.ToList();
-
-                foreach (var item in ResultEpisodes)
-                {
-                    item.EpisodeIamgePath = helper.LivePathImages + item.EpisodeIamgePath;
-                }
-                return ResultEpisodes.ToList();
+                Collection.Url = helper.LivePathImages;
+                Collection.DataList = ResultEpisodes.ToList();
+                return Ok(Collection);
             }
             catch (Exception ex)
             {
@@ -202,7 +194,7 @@ namespace BalarinaAPI.Controllers.Episodes
                     EpisodeVisible = model.EpisodeVisible,
                     SessionId = model.SeasonId,
                     YoutubeUrl = model.YoutubeUrl,
-                    EpisodeIamgePath = UploadImage(model.EpisodeIamge)
+                    EpisodeIamgePath =helper.UploadImage(model.EpisodeIamge)
                 };
                 #endregion
 
@@ -271,7 +263,7 @@ namespace BalarinaAPI.Controllers.Episodes
                 if (model.EpisodeImagePath == null)
                 {
                     if (model.EpisodeImage != null)
-                        model.EpisodeImagePath = UploadImage(model.EpisodeImage);
+                        model.EpisodeImagePath =helper.UploadImage(model.EpisodeImage);
                 }
                 if (model.EpisodeImagePath == null && model.EpisodeImage == null)
                 {
@@ -721,41 +713,6 @@ namespace BalarinaAPI.Controllers.Episodes
         }
         #endregion
 
-        #region Function take image and return image name that store in db 
-        /// <summary>
-        /// generate unique name of image and save image in specified path 
-        /// </summary>
-        /// <param name="categoryImage"></param>
-        /// <returns>
-        /// unique name of iamge concatenating with extension of image 
-        /// </returns>
-        private string UploadImage(IFormFile categoryImage)
-        {
-            try
-            {
-                var pathToSave = helper.PathImage;
-                if (categoryImage.Length > 0)
-                {
-                    var fileName = Guid.NewGuid().ToString() + Path.GetExtension(categoryImage.FileName);
-                    var fullPath = Path.Combine(pathToSave, fileName);
-                    using (var stream = new FileStream(fullPath, FileMode.Create))
-                    {
-                        categoryImage.CopyTo(stream);
-                    }
-                    return fileName;
-                }
-                else
-                {
-                    return "error";
-                }
-            }
-            catch (Exception ex)
-            {
-                helper.LogError(ex);
-                return "error";
-            }
-        }
-        #endregion
 
         #region Episodes Trending For Days
         /// <summary>
@@ -1107,7 +1064,6 @@ namespace BalarinaAPI.Controllers.Episodes
         }
         #endregion
 
-
         #region Get All Categories
 
             #region Get All Categories with API Key
@@ -1121,22 +1077,16 @@ namespace BalarinaAPI.Controllers.Episodes
             [ApiAuthentication]
             [HttpGet]
             [Route("getallcategorieswithapikey")]
-            public async Task<ActionResult<List<(string, List<Category>)>>> getallcategorieswithapikey()
+            public async Task<ActionResult<RetrieveData<Category>>> getallcategorieswithapikey()
             {
                 try
                 {
-                List<(string, List<Category>)> Results = new List<(string, List<Category>)>();
+                    RetrieveData<Category> collection = new RetrieveData<Category>();
+                    var ResultCategories = await unitOfWork.category.GetOrderedObjects(x => x.CategoryOrder);
+                    collection.Url = helper.LivePathImages;
+                    collection.DataList = ResultCategories.ToList();
 
-                    var ResultCategories = await unitOfWork.category.GetObjects();
-                    var ResultCategories2 =  ResultCategories.OrderBy(x => x.CategoryOrder).ToList();
-
-                Results.Add((helper.LivePathImages, ResultCategories2));
-
-                    //foreach (var item in ResultCategories2)
-                    //{
-                    //    item.CategoryImg = helper.LivePathImages + item.CategoryImg;
-                    //}
-                return Ok(ResultCategories2);
+                    return Ok(collection); 
                 }
                 catch (Exception ex)
                 {
@@ -1158,26 +1108,24 @@ namespace BalarinaAPI.Controllers.Episodes
             [Authorize]
             [HttpGet]
             [Route("getallcategories")]
-            public async Task<ActionResult<List<Category>>> getallcategories()
+            public async Task<ActionResult<RetrieveData<Category>>> getallcategories()
             {
-                try 
-                {
-                    var ResultCategories = await unitOfWork.category.GetObjects();
-                    var ResultCategories2 = ResultCategories.OrderBy(x => x.CategoryOrder).ToList();
+            try
+            {
+                RetrieveData<Category> collection = new RetrieveData<Category>();
+                var ResultCategories = await unitOfWork.category.GetOrderedObjects(x => x.CategoryOrder);
+                collection.Url = helper.LivePathImages;
+                collection.DataList = ResultCategories.ToList();
 
-                    foreach (var item in ResultCategories2)
-                    {
-                        item.CategoryImg = helper.LivePathImages + item.CategoryImg;
-                    }
-                    return Ok(ResultCategories2);
-                }
-                catch (Exception ex)
-                {
-                    helper.LogError(ex);
-                    return StatusCode(StatusCodes.Status500InternalServerError);
-                    // Log error in db
-                }
+                return Ok(collection);
             }
+            catch (Exception ex)
+            {
+                helper.LogError(ex);
+                return StatusCode(StatusCodes.Status500InternalServerError);
+                // Log error in db
+            }
+        }
             #endregion
 
         #endregion

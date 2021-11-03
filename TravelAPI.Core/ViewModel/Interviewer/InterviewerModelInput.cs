@@ -19,5 +19,8 @@ namespace BalarinaAPI.Core.ViewModel.Interviewer
         public string LinkedInUrl { get; set; }
         public string WebsiteUrl { get; set; }
         public string TiktokUrl { get; set; }
+        public DateTime? BirthDate { get; set; }
+        public IFormFile InterviewerCover { get; set; }
+
     }
 }

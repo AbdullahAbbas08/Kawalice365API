@@ -45,21 +45,17 @@ namespace BalarinaAPI.Controllers.Interviewers
         [Authorize]
         [HttpGet]
         [Route("getalliterviewers")]
-        public async Task<ActionResult<List<Interviewer>>> getalliterviewers()
+        public async Task<ActionResult<RetrieveData<Interviewer>>> getalliterviewers()
         {
             try
             {
                 //Get All Interviewer 
-                var ResultInterviewers = await unitOfWork.Interviewer.GetObjects(); ResultInterviewers.ToList();
+                var ResultInterviewers = await unitOfWork.Interviewer.GetObjects();
+                RetrieveData<Interviewer> Collection = new RetrieveData<Interviewer>();
+                Collection.Url = helper.LivePathImages;
+                Collection.DataList = ResultInterviewers.ToList();
 
-                #region Fill InterviewerList and Handle Image Path For all Categories
-                foreach (var item in ResultInterviewers)
-                {
-                    item.InterviewerPicture = helper.LivePathImages + item.InterviewerPicture;
-                    item.InterviewerCover = helper.LivePathImages + item.InterviewerCover;
-                }
-                #endregion
-                return ResultInterviewers.ToList();
+                return Collection;
             }
             catch (Exception ex)
             {
@@ -74,7 +70,7 @@ namespace BalarinaAPI.Controllers.Interviewers
         [ApiAuthentication]
         [HttpGet]
         [Route("findinterviewer")]
-        public async Task<ActionResult<Interviewer>> findinterviewer(int ID)
+        public async Task<ActionResult<RetrieveData<InterviewerProfile>>> findinterviewer(int ID)
         {
             try
             {
@@ -84,10 +80,45 @@ namespace BalarinaAPI.Controllers.Interviewers
                 if (ResultInterviewer == null)
                     return BadRequest("interviewer ID not found ");
 
-                ResultInterviewer.InterviewerPicture = helper.LivePathImages + ResultInterviewer.InterviewerPicture;
-                ResultInterviewer.InterviewerCover = helper.LivePathImages + ResultInterviewer.InterviewerCover;
-              
-                return ResultInterviewer;
+                InterviewerProfile interviewerProfile = new InterviewerProfile();
+                interviewerProfile.BirthDate = ResultInterviewer.BirthDate;
+                interviewerProfile.FacebookUrl = ResultInterviewer.FacebookUrl;
+                interviewerProfile.InstgramUrl = ResultInterviewer.InstgramUrl;
+                interviewerProfile.InterviewerCover = ResultInterviewer.InterviewerCover;
+                interviewerProfile.InterviewerDescription = ResultInterviewer.InterviewerDescription;
+                interviewerProfile.InterviewerId = ResultInterviewer.InterviewerId;
+                interviewerProfile.InterviewerName = ResultInterviewer.InterviewerName;
+                interviewerProfile.InterviewerPicture = ResultInterviewer.InterviewerPicture;
+                interviewerProfile.LinkedInUrl = ResultInterviewer.LinkedInUrl;
+                interviewerProfile.TiktokUrl = ResultInterviewer.TiktokUrl;
+                interviewerProfile.TwitterUrl = ResultInterviewer.TwitterUrl;
+                interviewerProfile.WebsiteUrl = ResultInterviewer.WebsiteUrl;
+                interviewerProfile.YoutubeUrl = ResultInterviewer.YoutubeUrl;
+                interviewerProfile.CreationDate = ResultInterviewer.CreationDate;
+
+
+
+                var _Programs = await unitOfWork.Program.GetObjects(x=>x.InterviewerId == ResultInterviewer.InterviewerId);
+                var ProgramTypes = await unitOfWork.ProgramType.GetObjects();
+
+                var ProgramTypeList = from _program in _Programs
+                                      join type in ProgramTypes
+                                      on _program.ProgramTypeId equals type.ProgramTypeId
+                                      select new { type.ProgramTypeTitle };
+
+                string TypeString = "";
+                foreach (var item in ProgramTypeList)
+                {
+                    TypeString += item.ProgramTypeTitle;
+                }
+
+                interviewerProfile.ProgramTypesAsString = TypeString;
+                
+                RetrieveData<InterviewerProfile> Collection = new RetrieveData<InterviewerProfile>();
+                Collection.Url = helper.LivePathImages;
+                Collection.DataList.Add(interviewerProfile);
+
+                return Collection;
             }
             catch (Exception ex)
             {
@@ -102,21 +133,17 @@ namespace BalarinaAPI.Controllers.Interviewers
         [ApiAuthentication]
         [HttpGet]
         [Route("getalliterviewersapikey")]
-        public async Task<ActionResult<List<Interviewer>>> getalliterviewerswithapikey()
+        public async Task<ActionResult<RetrieveData<Interviewer>>> getalliterviewerswithapikey()
         {
             try
             {
                 //Get All Interviewer 
-                var ResultInterviewers = await unitOfWork.Interviewer.GetObjects(); ResultInterviewers.ToList();
+                var ResultInterviewers = await unitOfWork.Interviewer.GetObjects();
+                RetrieveData<Interviewer> Collection = new RetrieveData<Interviewer>();
+                Collection.Url = helper.LivePathImages;
+                Collection.DataList = ResultInterviewers.ToList();
 
-                #region Fill InterviewerList and Handle Image Path For all Categories
-                foreach (var item in ResultInterviewers)
-                {
-                    item.InterviewerPicture = helper.LivePathImages + item.InterviewerPicture;
-                    item.InterviewerCover = helper.LivePathImages + item.InterviewerCover;
-                }
-                #endregion
-                return ResultInterviewers.ToList();
+                return Collection;
             }
             catch (Exception ex)
             {
@@ -163,6 +190,8 @@ namespace BalarinaAPI.Controllers.Interviewers
                     TwitterUrl = model.TwitterUrl,
                     WebsiteUrl = model.WebsiteUrl,
                     YoutubeUrl = model.YoutubeUrl,
+                    BirthDate = model.BirthDate,
+                    InterviewerCover = helper.UploadImage(model.InterviewerCover)
                 };
                 #endregion
 
@@ -326,6 +355,7 @@ namespace BalarinaAPI.Controllers.Interviewers
                 {
                     // Create Category Object
                     ProgramFilterModel _program = new ProgramFilterModel();
+
                     #region fill Category Object
                     _program.ProgramId = item.ProgramId;
                     _program.ProgramName = item.ProgramName;
@@ -337,7 +367,6 @@ namespace BalarinaAPI.Controllers.Interviewers
                     _program.CreationDate = item.CreationDate;
                     _program.CategoryId = item.CategoryId;
                     _program.InterviewerId = item.InterviewerId;
-
                     // Finally Add It Into Programs List
                     _programsList.Add(_program);
                     #endregion
