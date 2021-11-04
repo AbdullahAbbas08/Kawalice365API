@@ -112,10 +112,15 @@ namespace BalarinaAPI.Controllers.Advertisement
             {
                 //var Collection = new Dictionary<string, ADS>(); 
                 var ADPLACEHOLDERs = await unitOfWork.ADPLACEHOLDER.GetObjects(x => x.ADPlaceholderCode == Code);
+                if (ADPLACEHOLDERs == null)
+                    return BadRequest("Placement Code Not Found ");
+
                 var PlacementObj = ADPLACEHOLDERs.SingleOrDefault();
                 var ADSs = await unitOfWork.ADS.GetOrderedObjects(x => x.PlaceHolderID == PlacementObj.ADPlaceholderID &&
                                                            x.PublishStartDate <= DateTime.Now &&
                                                            x.PublishEndDate >= DateTime.Now, a => a.Views);
+                if (ADSs.Count() == 0 )
+                    return BadRequest("Placement Code Not Contain Any Advertisements ");
 
                 //Collection.Add(helper.LivePathImages, ADSs.FirstOrDefault());
                 RetrieveData<ADS> Collection = new RetrieveData<ADS>();
