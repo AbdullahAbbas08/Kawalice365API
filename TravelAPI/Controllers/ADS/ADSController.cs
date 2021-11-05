@@ -112,7 +112,7 @@ namespace BalarinaAPI.Controllers.Advertisement
             {
                 //var Collection = new Dictionary<string, ADS>(); 
                 var ADPLACEHOLDERs = await unitOfWork.ADPLACEHOLDER.GetObjects(x => x.ADPlaceholderCode == Code);
-                if (ADPLACEHOLDERs == null)
+                if (ADPLACEHOLDERs.Count() == 0)
                     return BadRequest("Placement Code Not Found ");
 
                 var PlacementObj = ADPLACEHOLDERs.SingleOrDefault();
@@ -164,7 +164,7 @@ namespace BalarinaAPI.Controllers.Advertisement
 
                 RetrieveData<ADS> Collection = new RetrieveData<ADS>();
                 Collection.Url = helper.LivePathImages;
-                Collection.DataList[0] = _ADS;
+                Collection.DataList.Add(_ADS);
                 return Collection;
             }
             catch (Exception ex)

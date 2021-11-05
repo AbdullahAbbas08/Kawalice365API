@@ -359,7 +359,7 @@ namespace BalarinaAPI.Controllers.Episodes
         [ApiAuthentication]
         [HttpGet]
         [Route("episodesfilterforrecently")]
-        public async Task<ActionResult<List<EpisodesRelatedForRecentlyModel>>> episodesfilterforrecently([FromQuery] EpisodesFilterForRecentlyInputs inputs)
+        public async Task<ActionResult<RetrieveData<EpisodesRelatedForRecentlyModel>>> episodesfilterforrecently([FromQuery] EpisodesFilterForRecentlyInputs inputs)
         {
             try
             {
@@ -429,11 +429,11 @@ namespace BalarinaAPI.Controllers.Episodes
                         EpisodeTitle = item.EpisodeTitle,
                         EpisodeViews = item.EpisodeViews,
                         ProgramId = item.ProgramId,
-                        ProgramImg = helper.LivePathImages + item.ProgramImg,
+                        ProgramImg =  item.ProgramImg,
                         ProgramName = item.ProgramName,
                         ProgramTypeId = item.ProgramTypeId,
                         ProgramTypeTitle = item.ProgramTypeTitle,
-                        EpisodeImg = helper.LivePathImages + item.EpisodeIamgePath,
+                        EpisodeImg =item.EpisodeIamgePath,
                         EpisodeUrl = item.YoutubeUrl
                     };
                     episodesRelatedForRecently.Add(model);
@@ -445,17 +445,19 @@ namespace BalarinaAPI.Controllers.Episodes
                 if (inputs.IsRecently == "desc" || inputs.IsRecently == "DESC")
                 {
                     episodesRelatedForRecentlyOrdered =episodesRelatedForRecently.OrderByDescending(o => o.EpisodePublishDate).ToList();
-
                 }
                 else  
                 {
                     episodesRelatedForRecentlyOrdered =  episodesRelatedForRecently.OrderBy(o => o.EpisodePublishDate).ToList();
                 }
-
-
                 #endregion
 
-                return episodesRelatedForRecentlyOrdered;
+                RetrieveData<EpisodesRelatedForRecentlyModel> RetrieveData = new RetrieveData<EpisodesRelatedForRecentlyModel>();
+                RetrieveData.DataList = episodesRelatedForRecentlyOrdered;
+                RetrieveData.Url = helper.LivePathImages;
+
+
+                return RetrieveData;
             }
             catch (Exception ex)
             {
@@ -483,7 +485,7 @@ namespace BalarinaAPI.Controllers.Episodes
         [ApiAuthentication]
         [HttpGet]
         [Route("episodesfilterforviews")]
-        public async Task<ActionResult<List<EpisodesRelatedForRecentlyModel>>> episodesfilterforviews([FromQuery] EpisodesFilterForRecentlyInputs inputs)
+        public async Task<ActionResult<RetrieveData<EpisodesRelatedForRecentlyModel>>> episodesfilterforviews([FromQuery] EpisodesFilterForRecentlyInputs inputs)
         {
             try
             {
@@ -558,12 +560,12 @@ namespace BalarinaAPI.Controllers.Episodes
                         EpisodeTitle = item.EpisodeTitle,
                         EpisodeViews = item.EpisodeViews,
                         ProgramId = item.ProgramId,
-                        ProgramImg = helper.LivePathImages + item.ProgramImg,
+                        ProgramImg =item.ProgramImg,
                         ProgramName = item.ProgramName,
                         ProgramTypeId = item.ProgramTypeId,
                         ProgramTypeTitle = item.ProgramTypeTitle,
                         EpisodeUrl = item.YoutubeUrl,
-                        EpisodeImg = helper.LivePathImages + item.EpisodeIamgePath
+                        EpisodeImg = item.EpisodeIamgePath
                     };
                     episodesRelatedForRecently.Add(model);
                 }
@@ -579,10 +581,16 @@ namespace BalarinaAPI.Controllers.Episodes
                 {
                     episodesRelatedForRecentlyOrdered = episodesRelatedForRecently.OrderBy(o => o.EpisodeViews).ToList();
                 }
-
                 #endregion
 
-                return episodesRelatedForRecentlyOrdered;
+                #region Create DTO To Retrieve Data
+                RetrieveData<EpisodesRelatedForRecentlyModel> _RetrieveData = new RetrieveData<EpisodesRelatedForRecentlyModel>();
+                _RetrieveData.DataList = episodesRelatedForRecentlyOrdered;
+                _RetrieveData.Url = helper.LivePathImages;
+                #endregion
+
+
+                return _RetrieveData;
             }
             catch (Exception ex)
             {
@@ -596,7 +604,7 @@ namespace BalarinaAPI.Controllers.Episodes
         [ApiAuthentication]
         [HttpGet]
         [Route("episodesrelatedforrecently")]
-        public async Task<ActionResult<List<EpisodesRelatedForRecentlyModel>>> episodesrelatedforrecently([FromQuery] EpisodesRelatedForRecentlyInputs inputs)
+        public async Task<ActionResult<RetrieveData<EpisodesRelatedForRecentlyModel>>> episodesrelatedforrecently([FromQuery] EpisodesRelatedForRecentlyInputs inputs)
         {
             try
             {
@@ -717,7 +725,13 @@ namespace BalarinaAPI.Controllers.Episodes
                 }
                 #endregion
 
-                return episodesRelatedForRecently;
+                #region Create DTO To Retrieve Data
+                RetrieveData<EpisodesRelatedForRecentlyModel> _RetrieveData = new RetrieveData<EpisodesRelatedForRecentlyModel>();
+                _RetrieveData.DataList = episodesRelatedForRecentlyOrdered;
+                _RetrieveData.Url = helper.LivePathImages;
+                #endregion
+
+                return _RetrieveData;
             }
             catch (Exception ex)
             {
@@ -726,7 +740,6 @@ namespace BalarinaAPI.Controllers.Episodes
             }
         }
         #endregion
-
 
         #region Episodes Trending For Days
         /// <summary>
@@ -745,7 +758,7 @@ namespace BalarinaAPI.Controllers.Episodes
         [ApiAuthentication]
         [HttpGet]
         [Route("episodestrending")]
-        public async Task<ActionResult<List<EpisodesRelatedForRecentlyModel>>> episodestrending([FromQuery] EpisodesTrendingModel model)
+        public async Task<ActionResult<RetrieveData<EpisodesRelatedForRecentlyModel>>> episodestrending([FromQuery] EpisodesTrendingModel model)
         {
             try
             {
@@ -785,7 +798,7 @@ namespace BalarinaAPI.Controllers.Episodes
         [ApiAuthentication]
         [HttpGet]
         [Route("EpisodesMostViewes")]
-        public async Task<ActionResult<List<EpisodesRelatedForRecentlyModel>>> EpisodesMostViewes([FromQuery] EpisodesMostViewesModel model)
+        public async Task<ActionResult<RetrieveData<EpisodesRelatedForRecentlyModel>>> EpisodesMostViewes([FromQuery] EpisodesMostViewesModel model)
         {
             try
             {
@@ -825,7 +838,7 @@ namespace BalarinaAPI.Controllers.Episodes
         [ApiAuthentication]
         [HttpGet]
         [Route("episodesshowmore")]
-        public async Task<ActionResult<List<EpisodesRelatedForRecentlyModel>>> episodesshowmore([FromQuery] EpisodesMostViewesModel model)
+        public async Task<ActionResult<RetrieveData<EpisodesRelatedForRecentlyModel>>> episodesshowmore([FromQuery] EpisodesMostViewesModel model)
         {
             try
             {
@@ -849,7 +862,6 @@ namespace BalarinaAPI.Controllers.Episodes
         }
         #endregion
 
-
         #region Episodes Recently
         /// <summary>
         /// this function get All Episodes Ordered Descending    
@@ -863,7 +875,7 @@ namespace BalarinaAPI.Controllers.Episodes
         [ApiAuthentication]
         [HttpGet]
         [Route("episodesrecently")]
-        public async Task<ActionResult<List<EpisodesRelatedForRecentlyModel>>> episodesrecently([FromQuery]EpisodesRecently episodesRecently)
+        public async Task<ActionResult<RetrieveData<EpisodesRelatedForRecentlyModel>>> episodesrecently([FromQuery]EpisodesRecently episodesRecently)
         {
             try
             {
@@ -899,7 +911,7 @@ namespace BalarinaAPI.Controllers.Episodes
         [ApiAuthentication]
         [HttpGet]
         [Route("detailapi")]
-        public async Task<ActionResult<List<DetailAPIModel>>> detailapi(int EPISODEID)
+        public async Task<ActionResult<RetrieveData<DetailAPIModel>>> detailapi(int EPISODEID)
         {
             try
             {
@@ -951,7 +963,7 @@ namespace BalarinaAPI.Controllers.Episodes
                                   episode.EpisodeIamgePath,
                                   episode.EpisodePublishDate,
                                   episode.EpisodeViews,
-                                  episode.YoutubeUrl
+                                  episode.YoutubeUrl,
                               }).Distinct();
                 #endregion
 
@@ -970,7 +982,7 @@ namespace BalarinaAPI.Controllers.Episodes
                         CategoryId = item.CategoryId,
                         CategoryTitle = item.CategoryTitle,
                         EpisodeDescription = item.EpisodeDescription,
-                        EpisodeIamgePath = helper.LivePathImages + item.EpisodeIamgePath,
+                        EpisodeIamgePath = item.EpisodeIamgePath,
                         EpisodeId = item.EpisodeId,
                         EpisodePublishDate = item.EpisodePublishDate,
                         ProgramStartDate = item.ProgramStartDate,
@@ -978,10 +990,10 @@ namespace BalarinaAPI.Controllers.Episodes
                         EpisodeViews = item.EpisodeViews,
                         InterviewerId = item.InterviewerId,
                         InterviewerName = item.InterviewerName,
-                        InterviewerPicture = helper.LivePathImages + item.InterviewerPicture,
+                        InterviewerPicture = item.InterviewerPicture,
                         ProgramDescription = item.ProgramDescription,
                         ProgramId = item.ProgramId,
-                        ProgramImg = helper.LivePathImages + item.ProgramImg,
+                        ProgramImg =  item.ProgramImg,
                         ProgramName = item.ProgramName,
                         ProgramTypeId = item.ProgramTypeId,
                         ProgramTypeTitle = item.ProgramTypeTitle,
@@ -1003,7 +1015,13 @@ namespace BalarinaAPI.Controllers.Episodes
                 await unitOfWork.Complete();
                 #endregion
 
-                return Ok(DetailAPIModelList);
+                #region Create DTO To Retrieve Data
+                RetrieveData<DetailAPIModel> _RetrieveData = new RetrieveData<DetailAPIModel>();
+                _RetrieveData.DataList = DetailAPIModelList;
+                _RetrieveData.Url = helper.LivePathImages;
+                #endregion
+
+                return Ok(_RetrieveData);
             }
             catch (Exception ex)
             {

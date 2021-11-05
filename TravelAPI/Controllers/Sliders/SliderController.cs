@@ -1,6 +1,7 @@
 ﻿using BalarinaAPI.Authentication;
 using BalarinaAPI.Core.Model;
 using BalarinaAPI.Core.Models;
+using BalarinaAPI.Core.ViewModel;
 using BalarinaAPI.Core.ViewModel.Slider;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -40,7 +41,7 @@ namespace BalarinaAPI.Controllers.sliders
         [ApiAuthentication]
         [HttpGet]
         [Route("getallslidersapikey")]
-        public async Task<ActionResult<List<Sliders>>> getallslidersapikeyAsync()
+        public async Task<ActionResult<RetrieveData<Sliders>>> getallslidersapikeyAsync()
         {
             try
             {
@@ -48,10 +49,14 @@ namespace BalarinaAPI.Controllers.sliders
                 var ResultSlider = await unitOfWork.Slider.GetObjects(); ResultSlider.OrderBy(x => x.SliderOrder).ToList();
                 #endregion
 
-                foreach (var item in ResultSlider)
-                {
-                    item.SliderImagePath = helper.LivePathImages + item.SliderImagePath;
-                }
+                //foreach (var item in ResultSlider)
+                //{
+                //    item.SliderImagePath = helper.LivePathImages + item.SliderImagePath;
+                //}
+              
+                RetrieveData<Sliders> Collection = new RetrieveData<Sliders>();
+                Collection.Url = helper.LivePathImages;
+                Collection.DataList = ResultSlider.ToList();
                 return Ok(ResultSlider);
             }
             catch (Exception ex)
@@ -93,7 +98,7 @@ namespace BalarinaAPI.Controllers.sliders
                 }
                 if (model.SliderImagePath == null)
                 {
-                    model.SliderImagePath = UploadImage(model.SliderImage);
+                    model.SliderImagePath =helper.UploadImage(model.SliderImage);
                 }
                 #endregion
 
@@ -212,40 +217,6 @@ namespace BalarinaAPI.Controllers.sliders
             }
         }
         #endregion
-
-        #region Function take image and return image name that store in db 
-        /// <summary>
-        /// generate unique name of image and save image in specified path 
-        /// </summary>
-        /// <param name="categoryImage"></param>
-        /// <returns>
-        /// unique name of iamge concatenating with extension of image 
-        /// </returns>
-        private string UploadImage(IFormFile categoryImage)
-        {
-            try
-            {
-                var pathToSave = helper.PathImage;
-                if (categoryImage.Length > 0)
-                {
-                    var fileName = Guid.NewGuid().ToString() + Path.GetExtension(categoryImage.FileName);
-                    var fullPath = Path.Combine(pathToSave, fileName);
-
-
-                    using (var stream = new FileStream(fullPath, FileMode.Create))
-                        categoryImage.CopyTo(stream);
-                    return fileName;
-                }
-                else
-                    return "error";
-            }
-            catch (Exception ex)
-            {
-                helper.LogError(ex);
-                return "error";
-            }
-        }
-
-        #endregion
+        
     }
 }

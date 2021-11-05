@@ -43,12 +43,12 @@ namespace BalarinaAPI.Controllers.Programs
         [ApiAuthentication]
         [HttpGet]
         [Route("getallprogramsapikey")]
-        public async Task<ActionResult<List<ProgramFilterModel>>> getallprogramsapikey()
+        public async Task<ActionResult<RetrieveData<ProgramFilterModel>>> getallprogramsapikey()
         {
-            // Create ProgramsList to return It
-            List<ProgramFilterModel> _programsList = new List<ProgramFilterModel>();
             try
             {
+                // Create ProgramsList to return It
+                List<ProgramFilterModel> _programsList = new List<ProgramFilterModel>();
                 //Get All Programs 
                 var ResultPrograms      = await unitOfWork.Program.GetObjects(); 
                 var ResultCategory      = await unitOfWork.category.GetObjects();
@@ -91,7 +91,7 @@ namespace BalarinaAPI.Controllers.Programs
                         InterviewerId       = item.InterviewerId,
                         ProgramDescription  = item.ProgramDescription,
                         ProgramId           = item.ProgramId,
-                        ProgramImg          = helper.LivePathImages+ item.ProgramImg,
+                        ProgramImg          = item.ProgramImg,
                         ProgramName         = item.ProgramName,
                         ProgramOrder        = item.ProgramOrder,
                         ProgramStartDate    = item.ProgramStartDate,
@@ -106,7 +106,12 @@ namespace BalarinaAPI.Controllers.Programs
                     _programsList.Add(_program);
                 }
                 #endregion
-                return _programsList;
+
+                RetrieveData<ProgramFilterModel> Collection = new RetrieveData<ProgramFilterModel>();
+                Collection.Url = helper.LivePathImages;
+                Collection.DataList = _programsList;
+
+                return Collection;
             }
             catch (Exception ex)
             {
@@ -121,12 +126,12 @@ namespace BalarinaAPI.Controllers.Programs
         [Authorize]
         [HttpGet]
         [Route("getallprograms")]
-        public async Task<ActionResult<List<ProgramFilterModel>>> getallprogramsAsync()
+        public async Task<ActionResult<RetrieveData<ProgramFilterModel>>> getallprogramsAsync()
         {
-            // Create ProgramsList to return It
-            List<ProgramFilterModel> _programsList = new List<ProgramFilterModel>();
             try
             {
+                // Create ProgramsList to return It
+                List<ProgramFilterModel> _programsList = new List<ProgramFilterModel>();
                 //Get All Programs 
                 var ResultPrograms = await unitOfWork.Program.GetObjects();
                 var ResultCategory = await unitOfWork.category.GetObjects();
@@ -169,7 +174,7 @@ namespace BalarinaAPI.Controllers.Programs
                         InterviewerId = item.InterviewerId,
                         ProgramDescription = item.ProgramDescription,
                         ProgramId = item.ProgramId,
-                        ProgramImg = helper.LivePathImages + item.ProgramImg,
+                        ProgramImg = item.ProgramImg,
                         ProgramName = item.ProgramName,
                         ProgramOrder = item.ProgramOrder,
                         ProgramStartDate = item.ProgramStartDate,
@@ -184,7 +189,12 @@ namespace BalarinaAPI.Controllers.Programs
                     _programsList.Add(_program);
                 }
                 #endregion
-                return _programsList;
+
+                RetrieveData<ProgramFilterModel> Collection = new RetrieveData<ProgramFilterModel>();
+                Collection.Url = helper.LivePathImages;
+                Collection.DataList = _programsList;
+
+                return Collection;
             }
             catch (Exception ex)
             {
@@ -274,7 +284,7 @@ namespace BalarinaAPI.Controllers.Programs
         [ApiAuthentication]
         [HttpGet]
         [Route("getallprogramsbycategoryid")]
-        public async Task<ActionResult<List<ProgramFilterModel>>> getallprogramsbycategoryid(int ID)
+        public async Task<ActionResult<RetrieveData<ProgramFilterModel>>> getallprogramsbycategoryid(int ID)
         {
             // Create ProgramsList to return It
             List<ProgramFilterModel> _programsList = new List<ProgramFilterModel>();
@@ -328,7 +338,7 @@ namespace BalarinaAPI.Controllers.Programs
                         InterviewerId = item.InterviewerId,
                         ProgramDescription = item.ProgramDescription,
                         ProgramId = item.ProgramId,
-                        ProgramImg = helper.LivePathImages + item.ProgramImg,
+                        ProgramImg = item.ProgramImg,
                         ProgramName = item.ProgramName,
                         ProgramOrder = item.ProgramOrder,
                         ProgramStartDate = item.ProgramStartDate,
@@ -343,7 +353,10 @@ namespace BalarinaAPI.Controllers.Programs
                     _programsList.Add(_program);
                 }
                 #endregion
-                return _programsList;
+                RetrieveData<ProgramFilterModel> Collection = new RetrieveData<ProgramFilterModel>();
+                Collection.Url = helper.LivePathImages;
+                Collection.DataList = _programsList;
+                return Collection;
             }
             catch (Exception ex)
             {
@@ -360,7 +373,7 @@ namespace BalarinaAPI.Controllers.Programs
         [ApiAuthentication]
         [HttpGet]
         [Route("getallprogramsbytypeid")]
-        public async Task<ActionResult<List<ProgramFilterModel>>> getallprogramsbytypeid(int ID)
+        public async Task<ActionResult<RetrieveData<ProgramFilterModel>>> getallprogramsbytypeid(int ID)
         {
             try
             {
@@ -377,7 +390,7 @@ namespace BalarinaAPI.Controllers.Programs
                         InterviewerId = item.InterviewerId,
                         ProgramDescription = item.ProgramDescription,
                         ProgramId = item.ProgramId,
-                        ProgramImg = helper.LivePathImages + item.ProgramImg,
+                        ProgramImg =  item.ProgramImg,
                         ProgramName = item.ProgramName,
                         ProgramOrder = item.ProgramOrder,
                         ProgramStartDate = item.ProgramStartDate,
@@ -389,7 +402,10 @@ namespace BalarinaAPI.Controllers.Programs
                     _programsList.Add(_program);
                 }
                 #endregion
-                return _programsList;
+                RetrieveData< ProgramFilterModel> Collection = new RetrieveData< ProgramFilterModel>();
+                Collection.Url = helper.LivePathImages;
+                Collection.DataList = _programsList;
+                return Collection;
             }
             catch (Exception ex)
             {
@@ -453,7 +469,7 @@ namespace BalarinaAPI.Controllers.Programs
                 if (model.ProgramImgPath == null)
                 {
                     if(model.ProgramImg != null)
-                    model.ProgramImgPath = UploadImage(model.ProgramImg);
+                    model.ProgramImgPath =helper.UploadImage(model.ProgramImg);
                 }
                 if (model.ProgramImgPath == null && model.ProgramImg == null)
                 {
@@ -550,7 +566,7 @@ namespace BalarinaAPI.Controllers.Programs
         [ApiAuthentication]
         [HttpGet]
         [Route("programfilter")]
-        public async Task<ActionResult<List<ProgramFilterModelWithTitle>>> programfilterAsync([FromQuery] ProgramFilterInputs inputs)
+        public async Task<ActionResult<RetrieveData<ProgramFilterModelWithTitle>>> programfilterAsync([FromQuery] ProgramFilterInputs inputs)
         {
             try
             {
@@ -609,7 +625,11 @@ namespace BalarinaAPI.Controllers.Programs
                 }
                 #endregion
 
-                return ProgramFilter;
+                RetrieveData<ProgramFilterModelWithTitle> Collection = new RetrieveData<ProgramFilterModelWithTitle>();
+                Collection.Url = helper.LivePathImages;
+                Collection.DataList = ProgramFilter;
+
+                return Collection;
             }
             catch (Exception ex)
             {
@@ -619,11 +639,11 @@ namespace BalarinaAPI.Controllers.Programs
         }
         #endregion
 
-        #region mostviewedprograms API Key Authentication
+        #region most viewed programs API Key Authentication
         [ApiAuthentication]
         [HttpGet]
         [Route("mostviewedprograms")]
-        public async Task<ActionResult<List<ProgramsMostViewsModel>>> mostviewedprograms([FromQuery] MostViewProgramInput input)
+        public async Task<ActionResult<RetrieveData<ProgramsMostViewsModel>>> mostviewedprograms([FromQuery] MostViewProgramInput input)
         {
             try
             {
@@ -722,7 +742,7 @@ namespace BalarinaAPI.Controllers.Programs
                                 ProgramTypeId = item.Item1.ProgramTypeId,
                                 ProgramVisible = (bool)item.Item1.ProgramVisible,
                                 Views = item.Item2,
-                                ProgramImg =helper.LivePathImages+ item.Item1.ProgramImg
+                                ProgramImg = item.Item1.ProgramImg
                             };
                             mostViewsModels.Add(model);
                             iterate++;
@@ -744,15 +764,18 @@ namespace BalarinaAPI.Controllers.Programs
                             ProgramTypeId = item.Item1.ProgramTypeId,
                             ProgramVisible = (bool)item.Item1.ProgramVisible,
                             Views = item.Item2,
-                            ProgramImg = helper.LivePathImages + item.Item1.ProgramImg
+                            ProgramImg =  item.Item1.ProgramImg
                         };
                         mostViewsModels.Add(model);
                     }
                 }
                 #endregion
 
+                RetrieveData<ProgramsMostViewsModel> Collection = new RetrieveData<ProgramsMostViewsModel>();
+                Collection.Url = helper.LivePathImages;
+                Collection.DataList = mostViewsModels ;
 
-                return mostViewsModels;
+                return Collection;
             }
             catch (Exception ex)
             {
@@ -760,43 +783,6 @@ namespace BalarinaAPI.Controllers.Programs
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
-        #endregion
-
-        #region Function take image and return image name that store in db 
-        /// <summary>
-        /// generate unique name of image and save image in specified path 
-        /// </summary>
-        /// <param name="categoryImage"></param>
-        /// <returns>
-        /// unique name of iamge concatenating with extension of image 
-        /// </returns>
-        private string UploadImage(IFormFile categoryImage)
-        {
-            try
-            {
-                var pathToSave = helper.PathImage;
-                if (categoryImage.Length > 0)
-                {
-                    var fileName = Guid.NewGuid().ToString() + Path.GetExtension(categoryImage.FileName);
-                    var fullPath = Path.Combine(pathToSave, fileName);
-                    using (var stream = new FileStream(fullPath, FileMode.Create))
-                    {
-                        categoryImage.CopyTo(stream);
-                    }
-                    return fileName;
-                }
-                else
-                {
-                    return "error : img is null ";
-                }
-            }
-            catch (Exception ex)
-            {
-                helper.LogError(ex);
-                return "error";
-            }
-        }
-
         #endregion
 
         #region Function To Update Order

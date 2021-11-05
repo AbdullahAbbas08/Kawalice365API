@@ -1,5 +1,6 @@
 ﻿using BalarinaAPI.Authentication;
 using BalarinaAPI.Core.Model;
+using BalarinaAPI.Core.ViewModel;
 using BalarinaAPI.Core.ViewModel.ADPLACEHOLDER;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -43,18 +44,15 @@ namespace BalarinaAPI.Controllers.ADPLACEHOLDERS
         [Authorize]
         [HttpGet]
         [Route("getallads")]
-        public async Task<ActionResult<IEnumerable<ADPLACEHOLDER>>> getallads()
+        public async Task<ActionResult<RetrieveData<ADPLACEHOLDER>>> getallads()
         {
             try
             {
+                RetrieveData<ADPLACEHOLDER> Collection= new RetrieveData<ADPLACEHOLDER>();    
                 var _ADPLACEHOLDER = await unitOfWork.ADPLACEHOLDER.GetObjects();
-
-                foreach (var item in _ADPLACEHOLDER)
-                {
-                    item.ImagePath = helper.LivePathImages + item.ImagePath;
-                }
-
-                return _ADPLACEHOLDER.ToList(); 
+                Collection.Url = helper.LivePathImages ;
+                Collection.DataList = _ADPLACEHOLDER.ToList();
+                return Collection; 
             }
             catch (Exception ex)
             {
@@ -74,18 +72,15 @@ namespace BalarinaAPI.Controllers.ADPLACEHOLDERS
         [ApiAuthentication]
         [HttpGet]
         [Route("getalladsapikey")]
-        public async Task<ActionResult<IEnumerable<ADPLACEHOLDER>>> getalladsapikey()
+        public async Task<ActionResult<RetrieveData<ADPLACEHOLDER>>> getalladsapikey()
         {
             try
             {
+                RetrieveData<ADPLACEHOLDER> Collection = new RetrieveData<ADPLACEHOLDER>();
                 var _ADPLACEHOLDER = await unitOfWork.ADPLACEHOLDER.GetObjects();
-
-                foreach (var item in _ADPLACEHOLDER)
-                {
-                    item.ImagePath = helper.LivePathImages + item.ImagePath;
-                }
-
-                return _ADPLACEHOLDER.ToList();
+                Collection.Url = helper.LivePathImages;
+                Collection.DataList = _ADPLACEHOLDER.ToList();
+                return Collection;
             }
             catch (Exception ex)
             {
@@ -102,21 +97,22 @@ namespace BalarinaAPI.Controllers.ADPLACEHOLDERS
         /// <returns>
         ///  Advertisement Object that Contains  ADPlaceholderID , AdStyleID , AdTargetId , Title AND ImagePath 
         /// </returns>
-        [ApiAuthentication]
+        //[ApiAuthentication]
         [HttpGet]
-        [Route("findads")]
-        public async Task<ActionResult<ADPLACEHOLDER>> findads(int ID)
+        [Route("findplacement")]
+        public async Task<ActionResult<RetrieveData<ADPLACEHOLDER>>> findplacement(int ID)
         {
             try 
             {
+               
+                RetrieveData<ADPLACEHOLDER> Collection = new RetrieveData<ADPLACEHOLDER>();
                 var _ADPLACEHOLDER = await unitOfWork.ADPLACEHOLDER.FindObjectAsync(ID);
-
                 if (_ADPLACEHOLDER == null)
-                    return BadRequest("ADS PLACEHOLDER ID NOT FOUND ");
+                    return BadRequest("PLACEHOLDER ID NOT FOUND ");
 
-                _ADPLACEHOLDER.ImagePath = helper.LivePathImages + _ADPLACEHOLDER.ImagePath;
-
-                return _ADPLACEHOLDER;
+                Collection.Url = helper.LivePathImages;
+                Collection.DataList.Add(_ADPLACEHOLDER);
+                return Collection;
             }
             catch (Exception ex)
             {

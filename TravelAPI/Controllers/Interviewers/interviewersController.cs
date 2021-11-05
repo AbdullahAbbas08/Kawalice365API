@@ -438,10 +438,12 @@ namespace BalarinaAPI.Controllers.Interviewers
         [ApiAuthentication]
         [HttpGet]
         [Route("mostviewedepisodesbyinterviewerid")]
-        public async Task<ActionResult<List<EpisodesRelatedForRecentlyModel>>> mostviewedepisodesbyintervieweridAsync([FromQuery] MostviewedEpisodesByInterviewerIDModel input)
+        public async Task<ActionResult<RetrieveData<EpisodesRelatedForRecentlyModel>>> mostviewedepisodesbyintervieweridAsync([FromQuery] MostviewedEpisodesByInterviewerIDModel input)
         {
             // Create EpisodeList to return It
             List<EpisodesRelatedForRecentlyModel> _episodeList = new List<EpisodesRelatedForRecentlyModel>();
+            RetrieveData<EpisodesRelatedForRecentlyModel> Collection = new RetrieveData<EpisodesRelatedForRecentlyModel>();
+
             try
             {
                 //Get All Programs 
@@ -545,7 +547,10 @@ namespace BalarinaAPI.Controllers.Interviewers
                     #endregion
                 }
 
-                return _episodeList;
+
+                Collection.Url = helper.LivePathImages;
+                Collection.DataList = _episodeList;
+                return Collection;
             }
             catch (Exception ex)
             {
@@ -560,7 +565,7 @@ namespace BalarinaAPI.Controllers.Interviewers
         //[ApiAuthentication]
         [HttpGet]
         [Route("mostviewedprogramsbyinterviewerid")]
-        public async Task<ActionResult<List<ProgramsMostViewsModel>>> mostviewedprogramsbyinterviewerid([FromQuery] MostViewProgramByInterviewerInput input)
+        public async Task<ActionResult<RetrieveData<ProgramsMostViewsModel>>> mostviewedprogramsbyinterviewerid([FromQuery] MostViewProgramByInterviewerInput input)
         {
             try
             {
@@ -569,6 +574,8 @@ namespace BalarinaAPI.Controllers.Interviewers
                 List<(Program, int)> ProgramSorted = new List<(Program, int)>();
                 IDictionary<int, int> SeasonIDWithCount = new Dictionary<int, int>();
                 List<ProgramsMostViewsModel> mostViewsModels = new List<ProgramsMostViewsModel>();
+                RetrieveData<ProgramsMostViewsModel> Collection = new RetrieveData<ProgramsMostViewsModel>();
+
                 #endregion
 
                 #region Fetch All Seasons from db
@@ -689,7 +696,10 @@ namespace BalarinaAPI.Controllers.Interviewers
                 }
                 #endregion
 
-                return mostViewsModels;
+                Collection.Url = helper.LivePathImages;
+                Collection.DataList = mostViewsModels;
+
+                return Collection;
             }
             catch (Exception ex)
             {
@@ -710,12 +720,15 @@ namespace BalarinaAPI.Controllers.Interviewers
         [ApiAuthentication]
         [HttpGet]
         [Route("geteallinterviewerbyviews")]
-        public async Task<ActionResult<List<(Interviewer, int)>>> geteallinterviewerbyviewsAsync()
+        public async Task<ActionResult<RetrieveData<InterviewerViewsModel>>> geteallinterviewerbyviewsAsync()
         {
-            // Create EpisodeList to return It
-            List<InterviewerModel> _episodeList = new List<InterviewerModel>();
+           
             try
             {
+                // Create EpisodeList to return It
+                List<InterviewerModel> _episodeList = new List<InterviewerModel>();
+                List<InterviewerViewsModel> interviewerViews = new List<InterviewerViewsModel>();
+                List<InterviewerViewsModel> interviewerViewsOrdered = new List<InterviewerViewsModel>();
                 //Get All Interviewer from Db
                 var ResultInterviewer = await unitOfWork.Interviewer.GetObjects(); ResultInterviewer.ToList();
                 //Get All Programs from Db
@@ -748,22 +761,28 @@ namespace BalarinaAPI.Controllers.Interviewers
                                                         interviewer.YoutubeUrl,
                                                         episode.EpisodeViews
                                                      };
-                //Create list of Interviewers and total views for it's
-                List<(Interviewer,int)> CountViews = new List<(Interviewer,int)>();
-
+               
                 #region Select interviewer and Calculate Episode Views
                 foreach (var _interviewer in ResultInterviewer)
                 {
+                    InterviewerViewsModel interviewerViewsModel= new InterviewerViewsModel();   
                     var _count = EpisodesRelatedWithInterviewer.
                                  Where(Obj => Obj.InterviewerId == _interviewer.InterviewerId).
                                  Sum(Obj => Obj.EpisodeViews);
-                    CountViews.Add((_interviewer, _count)); 
+                    interviewerViewsModel.Interviewer = _interviewer;
+                    interviewerViewsModel.Views = _count;
+
+                    interviewerViews.Add(interviewerViewsModel);
                 }
                 #endregion
                 //Order Interviewers by views 
-                CountViews.OrderByDescending(x => x.Item2);
+                interviewerViewsOrdered =  interviewerViews.OrderByDescending(x => x.Views).ToList();
 
-                return CountViews;
+                RetrieveData<InterviewerViewsModel> Collection = new RetrieveData<InterviewerViewsModel>();
+                Collection.DataList = interviewerViewsOrdered;
+                Collection.Url = helper.LivePathImages;
+
+                return Collection;
             }
             catch (Exception ex)
             {
@@ -778,25 +797,30 @@ namespace BalarinaAPI.Controllers.Interviewers
         [ApiAuthentication]
         [HttpGet]
         [Route("superstar")]
-        public ActionResult<List<SuperStarModel>> superstar()
+        public ActionResult<RetrieveData<SuperStarModel>> superstar()
         {
             try
             {
                 List<SuperStarModel> superStarModels = new List<SuperStarModel>();
                 var result = dbContext.SuperStarModel.FromSqlInterpolated($"EXEC [dbo].[SuperStarsSP]").ToList();
-                foreach (var item in result)
-                {
-                    SuperStarModel model = new SuperStarModel()
-                    {
-                        InterviewerID = item.InterviewerID,
-                        EpisodeViews = item.EpisodeViews,
-                        InterviewerDescription = item.InterviewerDescription,
-                        InterviewerName = item.InterviewerName,
-                        InterviewerPicture = helper.LivePathImages + item.InterviewerPicture
-                    };
-                    superStarModels.Add(model);
-                }
-                return superStarModels;
+                //foreach (var item in result)
+                //{
+                //    SuperStarModel model = new SuperStarModel()
+                //    {
+                //        InterviewerID = item.InterviewerID,
+                //        EpisodeViews = item.EpisodeViews,
+                //        InterviewerDescription = item.InterviewerDescription,
+                //        InterviewerName = item.InterviewerName,
+                //        InterviewerPicture = helper.LivePathImages + item.InterviewerPicture
+                //    };
+                //    superStarModels.Add(model);
+                //}
+
+                RetrieveData<SuperStarModel> Collection = new RetrieveData<SuperStarModel>();
+                Collection.DataList = result;
+                Collection.Url = helper.LivePathImages;
+
+                return Collection;
             }
             catch (Exception ex)
             {

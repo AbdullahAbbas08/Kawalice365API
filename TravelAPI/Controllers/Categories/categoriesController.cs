@@ -31,7 +31,6 @@ namespace BalarinaAPI.Controllers.Categories
         }
         #endregion
 
-
         #region CREUD OPERATION
 
         //Get All Category Exist in Episodes Controller
