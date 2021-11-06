@@ -1,6 +1,7 @@
 ﻿using BalarinaAPI.Authentication;
 using BalarinaAPI.Core.Model;
 using BalarinaAPI.Core.ViewModel;
+using BalarinaAPI.Core.ViewModel.Category;
 using BalarinaAPI.Core.ViewModel.DetailsAPI;
 using BalarinaAPI.Core.ViewModel.Episode;
 using Microsoft.AspNetCore.Authorization;
@@ -889,7 +890,13 @@ namespace BalarinaAPI.Controllers.Episodes
                     IsRecently = "DESC",
                     DateTo = DateTime.Now
                 };
-                return await episodesfilterforrecently(_EpisodesFilterForRecentlyInputs);
+
+                RetrieveData<EpisodesRelatedForRecentlyModel> Collection = new RetrieveData<EpisodesRelatedForRecentlyModel>();
+
+                Collection.DataList = (episodesfilterforrecently(_EpisodesFilterForRecentlyInputs)).Result.Value.DataList;
+                Collection.Url = (episodesfilterforrecently(_EpisodesFilterForRecentlyInputs)).Result.Value.Url;
+
+                return   Collection;
             }
             catch (Exception ex)
             {
@@ -1142,17 +1149,37 @@ namespace BalarinaAPI.Controllers.Episodes
             /// List Of Category that contain CategoryId,CategoryTitle,CreationDate,CategoryDescription,CategoryVisible,CategoryOrder,CategoryViews
             /// and CategoryImg concatenating with LivePathImages
             /// </returns>
-            [Authorize]
+            [ApiAuthentication]
             [HttpGet]
             [Route("getallcategories")]
-            public async Task<ActionResult<RetrieveData<Category>>> getallcategories()
+            public async Task<ActionResult<RetrieveData<CategoryModel>>> getallcategories()
             {
             try
             {
-                RetrieveData<Category> collection = new RetrieveData<Category>();
+                RetrieveData<CategoryModel> collection = new RetrieveData<CategoryModel>();
+                List<CategoryModel> categories = new List<CategoryModel>();
                 var ResultCategories = await unitOfWork.category.GetOrderedObjects(x => x.CategoryOrder);
+                foreach (var item in ResultCategories)
+                {
+                    var ProgramsCount = await unitOfWork.Program.GetObjects(x => x.CategoryId == item.CategoryId); ProgramsCount.ToList();
+                    CategoryModel category = new CategoryModel()
+                    {
+                        CategoryId = item.CategoryId,
+                        CategoryDescription = item.CategoryDescription,
+                        CategoryImg = item.CategoryImg,
+                        CategoryOrder = item.CategoryOrder,
+                        CategoryTitle = item.CategoryTitle,
+                        CategoryViews = item.CategoryViews,
+                        CategoryVisible = item.CategoryVisible,
+                        CreationDate = item.CreationDate,
+                        ProgramsCount = ProgramsCount.Count()
+                    };
+                    categories.Add(category);
+                };
+                
+                
                 collection.Url = helper.LivePathImages;
-                collection.DataList = ResultCategories.ToList();
+                collection.DataList = categories;
 
                 return Ok(collection);
             }

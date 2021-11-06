@@ -73,7 +73,6 @@ namespace BalarinaAPI.Controllers.Categories
         }
         #endregion
 
-
         #region Insert New Category 
         /// <summary>
         /// insert new category that have CategoryTitle,CategoryDescription,CategoryVisible,CategoryOrder
@@ -83,7 +82,7 @@ namespace BalarinaAPI.Controllers.Categories
         /// <returns>
         /// status of operation - Created Successfully  - or Status500InternalServerError
         /// </returns>
-        //[Authorize]
+        [Authorize]
         [HttpPost]
         [Route("createcategory")]
         public async Task<ActionResult<CategoryModelInput>> createcategoryAsync([FromQuery] CategoryModelInput model)
@@ -118,7 +117,8 @@ namespace BalarinaAPI.Controllers.Categories
                     CategoryOrder = model.CategoryOrder,
                     CreationDate = DateTime.Now,
                     CategoryVisible = model.CategoryVisible,
-                    CategoryImg = helper.UploadImage(model.CategoryImg)
+                    CategoryImg = helper.UploadImage(model.CategoryImg),
+                    CategoryViews = model.CategoryViews
                 };
                 #endregion
 
@@ -148,19 +148,23 @@ namespace BalarinaAPI.Controllers.Categories
 
         #region Edit Category
         /// <summary>
-        /// update Category ( elements or one element ) 
+        /// update Category(elements or one element)
         /// </summary>
-        /// <param name="model"></param>
-        /// <returns>
+        /// <param name = "model" ></ param >
+        /// < returns >
         /// status of operation  -Updated Successfully - or Status500InternalServerError
         /// </returns>
-        [Authorize]
+        
+        //[Authorize]
         [HttpPut]
-        [Route("putcategory")]
-        public async Task<ActionResult<CategoryModelInput>> putcategory([FromQuery] CategoryToUpdate model)
+        [Route("putcategories")]
+        public async Task<ActionResult<CategoryModelInput>> putcategories([FromQuery] CategoryToUpdate model)
         {
             try
             {
+                var CategoryImage = HttpContext.Request.Form.Files["CategoryImage"];
+                model.CategoryImg = CategoryImage;
+
                 #region check category id exist
                 var _categoryObj = await unitOfWork.category.FindObjectAsync(model.CategoryID);
 
@@ -186,10 +190,12 @@ namespace BalarinaAPI.Controllers.Categories
                 }
                 if (model.CategoryImgPath == null)
                 {
-                    model.CategoryImgPath =helper.UploadImage(model.CategoryImg);
+                    model.CategoryImgPath = helper.UploadImage(model.CategoryImg);
                 }
-                if (model.CategoryViews == null)
+
                     model.CategoryViews = _categoryObj.CategoryViews;
+
+
                 #endregion
 
                 #region Handle Order Update 
@@ -232,6 +238,7 @@ namespace BalarinaAPI.Controllers.Categories
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
+
         #endregion
 
         #region Function To Update Order
