@@ -891,12 +891,7 @@ namespace BalarinaAPI.Controllers.Episodes
                     DateTo = DateTime.Now
                 };
 
-                RetrieveData<EpisodesRelatedForRecentlyModel> Collection = new RetrieveData<EpisodesRelatedForRecentlyModel>();
-
-                Collection.DataList = (episodesfilterforrecently(_EpisodesFilterForRecentlyInputs)).Result.Value.DataList;
-                Collection.Url = (episodesfilterforrecently(_EpisodesFilterForRecentlyInputs)).Result.Value.Url;
-
-                return   Collection;
+                return await episodesfilterforrecently(_EpisodesFilterForRecentlyInputs);
             }
             catch (Exception ex)
             {

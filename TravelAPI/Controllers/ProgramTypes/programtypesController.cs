@@ -1,5 +1,7 @@
 ﻿using BalarinaAPI.Authentication;
 using BalarinaAPI.Core.Model;
+using BalarinaAPI.Core.ViewModel;
+using BalarinaAPI.Core.ViewModel.Category;
 using BalarinaAPI.Core.ViewModel.ProgramTypes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -37,11 +39,11 @@ namespace BalarinaAPI.Controllers.ProgramTypes
 
         #region CRUD OPERATIONS 
 
-           #region Get All ProgramsTypes
+         #region Get All ProgramsTypes
         [ApiAuthentication]
         [HttpGet]
         [Route("getallprogramTypes")]
-        public async Task<ActionResult<List<programTypesOutput>>> getallprogramTypes()
+        public async Task<ActionResult<RetrieveData<programTypesOutput>>> getallprogramTypes()
         {
             // Create ProgramsList to return It
             try
@@ -53,13 +55,18 @@ namespace BalarinaAPI.Controllers.ProgramTypes
                     programTypesOutput programTypes1 = new programTypesOutput()
                     {
                         ProgramTypeId = item.ProgramTypeId,
-                        ProgramTypeImgPath = helper.LivePathImages+item.ProgramTypeImgPath,
+                        ProgramTypeImgPath =item.ProgramTypeImgPath,
                         ProgramTypeOrder = item.ProgramTypeOrder,
                         ProgramTypeTitle = item.ProgramTypeTitle
                     };
                     programTypesOutputs.Add(programTypes1);
                 }
-                return programTypesOutputs;
+
+                RetrieveData<programTypesOutput> Collection = new RetrieveData<programTypesOutput>();
+                Collection.DataList = programTypesOutputs;
+                Collection.Url = helper.LivePathImages;
+
+                return Ok(Collection);
             }
             catch (Exception ex)
             {
@@ -70,7 +77,46 @@ namespace BalarinaAPI.Controllers.ProgramTypes
         }
         #endregion
 
-           #region Insert New program type
+        #region Get All Program Type Name , ID 
+        /// <summary>
+        /// Get All Program Type Name , ID 
+        /// </summary>
+        /// <returns>
+        /// List of Object that Contains 
+        /// Id , Name
+        /// </returns>
+        [ApiAuthentication]
+        [HttpGet]
+        [Route("GetProgramType_ID_Name")]
+        public async Task<ActionResult<List<ListOfNameID<Object_ID_Name>>>> GetProgramType_ID_Name()
+        {
+            try
+            {
+                //check If Category ID If Exist
+                var _InterviewerObject = await unitOfWork.ProgramType.GetObjects(); _InterviewerObject.ToList();
+                if (_InterviewerObject == null)
+                    return BadRequest("Interviewer list is empty ");
+                //Get All Programs 
+
+                List<ListOfNameID<Object_ID_Name>> Collection = new List<ListOfNameID<Object_ID_Name>>();
+                foreach (var item in _InterviewerObject)
+                {
+                    ListOfNameID<Object_ID_Name> obj = new ListOfNameID<Object_ID_Name>() { ID = item.ProgramTypeId, Name = item.ProgramTypeTitle };
+                    Collection.Add(obj);
+                }
+                return Collection;
+            }
+            catch (Exception ex)
+            {
+                // Log error in db
+                helper.LogError(ex);
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
+        #endregion
+
+
+        #region Insert New program type
         [Authorize]
         [HttpPost]
         [Route("createprogramtype")]
@@ -92,7 +138,7 @@ namespace BalarinaAPI.Controllers.ProgramTypes
                 {
                   ProgramTypeTitle = model.ProgramTypeTitle,
                   ProgramTypeOrder = model.ProgramTypeOrder,
-                  ProgramTypeImgPath = UploadImage(model.ProgramTypeImg),
+                  ProgramTypeImgPath =helper.UploadImage(model.ProgramTypeImg),
                 };
 
                 bool result = await unitOfWork.ProgramType.Create(_programtype);
@@ -112,7 +158,7 @@ namespace BalarinaAPI.Controllers.ProgramTypes
         }
         #endregion
 
-           #region Edit Program type
+         #region Edit Program type
         [Authorize]
         [HttpPut]
         [Route("putprogramtype")]
@@ -137,7 +183,7 @@ namespace BalarinaAPI.Controllers.ProgramTypes
                 if (model.ProgramTypeImgPath == null)
                 {
                     if (model.ProgramTypeImg != null)
-                        model.ProgramTypeImgPath = UploadImage(model.ProgramTypeImg);
+                        model.ProgramTypeImgPath =helper.UploadImage(model.ProgramTypeImg);
                 }
                 if (model.ProgramTypeImgPath == null && model.ProgramTypeImg == null)
                 {
@@ -177,7 +223,7 @@ namespace BalarinaAPI.Controllers.ProgramTypes
         }
         #endregion
 
-           #region Delete Program type
+         #region Delete Program type
         [Authorize]
         [HttpDelete("{ID}")]
         public async Task<ActionResult<ProgramType>> deleteprogramtype(int ID)
@@ -212,43 +258,5 @@ namespace BalarinaAPI.Controllers.ProgramTypes
         #endregion
 
         #endregion
-
-        #region Function take image and return image name that store in db 
-        /// <summary>
-        /// generate unique name of image and save image in specified path 
-        /// </summary>
-        /// <param name="categoryImage"></param>
-        /// <returns>
-        /// unique name of iamge concatenating with extension of image 
-        /// </returns>
-        private string UploadImage(IFormFile categoryImage)
-        {
-            try
-            {
-                var pathToSave = helper.PathImage;
-                if (categoryImage.Length > 0)
-                {
-                    var fileName = Guid.NewGuid().ToString() + Path.GetExtension(categoryImage.FileName);
-                    var fullPath = Path.Combine(pathToSave, fileName);
-                    using (var stream = new FileStream(fullPath, FileMode.Create))
-                    {
-                        categoryImage.CopyTo(stream);
-                    }
-                    return fileName;
-                }
-                else
-                {
-                    return "error : img is null ";
-                }
-            }
-            catch (Exception ex)
-            {
-                helper.LogError(ex);
-                return "error";
-            }
-        }
-
-        #endregion
-
     }
 }

@@ -1,6 +1,7 @@
 ﻿using BalarinaAPI.Authentication;
 using BalarinaAPI.Core.Model;
 using BalarinaAPI.Core.ViewModel;
+using BalarinaAPI.Core.ViewModel.Category;
 using BalarinaAPI.Core.ViewModel.Episode;
 using BalarinaAPI.Core.ViewModel.Interviewer;
 using Microsoft.AspNetCore.Authorization;
@@ -64,6 +65,44 @@ namespace BalarinaAPI.Controllers.Interviewers
                 helper.LogError(ex);
                 return StatusCode(StatusCodes.Status500InternalServerError);
                 // Log error in db
+            }
+        }
+        #endregion
+
+        #region Get All Interviewer Name , ID 
+        /// <summary>
+        /// Get All Interviewer Name , ID 
+        /// </summary>
+        /// <returns>
+        /// List of Object that Contains 
+        /// InterviewerId , InterviewerName
+        /// </returns>
+        [ApiAuthentication]
+        [HttpGet]
+        [Route("GetInterviewer_ID_Name")]
+        public async Task<ActionResult<List<ListOfNameID<Object_ID_Name>>>> GetInterviewer_ID_Name()
+        {
+            try
+            {
+                //check If Category ID If Exist
+                var _InterviewerObject = await unitOfWork.Interviewer.GetObjects(); _InterviewerObject.ToList();
+                if (_InterviewerObject == null)
+                    return BadRequest("Interviewer list is empty ");
+                //Get All Programs 
+
+                List<ListOfNameID<Object_ID_Name>> Collection = new List<ListOfNameID<Object_ID_Name>>();
+                foreach (var item in _InterviewerObject)
+                {
+                    ListOfNameID<Object_ID_Name> obj = new ListOfNameID<Object_ID_Name>() { ID = item.InterviewerId, Name = item.InterviewerName };
+                    Collection.Add(obj);
+                }
+                return Collection;
+            }
+            catch (Exception ex)
+            {
+                // Log error in db
+                helper.LogError(ex);
+                return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
         #endregion

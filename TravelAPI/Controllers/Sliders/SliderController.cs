@@ -57,7 +57,7 @@ namespace BalarinaAPI.Controllers.sliders
                 RetrieveData<Sliders> Collection = new RetrieveData<Sliders>();
                 Collection.Url = helper.LivePathImages;
                 Collection.DataList = ResultSlider.ToList();
-                return Ok(ResultSlider);
+                return Ok(Collection);
             }
             catch (Exception ex)
             {

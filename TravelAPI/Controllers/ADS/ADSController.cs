@@ -57,7 +57,7 @@ namespace BalarinaAPI.Controllers.Advertisement
                 RetrieveData<ADS> Collection = new RetrieveData<ADS>();
                 Collection.Url = helper.LivePathImages;
                 Collection.DataList = ADSs.ToList();
-                return Collection;
+                return Ok(Collection);
             }
             catch (Exception ex)
             {
@@ -86,7 +86,7 @@ namespace BalarinaAPI.Controllers.Advertisement
                 RetrieveData<ADS> Collection = new RetrieveData<ADS>();
                 Collection.Url = helper.LivePathImages;
                 Collection.DataList = ADSs.ToList();
-                return Collection;
+                return Ok(Collection);
             }
             catch (Exception ex)
             {
@@ -133,7 +133,7 @@ namespace BalarinaAPI.Controllers.Advertisement
                 await unitOfWork.Complete();
                 #endregion
 
-                return Collection;
+                return Ok(Collection);
             }
             catch (Exception ex)
             {
@@ -165,7 +165,7 @@ namespace BalarinaAPI.Controllers.Advertisement
                 RetrieveData<ADS> Collection = new RetrieveData<ADS>();
                 Collection.Url = helper.LivePathImages;
                 Collection.DataList.Add(_ADS);
-                return Collection;
+                return Ok(Collection);
             }
             catch (Exception ex)
             {
