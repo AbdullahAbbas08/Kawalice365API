@@ -699,11 +699,11 @@ namespace BalarinaAPI.Controllers.Episodes
                         EpisodeTitle = item.EpisodeTitle,
                         EpisodeViews = item.EpisodeViews,
                         ProgramId = item.ProgramId,
-                        ProgramImg = helper.LivePathImages + item.ProgramImg,
+                        ProgramImg =  item.ProgramImg,
                         ProgramName = item.ProgramName,
                         ProgramTypeId = item.ProgramTypeId,
                         ProgramTypeTitle = item.ProgramTypeTitle,
-                        EpisodeImg = helper.LivePathImages + item.EpisodeIamgePath,
+                        EpisodeImg =  item.EpisodeIamgePath,
                         EpisodeUrl = item.YoutubeUrl
 
                     };

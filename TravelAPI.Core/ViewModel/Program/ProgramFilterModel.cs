@@ -15,6 +15,7 @@ namespace BalarinaAPI.Core.ViewModel
         public string InterviewerName { get; set; }
         public string ProgramTypeName { get; set; }
         public string ProgramImg { get; set; }
+        public string ProgramPromoUrl { get; set; } 
         public DateTime CreationDate { get; set; }
         public int CategoryId { get; set; }
         public DateTime ProgramStartDate { get; set; }

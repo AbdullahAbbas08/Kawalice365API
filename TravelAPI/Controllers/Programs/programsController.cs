@@ -70,6 +70,7 @@ namespace BalarinaAPI.Controllers.Programs
                                  program.ProgramId,
                                  program.ProgramImg,
                                  program.ProgramName,
+                                 program.ProgramPromoUrl,
                                  program.ProgramOrder,
                                  program.ProgramVisible,
                                  program.ProgramStartDate,
@@ -101,6 +102,8 @@ namespace BalarinaAPI.Controllers.Programs
                         CategoryName        = item.CategoryTitle,
                         InterviewerName     = item.InterviewerName,
                         ProgramTypeName     = item.ProgramTypeTitle,
+                        ProgramPromoUrl = item.ProgramPromoUrl
+                        
                     };
                     // Finally Add It Into Programs List
                     _programsList.Add(_program);
@@ -155,6 +158,7 @@ namespace BalarinaAPI.Controllers.Programs
                                   program.ProgramName,
                                   program.ProgramOrder,
                                   program.ProgramVisible,
+                                  program.ProgramPromoUrl,                                 
                                   program.ProgramStartDate,
                                   program.CreationDate,
                                   interviewer.InterviewerId,
@@ -184,6 +188,7 @@ namespace BalarinaAPI.Controllers.Programs
                         CategoryName = item.CategoryTitle,
                         InterviewerName = item.InterviewerName,
                         ProgramTypeName = item.ProgramTypeTitle,
+                        ProgramPromoUrl=item.ProgramPromoUrl
                     };
                     // Finally Add It Into Programs List
                     _programsList.Add(_program);
@@ -206,13 +211,16 @@ namespace BalarinaAPI.Controllers.Programs
         #endregion
 
         #region Insert New program 
-        [Authorize]
+        //[Authorize]
+        //[ApiAuthentication]
         [HttpPost]
         [Route("createprogram")]
-        public async Task<ActionResult<ProgramViewModel>> createprogramAsync([FromQuery] ProgramViewModel model)
+        public async Task<ActionResult<ProgramViewModel>> createprogram([FromQuery] ProgramViewModel model)
         {
-            try
+            try 
             {
+                var ProgramImage = HttpContext.Request.Form.Files["ProgramImage"];
+
                 var typeID = unitOfWork.ProgramType.GetObjects(x=>x.ProgramTypeId == model.ProgramTypeId);
                 if (typeID == null)
                     return BadRequest("program type ID Not Found ");
@@ -230,6 +238,9 @@ namespace BalarinaAPI.Controllers.Programs
 
                 if (string.IsNullOrEmpty(model.ProgramDescription))
                     return BadRequest("program Description cannot be null or empty");
+
+                if (ProgramImage != null)
+                    model.ProgramImg = ProgramImage;
 
                 if (model.ProgramImg == null)
                     return BadRequest("program Image cannot be null ");
@@ -256,7 +267,7 @@ namespace BalarinaAPI.Controllers.Programs
 
                     ProgramDescription = model.ProgramDescription,
                     ProgramImg = helper.UploadImage(model.ProgramImg),
-                    ProgramPromoUrl = helper.UploadImage(model.ProgramPromoUrl),
+                    ProgramPromoUrl = model.ProgramPromoUrl,
                     ProgramName = model.ProgramName,
                     ProgramOrder = model.ProgramOrder,
                     ProgramStartDate = (DateTime) model.ProgramStartDate,
