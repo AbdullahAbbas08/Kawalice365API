@@ -117,7 +117,7 @@ namespace BalarinaAPI.Controllers.Programs
                 return Collection;
             }
             catch (Exception ex)
-            {
+             {
                 helper.LogError(ex);
                 return StatusCode(StatusCodes.Status500InternalServerError);
                 // Log error in db
@@ -218,7 +218,7 @@ namespace BalarinaAPI.Controllers.Programs
         public async Task<ActionResult<ProgramViewModel>> createprogram([FromQuery] ProgramViewModel model)
         {
             try 
-            {
+            {  
                 var ProgramImage = HttpContext.Request.Form.Files["ProgramImage"];
 
                 var typeID = unitOfWork.ProgramType.GetObjects(x=>x.ProgramTypeId == model.ProgramTypeId);
@@ -257,7 +257,7 @@ namespace BalarinaAPI.Controllers.Programs
                 if (model.ProgramVisible == null)
                     return BadRequest("Program Visible cannot be null ");
 
-                var d = DateTime.ParseExact(model.ProgramStartDate, "dd-MM-yyyy", null);
+                var ProgramStartDate = DateTime.ParseExact(model.ProgramStartDate, "dd-MM-yyyy", null);
                
 
                 Program _program = new Program()
@@ -273,7 +273,7 @@ namespace BalarinaAPI.Controllers.Programs
                     ProgramPromoUrl = model.ProgramPromoUrl,
                     ProgramName = model.ProgramName,
                     ProgramOrder = model.ProgramOrder,
-                    ProgramStartDate = d,
+                    ProgramStartDate = ProgramStartDate,
                     ProgramVisible = (bool)model.ProgramVisible,
                 };
 
@@ -431,13 +431,15 @@ namespace BalarinaAPI.Controllers.Programs
         #endregion
 
         #region Edit Program
-        [Authorize]
+        //[Authorize]
         [HttpPut]
         [Route("putprogram")]
         public async Task<ActionResult<ProgramInsertModel>> putprogram([FromQuery] ProgramInsertModel model )
         {
             try
             {
+                var ProgramImage = HttpContext.Request.Form.Files["ProgramImage"];
+                model.ProgramImg = ProgramImage;
                 if (model.ProgramId == null)
                     return BadRequest("Program ID Invalid !! ");
 
@@ -480,8 +482,9 @@ namespace BalarinaAPI.Controllers.Programs
                     model.ProgramName = _programObject.ProgramName;
 
                 #region check if image updated or not 
+
                 if (model.ProgramImgPath == null)
-                {
+                 {
                     if(model.ProgramImg != null)
                     model.ProgramImgPath =helper.UploadImage(model.ProgramImg);
                 }
@@ -501,8 +504,12 @@ namespace BalarinaAPI.Controllers.Programs
 
                 if(model.ProgramStartDate == null)
                     model.ProgramStartDate = _programObject.ProgramStartDate;
+
                 if(model.ProgramViews == null)
                     model.ProgramViews = _programObject.ProgramViews;
+
+                var ProgramStartDate = DateTime.ParseExact(model.ProgramStartDate, "dd-MM-yyyy", null);
+
                 #region Handle Order Update 
                 await UpdateOrder(model, _programObject.ProgramOrder);
                 #endregion
@@ -543,7 +550,7 @@ namespace BalarinaAPI.Controllers.Programs
         #endregion
 
         #region Delete Program
-        [Authorize]
+        //[Authorize]
         [HttpDelete("{ID}")]
         public async Task<ActionResult<Program>> deleteprogramAsync(int ID)
         {
