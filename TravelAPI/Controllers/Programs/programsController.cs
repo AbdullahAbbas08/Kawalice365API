@@ -215,7 +215,7 @@ namespace BalarinaAPI.Controllers.Programs
         //[ApiAuthentication]
         [HttpPost]
         [Route("createprogram")]
-        public async Task<ActionResult<ProgramViewModel>> createprogram([FromQuery] ProgramViewModel model)
+        public async Task<ActionResult<ProgramViewModel>> createprogram([FromQuery]ProgramViewModel model)
         {
             try 
             {  
@@ -284,7 +284,7 @@ namespace BalarinaAPI.Controllers.Programs
 
                 await unitOfWork.Complete();
 
-                return Ok("Program Created Successfully");
+                return StatusCode(StatusCodes.Status200OK);
             }
             catch (Exception ex)
             {
@@ -432,14 +432,18 @@ namespace BalarinaAPI.Controllers.Programs
 
         #region Edit Program
         //[Authorize]
+        //[ApiAuthentication]
         [HttpPut]
         [Route("putprogram")]
         public async Task<ActionResult<ProgramInsertModel>> putprogram([FromQuery] ProgramInsertModel model )
         {
             try
             {
+                DateTime? ProgramStartDate = new DateTime();
                 var ProgramImage = HttpContext.Request.Form.Files["ProgramImage"];
+
                 model.ProgramImg = ProgramImage;
+
                 if (model.ProgramId == null)
                     return BadRequest("Program ID Invalid !! ");
 
@@ -502,13 +506,22 @@ namespace BalarinaAPI.Controllers.Programs
                 if (model.ProgramOrder == null)
                     model.ProgramOrder = _programObject.ProgramOrder;
 
-                if(model.ProgramStartDate == null)
-                    model.ProgramStartDate = _programObject.ProgramStartDate;
-
-                if(model.ProgramViews == null)
+                if (model.ProgramViews == null)
                     model.ProgramViews = _programObject.ProgramViews;
 
-                var ProgramStartDate = DateTime.ParseExact(model.ProgramStartDate, "dd-MM-yyyy", null);
+               
+
+                if (model.ProgramStartDate == null)
+                    ProgramStartDate = _programObject.ProgramStartDate;
+                else if(model.ProgramStartDate.Contains("T"))
+                {
+                    model.ProgramStartDate = model.ProgramStartDate.Substring(0, model.ProgramStartDate.IndexOf("T"));
+                }
+                else
+                {
+                    ProgramStartDate = DateTime.ParseExact(model.ProgramStartDate, "dd-MM-yyyy", null);
+                }
+                
 
                 #region Handle Order Update 
                 await UpdateOrder(model, _programObject.ProgramOrder);
@@ -524,7 +537,7 @@ namespace BalarinaAPI.Controllers.Programs
                     ProgramImg          =         model.ProgramImgPath,
                     ProgramName         =         model.ProgramName,
                     ProgramOrder        = (int)   model.ProgramOrder,
-                    ProgramStartDate    = (DateTime) model.ProgramStartDate,
+                    ProgramStartDate    = (DateTime)ProgramStartDate,
                     ProgramVisible      = (bool)  model.ProgramVisible,
                     CreationDate        =         DateTime.Now,
                     ProgramViews        = (int)model.ProgramViews
@@ -537,7 +550,7 @@ namespace BalarinaAPI.Controllers.Programs
 
                 await unitOfWork.Complete();
 
-                return Ok("UPDATE OPERATION Successfully");
+                return StatusCode(StatusCodes.Status200OK) ;
             }
             catch (Exception ex)
             {
@@ -571,7 +584,8 @@ namespace BalarinaAPI.Controllers.Programs
                 helper.DeleteFiles(ProgramObj.ProgramImg);
                 #endregion
 
-                return Ok("program id deleted successfully ");
+                return StatusCode(StatusCodes.Status200OK);
+
             }
             catch (Exception ex)
             {

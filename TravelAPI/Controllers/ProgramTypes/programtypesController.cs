@@ -117,13 +117,15 @@ namespace BalarinaAPI.Controllers.ProgramTypes
 
 
         #region Insert New program type
-        [Authorize]
+        //[Authorize]
         [HttpPost]
         [Route("createprogramtype")]
         public async Task<ActionResult<ProgramTypeInput>> createprogramtypeAsync([FromQuery] ProgramTypeInput model)
         {
             try
             {
+                var Image = HttpContext.Request.Form.Files["ProgramTypeImage"];
+                model.ProgramTypeImg = Image; 
 
                 if (string.IsNullOrEmpty(model.ProgramTypeTitle))
                     return BadRequest("program type title cannot be null or empty");
@@ -148,7 +150,7 @@ namespace BalarinaAPI.Controllers.ProgramTypes
 
                 await unitOfWork.Complete();
 
-                return Ok("Program type Created Successfully");
+                return StatusCode(StatusCodes.Status200OK);
             }
             catch (Exception ex)
             {
@@ -159,7 +161,7 @@ namespace BalarinaAPI.Controllers.ProgramTypes
         #endregion
 
          #region Edit Program type
-        [Authorize]
+        //[Authorize]
         [HttpPut]
         [Route("putprogramtype")]
         public async Task<ActionResult<ProgramTypeToUpdate>> putprogramtype([FromQuery] ProgramTypeToUpdate model)
@@ -211,7 +213,7 @@ namespace BalarinaAPI.Controllers.ProgramTypes
 
                 await unitOfWork.Complete();
 
-                return Ok("UPDATE OPERATION Successfully ");
+                return StatusCode(StatusCodes.Status200OK);
             }
             catch (Exception ex)
             {
@@ -224,7 +226,7 @@ namespace BalarinaAPI.Controllers.ProgramTypes
         #endregion
 
          #region Delete Program type
-        [Authorize]
+        //[Authorize]
         [HttpDelete("{ID}")]
         public async Task<ActionResult<ProgramType>> deleteprogramtype(int ID)
         {
@@ -247,7 +249,7 @@ namespace BalarinaAPI.Controllers.ProgramTypes
                 helper.DeleteFiles(programTypeObj.ProgramTypeImgPath);
                 #endregion
 
-                return Ok("program type id deleted successfully ");
+                return StatusCode(StatusCodes.Status200OK);
             }
             catch (Exception ex)
             {

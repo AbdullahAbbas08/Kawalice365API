@@ -279,7 +279,7 @@ namespace BalarinaAPI.Core.Migrations
                         column: x => x.ProgramTypeID,
                         principalTable: "ProgramTypes",
                         principalColumn: "ProgramTypeID",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.NoAction);
                 });
 
             migrationBuilder.CreateTable(

@@ -123,7 +123,7 @@ namespace BalarinaAPI.Controllers.Categories
         /// <returns>
         /// status of operation - Created Successfully  - or Status500InternalServerError
         /// </returns>
-        [Authorize]
+        //[ApiAuthentication]
         [HttpPost]
         [Route("createcategory")]
         public async Task<ActionResult<CategoryModelInput>> createcategoryAsync([FromQuery] CategoryModelInput model)
@@ -176,7 +176,7 @@ namespace BalarinaAPI.Controllers.Categories
                 await unitOfWork.Complete();
                 #endregion
 
-                return Ok("Category Created Successfully ");
+                return StatusCode(StatusCodes.Status200OK);
             }
             catch (Exception ex)
             {
@@ -195,8 +195,8 @@ namespace BalarinaAPI.Controllers.Categories
         /// < returns >
         /// status of operation  -Updated Successfully - or Status500InternalServerError
         /// </returns>
-        
-        //[Authorize]
+
+        //[ApiAuthentication]
         [HttpPut]
         [Route("putcategories")]
         public async Task<ActionResult<CategoryModelInput>> putcategories([FromQuery] CategoryToUpdate model)
@@ -271,7 +271,7 @@ namespace BalarinaAPI.Controllers.Categories
                 #endregion
 
 
-                return Ok("Category Updated Successfully ");
+                return StatusCode(StatusCodes.Status200OK);
             }
             catch (Exception ex)
             {
@@ -368,7 +368,7 @@ namespace BalarinaAPI.Controllers.Categories
         /// <returns>
         /// status of operation - Deleted Successfully - or Status500InternalServerError
         /// </returns>
-        [Authorize]
+        //[Authorize]
         [HttpDelete("{ID}")]
         public async Task<ActionResult<Category>> deletecategoryAsync(int ID)
         {
@@ -398,7 +398,7 @@ namespace BalarinaAPI.Controllers.Categories
                 await unitOfWork.Complete();
                 #endregion
 
-                return Ok("Category ID Deleted Successfully");
+                return StatusCode(StatusCodes.Status200OK);
             }
             catch (Exception ex)
             {
