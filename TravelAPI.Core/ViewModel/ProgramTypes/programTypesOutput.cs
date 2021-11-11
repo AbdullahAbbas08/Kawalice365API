@@ -12,5 +12,6 @@ namespace BalarinaAPI.Core.ViewModel.ProgramTypes
         public string ProgramTypeTitle { get; set; }
         public string ProgramTypeImgPath { get; set; }
         public int ProgramTypeOrder { get; set; }
+        public int ProgramCount { get; set; }
     }
 }

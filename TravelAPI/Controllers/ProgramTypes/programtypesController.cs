@@ -39,7 +39,7 @@ namespace BalarinaAPI.Controllers.ProgramTypes
 
         #region CRUD OPERATIONS 
 
-         #region Get All ProgramsTypes
+        #region Get All ProgramsTypes
         [ApiAuthentication]
         [HttpGet]
         [Route("getallprogramTypes")]
@@ -50,14 +50,17 @@ namespace BalarinaAPI.Controllers.ProgramTypes
             {
                 List<programTypesOutput> programTypesOutputs = new List<programTypesOutput>();
                 var programTypes = await unitOfWork.ProgramType.GetObjects(); programTypes.ToList();
+
                 foreach (var item in programTypes)
                 {
+                    var _Programs = await unitOfWork.Program.GetObjects(x=>x.ProgramTypeId ==  item.ProgramTypeId);
                     programTypesOutput programTypes1 = new programTypesOutput()
                     {
                         ProgramTypeId = item.ProgramTypeId,
                         ProgramTypeImgPath =item.ProgramTypeImgPath,
                         ProgramTypeOrder = item.ProgramTypeOrder,
-                        ProgramTypeTitle = item.ProgramTypeTitle
+                        ProgramTypeTitle = item.ProgramTypeTitle,
+                        ProgramCount = _Programs.Count()
                     };
                     programTypesOutputs.Add(programTypes1);
                 }
@@ -93,13 +96,11 @@ namespace BalarinaAPI.Controllers.ProgramTypes
             try
             {
                 //check If Category ID If Exist
-                var _InterviewerObject = await unitOfWork.ProgramType.GetObjects(); _InterviewerObject.ToList();
-                if (_InterviewerObject == null)
-                    return BadRequest("Interviewer list is empty ");
+                var _ProgramTypes = await unitOfWork.ProgramType.GetObjects(); _ProgramTypes.ToList();
                 //Get All Programs 
 
                 List<ListOfNameID<Object_ID_Name>> Collection = new List<ListOfNameID<Object_ID_Name>>();
-                foreach (var item in _InterviewerObject)
+                foreach (var item in _ProgramTypes)
                 {
                     ListOfNameID<Object_ID_Name> obj = new ListOfNameID<Object_ID_Name>() { ID = item.ProgramTypeId, Name = item.ProgramTypeTitle };
                     Collection.Add(obj);
@@ -114,7 +115,6 @@ namespace BalarinaAPI.Controllers.ProgramTypes
             }
         }
         #endregion
-
 
         #region Insert New program type
         //[Authorize]
@@ -160,7 +160,7 @@ namespace BalarinaAPI.Controllers.ProgramTypes
         }
         #endregion
 
-         #region Edit Program type
+        #region Edit Program type
         //[Authorize]
         [HttpPut]
         [Route("putprogramtype")]
@@ -225,7 +225,7 @@ namespace BalarinaAPI.Controllers.ProgramTypes
         }
         #endregion
 
-         #region Delete Program type
+        #region Delete Program type
         //[Authorize]
         [HttpDelete("{ID}")]
         public async Task<ActionResult<ProgramType>> deleteprogramtype(int ID)
@@ -254,6 +254,7 @@ namespace BalarinaAPI.Controllers.ProgramTypes
             catch (Exception ex)
             {
                 helper.LogError(ex);
+                string e = ex.StackTrace;
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }

@@ -16,8 +16,8 @@ namespace BalarinaAPI.Core.Model
         }
         public int SessionId { get; set; }
         public string SessionTitle { get; set; }
-        public int? ProgramId { get; set; }
-        public int? ProgramViews  { get; set; }
+        public int ProgramId { get; set; }
+        public int SeasonViews  { get; set; }
         public DateTime CreationDate  { get; set; }
 
         [JsonIgnore]

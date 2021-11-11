@@ -304,7 +304,8 @@ namespace BalarinaAPI.Core.Model
                 entity.HasOne(d => d.ProgramType)
                     .WithMany(p => p.Programs)
                     .HasForeignKey(d => d.ProgramTypeId)
-                    .HasConstraintName("FK_Programs_ProgramTypes");
+                    .HasConstraintName("FK_Programs_ProgramTypes")
+                    .OnDelete(DeleteBehavior.NoAction);
             });
 
             modelBuilder.Entity<ProgramType>(entity =>

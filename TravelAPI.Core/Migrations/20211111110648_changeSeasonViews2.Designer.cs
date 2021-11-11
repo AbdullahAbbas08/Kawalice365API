@@ -4,14 +4,16 @@ using BalarinaAPI.Core.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace BalarinaAPI.Core.Migrations
 {
     [DbContext(typeof(BalarinaDatabaseContext))]
-    partial class BalarinaDbContextModelSnapshot : ModelSnapshot
+    [Migration("20211111110648_changeSeasonViews2")]
+    partial class changeSeasonViews2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -510,7 +512,7 @@ namespace BalarinaAPI.Core.Migrations
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("ProgramId")
+                    b.Property<int?>("ProgramId")
                         .HasColumnType("int")
                         .HasColumnName("ProgramID");
 
@@ -892,9 +894,7 @@ namespace BalarinaAPI.Core.Migrations
                     b.HasOne("BalarinaAPI.Core.Model.Program", "Program")
                         .WithMany("Sessions")
                         .HasForeignKey("ProgramId")
-                        .HasConstraintName("FK_Sessions_Programs")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasConstraintName("FK_Sessions_Programs");
 
                     b.Navigation("Program");
                 });

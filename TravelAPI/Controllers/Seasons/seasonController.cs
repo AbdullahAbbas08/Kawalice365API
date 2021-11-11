@@ -40,13 +40,44 @@ namespace BalarinaAPI.Controllers.Season
         [ApiAuthentication]
         [HttpGet]
         [Route("getallseasonsapikey")]
-        public async Task<ActionResult<List<Seasons>>> getallseasonsapikeyAsync()
+        public async Task<ActionResult<List<SeasonModel>>> getallseasonsapikeyAsync()
         {
             try
             {
+                List<SeasonModel> seasons = new List<SeasonModel>();
                 //Get All Programs 
-                var ResultSeasons = await unitOfWork.Season.GetObjects(); ResultSeasons.ToList();  
-                return Ok(ResultSeasons);
+                var ResultSeasons = await unitOfWork.Season.GetObjects(); ResultSeasons.ToList();
+                var ResultPrograms = await unitOfWork.Program.GetObjects(); ResultPrograms.ToList();
+
+                var result = (from program in ResultPrograms 
+                              join season in ResultSeasons
+                                on program.ProgramId equals season.ProgramId
+                                 select new
+                                 {
+                                     season.SessionId,
+                                     season.SessionTitle,
+                                     season.CreationDate,
+                                     season.SeasonViews,
+                                     program.ProgramId,
+                                     program.ProgramName     
+                                 }).ToList();
+                foreach (var item in result)
+                {
+                    var EpisodesRelated = await unitOfWork.Episode.GetObjects(x => x.SessionId == item.SessionId);
+
+                    SeasonModel model = new SeasonModel()
+                    {
+                        SessionId = item.SessionId,
+                        ProgramId = item.ProgramId,
+                        CreationDate = item.CreationDate,
+                        SeasonViews =item.SeasonViews,
+                        SessionTitle = item.SessionTitle,
+                        ProgramName = item.ProgramName,
+                        EpisodesCount = EpisodesRelated.Count()
+                    };
+                    seasons.Add(model);
+                }
+                return seasons;
             }
             catch (Exception ex)
             {
@@ -77,6 +108,8 @@ namespace BalarinaAPI.Controllers.Season
             }
         }
         #endregion
+
+
 
         #region Get All Season Related With ProgramID API Key Authentication
         [ApiAuthentication]
@@ -121,14 +154,14 @@ namespace BalarinaAPI.Controllers.Season
         #endregion
 
         #region Insert New Season 
-        [Authorize]
+        [ApiAuthentication]
         [HttpPost]
         [Route("createseason")]
         public async Task<ActionResult<SeasonInput>> createseasonAsync([FromQuery] SeasonInput  model )
         {
             try
             {
-                var programID = unitOfWork.Program.FindObjectAsync(model.ProgramId);
+                var programID = await unitOfWork.Program.FindObjectAsync(model.ProgramId);
                 if (programID == null)
                     return BadRequest("program ID Not Found ");
 
@@ -139,7 +172,8 @@ namespace BalarinaAPI.Controllers.Season
                 {
                      SessionTitle = model.SessionTitle,
                      ProgramId = model.ProgramId,
-                     CreationDate = DateTime.Now
+                     CreationDate = DateTime.Now,
+                     SeasonViews = model.SeasonViews
                 };
 
                 bool result = await unitOfWork.Season.Create(_season);
@@ -149,7 +183,7 @@ namespace BalarinaAPI.Controllers.Season
 
                 await unitOfWork.Complete();
 
-                return Ok("season Inserted Successfully ");
+                return StatusCode(StatusCodes.Status200OK);
             }
             catch (Exception ex)
             {
@@ -160,7 +194,7 @@ namespace BalarinaAPI.Controllers.Season
         #endregion
 
         #region Edit Season
-        [Authorize]
+        [ApiAuthentication]
         [HttpPut]
         [Route("putseason")]
         public async Task<ActionResult<SeasonToUpdate>> putseason([FromQuery] SeasonToUpdate model)
@@ -174,6 +208,9 @@ namespace BalarinaAPI.Controllers.Season
                 if(model.SessionTitle == null)
                     model.SessionTitle = SeasonObj.SessionTitle;
 
+                if (model.SeasonViews == null)
+                    model.SeasonViews = SeasonObj.SeasonViews;
+
                 if (model.ProgramId == null)
                     model.ProgramId = SeasonObj.ProgramId;
                 else
@@ -186,8 +223,9 @@ namespace BalarinaAPI.Controllers.Season
                 Seasons _season = new Seasons()
                 {
                   SessionId= model.SessionId,
-                  ProgramId = model.ProgramId,
+                  ProgramId =(int) model.ProgramId,
                   SessionTitle = model.SessionTitle,
+                  SeasonViews = (int)model.SeasonViews
                 };
 
                 bool result = unitOfWork.Season.Update(_season);
@@ -197,7 +235,7 @@ namespace BalarinaAPI.Controllers.Season
 
                 await unitOfWork.Complete();
 
-                return Ok("Season Update Successfully ");
+                return StatusCode(StatusCodes.Status200OK);
             }
             catch (Exception ex)
             {
@@ -210,7 +248,7 @@ namespace BalarinaAPI.Controllers.Season
         #endregion
 
         #region Delete season
-        [Authorize]
+        //[ApiAuthentication]
         [HttpDelete("{ID}")]
         public async Task<ActionResult<Seasons>> deleteseasonAsync(int ID)
         {
@@ -221,7 +259,7 @@ namespace BalarinaAPI.Controllers.Season
                     return BadRequest("season Not Exist");
                 await unitOfWork.Complete();
 
-                return Ok("season Deleted Successfully ");
+                return StatusCode(StatusCodes.Status200OK);
             }
             catch (Exception ex)
             {
