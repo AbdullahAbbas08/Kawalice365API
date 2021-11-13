@@ -13,20 +13,20 @@ namespace BalarinaAPI.Core.Model
         {
             Programs = new HashSet<Program>();
         }
-        public int InterviewerId { get; set; }
-        public string InterviewerName { get; set; }
-        public string InterviewerPicture { get; set; }
-        public string InterviewerCover { get; set; }
-        public string InterviewerDescription { get; set; }
-        public string FacebookUrl { get; set; }
-        public string InstgramUrl { get; set; }
-        public string TwitterUrl { get; set; }
-        public string YoutubeUrl { get; set; }
-        public string LinkedInUrl { get; set; }
-        public string WebsiteUrl { get; set; }
-        public DateTime? CreationDate { get; set; }
-        public DateTime? BirthDate { get; set; }
-        public string TiktokUrl { get; set; }
+        public int          InterviewerId           { get; set; }
+        public string       InterviewerName         { get; set; }
+        public string       InterviewerPicture      { get; set; }
+        public string       InterviewerCover        { get; set; }
+        public string       InterviewerDescription  { get; set; }
+        public string       FacebookUrl             { get; set; }
+        public string       InstgramUrl             { get; set; }
+        public string       TwitterUrl              { get; set; }
+        public string       YoutubeUrl              { get; set; }
+        public string       LinkedInUrl             { get; set; }
+        public string       WebsiteUrl              { get; set; }
+        public DateTime?    CreationDate            { get; set; }
+        public DateTime?    BirthDate               { get; set; }
+        public string       TiktokUrl               { get; set; }
         [JsonIgnore]
         public virtual ICollection<Program> Programs { get; set; }
     }

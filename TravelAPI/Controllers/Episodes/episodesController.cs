@@ -144,13 +144,17 @@ namespace BalarinaAPI.Controllers.Episodes
         /// <returns>
         /// status of operation - Created Successfully - or Status500InternalServerError
         /// </returns>
-        [Authorize]
+        [ApiAuthentication]
         [HttpPost]
         [Route("createepisode")]
         public async Task<ActionResult<EpisodeModelInput>> createepisodeAsync([FromQuery] EpisodeModelInput model)
         {
             try
             {
+                DateTime EpisodePublishDate = new DateTime();
+                var ProgramImage = HttpContext.Request.Form.Files["EpisodeIamge"];
+                model.EpisodeIamge = ProgramImage;
+
                 #region Check values of Episodes is not null or empty
                 if (string.IsNullOrEmpty(model.EpisodeTitle))
                     return BadRequest("Episode Title cannot be null or empty");
@@ -180,6 +184,16 @@ namespace BalarinaAPI.Controllers.Episodes
                 var SeasonId = unitOfWork.Season.FindObjectAsync(model.SeasonId);
                 if (SeasonId == null)
                     return BadRequest("Season ID not found ");
+
+                  else if (model.EpisodePublishDate.Contains("T"))
+                {
+                    model.EpisodePublishDate = model.EpisodePublishDate.Substring(0, model.EpisodePublishDate.IndexOf("T"));
+                }
+                else
+                {
+                    EpisodePublishDate = DateTime.ParseExact(model.EpisodePublishDate, "dd-MM-yyyy", null);
+                }
+
                 #endregion
 
                 #region Fill Episode object with values to insert
@@ -188,7 +202,7 @@ namespace BalarinaAPI.Controllers.Episodes
                     CreationDate = DateTime.Now,
                     DislikeRate = (int)model.LikeRate,
                     EpisodeDescription = model.EpisodeDescription,
-                    EpisodePublishDate = model.EpisodePublishDate,
+                    EpisodePublishDate = EpisodePublishDate,
                     EpisodeTitle = model.EpisodeTitle,
                     LikeRate = (int)model.LikeRate,
                     EpisodeViews = (int)model.EpisodeViews,
@@ -212,7 +226,7 @@ namespace BalarinaAPI.Controllers.Episodes
                 await unitOfWork.Complete();
                 #endregion
 
-                return Ok("Episode Created Successfully ");
+                return StatusCode(StatusCodes.Status200OK);
             }
             catch (Exception ex)
             {
@@ -224,13 +238,17 @@ namespace BalarinaAPI.Controllers.Episodes
         #endregion
 
         #region Edit Episode
-        [Authorize]
+        [ApiAuthentication]
         [HttpPut]
         [Route("putepisode")]
         public async Task<ActionResult<Episode>> putepisodeAsync([FromQuery] EpisodeToUpdate model)
         {
             try
             {
+                DateTime EpisodePublishDate = new DateTime();
+                var ProgramImage = HttpContext.Request.Form.Files["EpisodeIamge"];
+                model.EpisodeImage = ProgramImage;
+
                 #region check Episode id exist
 
                 var _EpisodeObj = await unitOfWork.Episode.FindObjectAsync(model.EpisodeId);
@@ -253,11 +271,20 @@ namespace BalarinaAPI.Controllers.Episodes
                     model.EpisodeVisible = _EpisodeObj.EpisodeVisible;
 
                 if (model.EpisodePublishDate == null)
-                    model.EpisodePublishDate = _EpisodeObj.EpisodePublishDate;
+                    EpisodePublishDate = _EpisodeObj.EpisodePublishDate;
 
                 if (model.SeasonId == null)
                     model.SeasonId = _EpisodeObj.SessionId;
 
+                if (model.EpisodePublishDate == null)
+                    EpisodePublishDate = _EpisodeObj.EpisodePublishDate;
+
+                if (model.EpisodePublishDate.Contains("T"))
+                {
+                    model.EpisodePublishDate = model.EpisodePublishDate.Substring(0, model.EpisodePublishDate.IndexOf("T"));
+                }
+
+                EpisodePublishDate = DateTime.ParseExact(model.EpisodePublishDate, "dd-MM-yyyy", null);
                 #endregion
 
                 #region check if image updated or not 
@@ -280,7 +307,7 @@ namespace BalarinaAPI.Controllers.Episodes
                     DislikeRate = _EpisodeObj.DislikeRate,
                     LikeRate = _EpisodeObj.LikeRate,
                     EpisodeDescription = model.EpisodeDescription,
-                    EpisodePublishDate = (DateTime)model.EpisodePublishDate,
+                    EpisodePublishDate = EpisodePublishDate,
                     EpisodeTitle = model.EpisodeTitle,
                     EpisodeViews = _EpisodeObj.EpisodeViews,
                     EpisodeVisible = model.EpisodeVisible,
@@ -303,7 +330,7 @@ namespace BalarinaAPI.Controllers.Episodes
                 await unitOfWork.Complete();
                 #endregion
 
-                return Ok("Episode Updated Successfully ");
+                return StatusCode(StatusCodes.Status200OK);
             }
             catch (Exception ex)
             {
@@ -315,7 +342,7 @@ namespace BalarinaAPI.Controllers.Episodes
 
         #region Delete Episode
 
-        [Authorize]
+        //[Authorize]
         [HttpDelete("{ID}")]
         public async Task<ActionResult<Category>> deleteepisodeAsync(int ID)
         {
@@ -344,7 +371,7 @@ namespace BalarinaAPI.Controllers.Episodes
                 helper.DeleteFiles(checkIDIfExist.EpisodeIamgePath);
                 #endregion
 
-                return Ok("Episode Deleted Successfully ");
+                return StatusCode(StatusCodes.Status200OK);
             }
             catch (Exception ex)
             {
@@ -401,8 +428,10 @@ namespace BalarinaAPI.Controllers.Episodes
                               select new
                               {
                                   season.SessionId,
+                                  season.SessionTitle,
                                   episode.EpisodeId,
                                   episode.EpisodeTitle,
+                                  episode.EpisodeDescription,
                                   episode.EpisodeViews,
                                   episode.EpisodePublishDate,
                                   episode.EpisodeIamgePath,
@@ -413,7 +442,8 @@ namespace BalarinaAPI.Controllers.Episodes
                                   category.CategoryTitle,
                                   programType.ProgramTypeId,
                                   programType.ProgramTypeTitle,
-                                  episode.YoutubeUrl
+                                  episode.YoutubeUrl,
+                                  episode.EpisodeVisible,
                               }).Distinct().Take(trendingDuration.Top);
                 #endregion
 
@@ -423,6 +453,7 @@ namespace BalarinaAPI.Controllers.Episodes
                     EpisodesRelatedForRecentlyModel model = new EpisodesRelatedForRecentlyModel()
                     {
                         SessionId = item.SessionId,
+                        SeasonTitle= item.SessionTitle,
                         CategoryId = item.CategoryId,
                         CategoryTitle = item.CategoryTitle,
                         EpisodeId = item.EpisodeId,
@@ -435,7 +466,9 @@ namespace BalarinaAPI.Controllers.Episodes
                         ProgramTypeId = item.ProgramTypeId,
                         ProgramTypeTitle = item.ProgramTypeTitle,
                         EpisodeImg =item.EpisodeIamgePath,
-                        EpisodeUrl = item.YoutubeUrl
+                        EpisodeUrl = item.YoutubeUrl,
+                        EpisodeDescription = item.EpisodeDescription,
+                        EpisodeVisible = item.EpisodeVisible
                     };
                     episodesRelatedForRecently.Add(model);
                 }
@@ -451,6 +484,113 @@ namespace BalarinaAPI.Controllers.Episodes
                 {
                     episodesRelatedForRecentlyOrdered =  episodesRelatedForRecently.OrderBy(o => o.EpisodePublishDate).ToList();
                 }
+                #endregion
+
+                RetrieveData<EpisodesRelatedForRecentlyModel> RetrieveData = new RetrieveData<EpisodesRelatedForRecentlyModel>();
+                RetrieveData.DataList = episodesRelatedForRecentlyOrdered;
+                RetrieveData.Url = helper.LivePathImages;
+
+
+                return RetrieveData;
+            }
+            catch (Exception ex)
+            {
+                helper.LogError(ex);
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
+        #endregion
+
+        #region Get Episodes Filter ForRecently2
+
+        private async Task<ActionResult<RetrieveData<EpisodesRelatedForRecentlyModel>>> episodesfilterforrecently2()
+        {
+            try
+            {
+                #region get Categories , Programs , ProgramTypes , Episodes
+                var Interviewers = await unitOfWork.Interviewer.GetObjects(); Interviewers.ToList();
+                var Categories = await unitOfWork.category.GetObjects(); Categories.ToList();
+                var Programs = await unitOfWork.Program.GetObjects(); Programs.ToList();
+                var ProgramTypes = await unitOfWork.ProgramType.GetObjects(); ProgramTypes.ToList();
+                var Episodes = await unitOfWork.Episode.GetObjects(); Episodes.ToList();
+                var Seasons = await unitOfWork.Season.GetObjects(); Seasons.ToList();
+                #endregion
+
+                #region declare list to fetch output 
+                List<EpisodesRelatedForRecentlyModel> episodesRelatedForRecently = new List<EpisodesRelatedForRecentlyModel>();
+                List<EpisodesRelatedForRecentlyModel> episodesRelatedForRecentlyOrdered = new List<EpisodesRelatedForRecentlyModel>();
+
+                #endregion
+
+                #region Apply Query in db 
+                var Result = (from category in Categories
+                              join program in Programs
+                              on category.CategoryId equals program.CategoryId
+                              join programType in ProgramTypes
+                              on program.ProgramTypeId equals programType.ProgramTypeId
+                              join interviewer in Interviewers
+                                on program.InterviewerId equals interviewer.InterviewerId
+                              join season in Seasons
+                              on program.ProgramId equals season.ProgramId
+                              join episode in Episodes
+                              on season.SessionId equals episode.SessionId
+                              //where (category.CategoryId == inputs.CategoryID || inputs.CategoryID is null) &&
+                              //      (programType.ProgramTypeId == inputs.ProgramTypeID || inputs.ProgramTypeID is null) &&
+                              //      (interviewer.InterviewerId == inputs.InterviewerID || inputs.InterviewerID is null) &&
+                              //      (program.ProgramId == inputs.ProgramID || inputs.ProgramID is null) &&
+                              //      (episode.EpisodePublishDate >= inputs.DateFrom || inputs.DateFrom is null) &&
+                              //      (episode.EpisodePublishDate <= inputs.DateTo || inputs.DateTo is null)
+                              select new
+                              {
+                                  season.SessionId,
+                                  season.SessionTitle,
+                                  episode.EpisodeId,
+                                  episode.EpisodeTitle,
+                                  episode.EpisodeDescription,
+                                  episode.EpisodeViews,
+                                  episode.EpisodePublishDate,
+                                  episode.EpisodeIamgePath,
+                                  program.ProgramId,
+                                  program.ProgramName,
+                                  program.ProgramImg,
+                                  category.CategoryId,
+                                  category.CategoryTitle,
+                                  programType.ProgramTypeId,
+                                  programType.ProgramTypeTitle,
+                                  episode.YoutubeUrl,
+                                  episode.EpisodeVisible,
+                              }).Distinct();
+                #endregion
+
+                #region Fill output List from returned list from db
+                foreach (var item in Result)
+                {
+                    EpisodesRelatedForRecentlyModel model = new EpisodesRelatedForRecentlyModel()
+                    {
+                        SessionId = item.SessionId,
+                        SeasonTitle = item.SessionTitle,
+                        CategoryId = item.CategoryId,
+                        CategoryTitle = item.CategoryTitle,
+                        EpisodeId = item.EpisodeId,
+                        EpisodePublishDate = item.EpisodePublishDate,
+                        EpisodeTitle = item.EpisodeTitle,
+                        EpisodeViews = item.EpisodeViews,
+                        ProgramId = item.ProgramId,
+                        ProgramImg = item.ProgramImg,
+                        ProgramName = item.ProgramName,
+                        ProgramTypeId = item.ProgramTypeId,
+                        ProgramTypeTitle = item.ProgramTypeTitle,
+                        EpisodeImg = item.EpisodeIamgePath,
+                        EpisodeUrl = item.YoutubeUrl,
+                        EpisodeDescription = item.EpisodeDescription,
+                        EpisodeVisible = item.EpisodeVisible
+                    };
+                    episodesRelatedForRecently.Add(model);
+                }
+                #endregion
+
+                #region check IsRecently condition
+                    episodesRelatedForRecentlyOrdered = episodesRelatedForRecently.OrderByDescending(o => o.EpisodePublishDate).ToList();
                 #endregion
 
                 RetrieveData<EpisodesRelatedForRecentlyModel> RetrieveData = new RetrieveData<EpisodesRelatedForRecentlyModel>();
@@ -901,16 +1041,44 @@ namespace BalarinaAPI.Controllers.Episodes
         }
         #endregion
 
-        #region Detail API
+        #region Episodes Recently
         /// <summary>
-        ///     
+        /// this function get All Episodes Ordered Descending    
         /// </summary>
         /// <returns>
         ///  return list of Model that contains
-        /// 
+        ///  EpisodeId,EpisodeTitle,EpisodeViews,EpisodePublishDate,ProgramId
+        ///  ProgramName,ProgramImg,CategoryId,CategoryTitle,ProgramTypeId,ProgramTypeTitle
         /// </returns>
 
         [ApiAuthentication]
+        [HttpGet]
+        [Route("episodesrecently2")]
+        public async Task<ActionResult<RetrieveData<EpisodesRelatedForRecentlyModel>>> episodesrecently2()
+        {
+            try
+            {
+                return await episodesfilterforrecently2();
+            }
+            catch (Exception ex)
+            {
+                helper.LogError(ex);
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
+        
+        #endregion
+
+        #region Detail API
+       /// <summary>
+       ///     
+       /// </summary>
+       /// <returns>
+       ///  return list of Model that contains
+       /// 
+       /// </returns>
+
+       [ApiAuthentication]
         [HttpGet]
         [Route("detailapi")]
         public async Task<ActionResult<RetrieveData<DetailAPIModel>>> detailapi(int EPISODEID)

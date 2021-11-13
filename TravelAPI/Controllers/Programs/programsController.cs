@@ -474,7 +474,7 @@ namespace BalarinaAPI.Controllers.Programs
         {
             try
             {
-                DateTime? ProgramStartDate = new DateTime();
+                DateTime ProgramStartDate = new DateTime();
                 var ProgramImage = HttpContext.Request.Form.Files["ProgramImage"];
 
                 model.ProgramImg = ProgramImage;
@@ -548,14 +548,14 @@ namespace BalarinaAPI.Controllers.Programs
 
                 if (model.ProgramStartDate == null)
                     ProgramStartDate = _programObject.ProgramStartDate;
-                else if(model.ProgramStartDate.Contains("T"))
+
+                if(model.ProgramStartDate.Contains("T"))
                 {
                     model.ProgramStartDate = model.ProgramStartDate.Substring(0, model.ProgramStartDate.IndexOf("T"));
                 }
-                else
-                {
+               
                     ProgramStartDate = DateTime.ParseExact(model.ProgramStartDate, "dd-MM-yyyy", null);
-                }
+              
                 
 
                 #region Handle Order Update 
@@ -572,7 +572,7 @@ namespace BalarinaAPI.Controllers.Programs
                     ProgramImg          =         model.ProgramImgPath,
                     ProgramName         =         model.ProgramName,
                     ProgramOrder        = (int)   model.ProgramOrder,
-                    ProgramStartDate    = (DateTime)ProgramStartDate,
+                    ProgramStartDate    = ProgramStartDate,
                     ProgramVisible      = (bool)  model.ProgramVisible,
                     CreationDate        =         DateTime.Now,
                     ProgramViews        = (int)model.ProgramViews

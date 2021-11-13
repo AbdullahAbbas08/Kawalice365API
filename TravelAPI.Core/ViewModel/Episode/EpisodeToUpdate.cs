@@ -16,9 +16,9 @@ namespace BalarinaAPI.Core.Model
         public IFormFile EpisodeImage { get; set; }
         public string YoutubeUrl { get; set; }
         public bool EpisodeVisible { get; set; } 
-        public DateTime CreationDate { get; set; }
+       // public DateTime CreationDate { get; set; }
         public int? SeasonId { get; set; }
-        public DateTime? EpisodePublishDate { get; set; }
+        public string EpisodePublishDate { get; set; }
 
     }
 }

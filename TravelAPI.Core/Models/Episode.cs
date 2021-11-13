@@ -28,7 +28,7 @@ namespace BalarinaAPI.Core.Model
 
         [JsonIgnore]
         public virtual Seasons Session { get; set; }
-        
+
         [JsonIgnore]
         public virtual ICollection<EpisodesKeyword> EpisodesKeywords { get; set; }
     }
