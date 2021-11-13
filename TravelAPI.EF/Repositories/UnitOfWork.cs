@@ -3,6 +3,7 @@ using BalarinaAPI.Core.Models;
 using System.Threading.Tasks;
 using TravelAPI.Core;
 using TravelAPI.Interfaces;
+using TravelAPI.Models;
 using TravelAPI.Repositories;
 
 namespace TravelAPI.EF
@@ -25,6 +26,7 @@ namespace TravelAPI.EF
         public IBaseRepository<ADSTYLES> ADSTYLES { get; private set; }
         public IBaseRepository<ADPLACEHOLDER> ADPLACEHOLDER { get; private set; }
         public IBaseRepository<ADS> ADS { get; private set; }
+        public IBaseRepository<ApplicationUser> ApplicationUser  { get; private set; }
 
 
         public UnitOfWork(BalarinaDatabaseContext _context)
@@ -43,6 +45,7 @@ namespace TravelAPI.EF
             this.ADS = new BaseRepository<ADS>(_context);
             this.ADPLACEHOLDER = new BaseRepository<ADPLACEHOLDER>(_context);
             this.ADSTYLES = new BaseRepository<ADSTYLES>(_context);
+            ApplicationUser = new BaseRepository<ApplicationUser>(_context);
         }
 
         public void Dispose()

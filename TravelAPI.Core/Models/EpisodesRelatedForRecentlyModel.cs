@@ -24,6 +24,6 @@ namespace BalarinaAPI.Core.Model
         public int      ProgramTypeId       { get; set; }
         public string   ProgramTypeTitle    { get; set; }
         public string   EpisodeUrl          { get; set; }
-        public Boolean EpisodeVisible { get; set; }
+        public Boolean EpisodeVisible       { get; set; }
     }
 }

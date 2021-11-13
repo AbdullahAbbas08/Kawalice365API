@@ -10,7 +10,7 @@ namespace BalarinaAPI.Core.ViewModel.Interviewer
     public class InterviewerModelInput
     {
         public string InterviewerName { get; set; }
-        public IFormFile _InterviewerPicture { get; set; }
+        public IFormFile InterviewerPicture { get; set; }
         public string InterviewerDescription { get; set; }
         public string FacebookUrl { get; set; }
         public string InstgramUrl { get; set; }
@@ -19,7 +19,7 @@ namespace BalarinaAPI.Core.ViewModel.Interviewer
         public string LinkedInUrl { get; set; }
         public string WebsiteUrl { get; set; }
         public string TiktokUrl { get; set; }
-        public DateTime? BirthDate { get; set; }
+        public string BirthDate { get; set; }
         public IFormFile InterviewerCover { get; set; }
 
     }

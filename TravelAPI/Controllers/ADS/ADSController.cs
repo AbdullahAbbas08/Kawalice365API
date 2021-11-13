@@ -2,6 +2,7 @@
 using BalarinaAPI.Core.Model;
 using BalarinaAPI.Core.ViewModel;
 using BalarinaAPI.Core.ViewModel.ADS;
+using BalarinaAPI.Core.ViewModel.Category;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -14,6 +15,7 @@ using System.Threading.Tasks;
 using TravelAPI.Core;
 using TravelAPI.Core.Helper;
 using TravelAPI.Models;
+using BalarinaAPI.Core.ViewModel.Clients;
 
 namespace BalarinaAPI.Controllers.Advertisement
 {
@@ -45,19 +47,58 @@ namespace BalarinaAPI.Controllers.Advertisement
         /// <returns>
         /// List Of Advertisement Object that Contains AdId , AdTitle , ImagePath , URL , Views , PlaceHolderID , ClientID , PublishStartDate and PublishEndDate  
         /// </returns>
-        [Authorize]
+        [ApiAuthentication]
         [HttpGet]
         [Route("getallads")]
-        public async Task<ActionResult<RetrieveData<ADS>>> getallads()
+        public async Task<ActionResult<RetrieveData<AdsClientModel>>> getallads()
         {
             try
             {
-                var ADSs = await unitOfWork.ADS.GetObjects();
+                RetrieveData<AdsClientModel> Collection = new RetrieveData<AdsClientModel>();
 
-                RetrieveData<ADS> Collection = new RetrieveData<ADS>();
+                var ADSs = await unitOfWork.ADS.GetObjects();
+                var _ClientsObject = await unitOfWork.ApplicationUser.GetObjects(); _ClientsObject.ToList();
+                var _Placements = await unitOfWork.ADPLACEHOLDER.GetObjects(); _Placements.ToList();
+                var Result = (from ads in ADSs
+                             join client in _ClientsObject
+                             on ads.ClientID equals client.Id
+                             join placement in _Placements
+                             on ads.PlaceHolderID equals placement.ADPlaceholderID
+                             select new
+                             {
+                                 ads.AdId,
+                                 ads.AdTitle,
+                                 ads.ClientID,
+                                 ads.ImagePath,
+                                 ads.PlaceHolderID,
+                                 ads.PublishEndDate,
+                                 ads.PublishStartDate,
+                                 ads.URL,
+                                 ads.Views,
+                                 client.FirstName,
+                                 client.LastName,
+                                 placement.ADPlaceholderCode   
+                             }).ToList();
+                foreach (var item in Result)
+                {
+                    AdsClientModel model = new AdsClientModel()
+                    {
+                        AdId = item.AdId,
+                        AdTitle = item.AdTitle,
+                        ClientID=item.ClientID,
+                        ClientName=item.FirstName+' '+item.LastName,
+                        ImagePath=item.ImagePath,
+                        PlaceHolderID=item.PlaceHolderID,
+                        PublishEndDate=item.PublishEndDate,
+                        PublishStartDate=item.PublishStartDate,
+                        URL=item.URL,
+                        Views=item.Views,
+                        PlaceHolderCode = item.ADPlaceholderCode
+                    };
+                    Collection.DataList.Add(model);
+                }
                 Collection.Url = helper.LivePathImages;
-                Collection.DataList = ADSs.ToList();
-                return Ok(Collection);
+                return Collection;
             }
             catch (Exception ex)
             {
@@ -143,6 +184,72 @@ namespace BalarinaAPI.Controllers.Advertisement
         }
         #endregion
 
+        #region Get All Clients Name , ID 
+        /// <summary>
+        /// Get All Client Name , ID 
+        /// </summary>
+        /// <returns>
+        /// </returns>
+        [ApiAuthentication]
+        [HttpGet]
+        [Route("getclient_id_name")]
+        public async Task<ActionResult<List<Object_ID_Name_string>>> GetClient_ID_Name() 
+        {
+            try
+            {
+                var _ClientsObject = await unitOfWork.ApplicationUser.GetObjects(); _ClientsObject.ToList();
+
+                List<Object_ID_Name_string> Collection = new List<Object_ID_Name_string>();
+                foreach (var item in _ClientsObject)
+                {
+                    Object_ID_Name_string obj = new Object_ID_Name_string() { ID=item.Id , Name=item.FirstName+' '+item.LastName};
+                    Collection.Add(obj);
+                }
+                return Collection.ToList();
+            }
+            catch (Exception ex)
+            {
+                // Log error in db
+                helper.LogError(ex);
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
+        #endregion
+
+        #region Get All placement Name , ID 
+        /// <summary>
+        /// Get All Client Name , ID 
+        /// </summary>
+        /// <returns>
+        /// </returns>
+        [ApiAuthentication]
+        [HttpGet]
+        [Route("getplacement_id_name")]
+        public async Task<ActionResult<List<Object_ID_Name>>> GetPlacement_ID_Name()
+        {
+            try
+            {
+                var _placementObject = await unitOfWork.ADPLACEHOLDER.GetObjects(); _placementObject.ToList();
+
+                List<Object_ID_Name> Collection = new List<Object_ID_Name>();
+
+                foreach (var item in _placementObject)
+                {
+                    Object_ID_Name obj = new Object_ID_Name() {ID = item.ADPlaceholderID,Name=item.ADPlaceholderCode.ToString() };
+                    Collection.Add(obj);
+                }
+                return Collection.ToList();
+            }
+            catch (Exception ex)
+            {
+                // Log error in db
+                helper.LogError(ex);
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
+        #endregion
+
+
         #region Find Advertisement By ID ApiAuthentication
         /// <summary>
         /// Reteive All Data in Advertisement 
@@ -201,7 +308,7 @@ namespace BalarinaAPI.Controllers.Advertisement
                 if (model.URL == null)
                     return BadRequest("AD URL EMPTY !! ");
 
-                var placeholderID = unitOfWork.ADPLACEHOLDER.FindObjectAsync(model.PlaceHolderID);
+                var placeholderID = await unitOfWork.ADPLACEHOLDER.FindObjectAsync(model.PlaceHolderID);
                 if (placeholderID == null)
                     return BadRequest("placeholderID not found ");
 

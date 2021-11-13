@@ -185,14 +185,13 @@ namespace BalarinaAPI.Controllers.Episodes
                 if (SeasonId == null)
                     return BadRequest("Season ID not found ");
 
-                  else if (model.EpisodePublishDate.Contains("T"))
+                if (model.EpisodePublishDate.Contains("T"))
                 {
                     model.EpisodePublishDate = model.EpisodePublishDate.Substring(0, model.EpisodePublishDate.IndexOf("T"));
                 }
-                else
-                {
+            
                     EpisodePublishDate = DateTime.ParseExact(model.EpisodePublishDate, "dd-MM-yyyy", null);
-                }
+              
 
                 #endregion
 

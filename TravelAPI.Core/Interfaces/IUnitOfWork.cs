@@ -3,6 +3,7 @@ using System;
 using BalarinaAPI.Core.Model;
 using BalarinaAPI.Core.Models;
 using System.Threading.Tasks;
+using TravelAPI.Models;
 
 namespace TravelAPI.Core
 {
@@ -21,6 +22,7 @@ namespace TravelAPI.Core
         IBaseRepository<ADSTYLES> ADSTYLES { get; }
         IBaseRepository<ADPLACEHOLDER> ADPLACEHOLDER { get; }
         IBaseRepository<ADS> ADS { get; }
+        IBaseRepository<ApplicationUser> ApplicationUser  { get; }
          
 
         Task<int> Complete(); 

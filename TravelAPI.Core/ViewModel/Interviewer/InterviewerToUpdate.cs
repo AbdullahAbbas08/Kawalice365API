@@ -12,7 +12,9 @@ namespace BalarinaAPI.Core.ViewModel
         public int InterviewerId { get; set; }
         public string InterviewerName { get; set; }
         public string InterviewerPicturePath { get; set; }
+        public string InterviewerCoverePath { get; set; }
         public IFormFile InterviewerPicture { get; set; }
+        public IFormFile InterviewerCover { get; set; }
         public string InterviewerDescription { get; set; }
         public string FacebookUrl { get; set; }
         public string InstgramUrl { get; set; }
@@ -20,6 +22,7 @@ namespace BalarinaAPI.Core.ViewModel
         public string YoutubeUrl { get; set; }
         public string LinkedInUrl { get; set; }
         public string WebsiteUrl { get; set; }
-        public string TiktokUrl { get; set; }
+        public string TiktokUrl { get; set; } 
+        public string BirthDate { get; set; }
     }
 }

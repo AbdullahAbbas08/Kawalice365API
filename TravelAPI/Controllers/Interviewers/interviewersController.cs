@@ -196,23 +196,49 @@ namespace BalarinaAPI.Controllers.Interviewers
         #endregion
 
         #region Insert New Interviewer 
-        [Authorize]
+        //[ApiAuthentication]
         [HttpPost]
         [Route("createinterviewer")]
         public async Task<ActionResult<InterviewerModelInput>> createinterviewerAsync([FromQuery] InterviewerModelInput model)
         {
             try
             {
+                var InterviewerIamge = HttpContext.Request.Form.Files["InterviewerIamge"];
+                var InterviewerCover = HttpContext.Request.Form.Files["InterviewerCover"];
+
+                model.InterviewerPicture = InterviewerIamge;
+                model.InterviewerCover = InterviewerCover;
+
+                DateTime EpisodePublishDate = new DateTime();
+
                 #region Check values of Interviewer is not null or empty
 
                 if (string.IsNullOrEmpty(model.InterviewerName))
                     return BadRequest("Category Title cannot be null or empty");
 
-                if (model._InterviewerPicture == null)
+                if (model.InterviewerPicture == null)
                     return BadRequest("Interviewer Picture cannot be null ");
 
                 if (string.IsNullOrEmpty(model.InterviewerDescription))
                     return BadRequest("Interviewer Description cannot be null or empty");
+
+                if(model.BirthDate == null)
+                    return BadRequest("Interviewer Birth Date cannot be null or empty");
+
+               if(model.InterviewerPicture == null)
+                    return BadRequest("Interviewer Picture cannot be null ");
+
+                if (model.InterviewerCover == null)
+                    return BadRequest("Interviewer Cover cannot be null ");
+
+
+                if (model.BirthDate.Contains("T"))
+                {
+                    model.BirthDate = model.BirthDate.Substring(0, model.BirthDate.IndexOf("T"));
+                }
+               
+                    EpisodePublishDate = DateTime.ParseExact(model.BirthDate, "dd-MM-yyyy", null);
+               
 
 
                 #endregion
@@ -221,7 +247,7 @@ namespace BalarinaAPI.Controllers.Interviewers
                 Interviewer _interviewer = new Interviewer()
                 {
                     InterviewerName = model.InterviewerName,
-                    InterviewerPicture =helper.UploadImage(model._InterviewerPicture),
+                    InterviewerPicture =helper.UploadImage(model.InterviewerPicture),
                     CreationDate = DateTime.Now,
                     InterviewerDescription = model.InterviewerDescription,
                     FacebookUrl = model.FacebookUrl,
@@ -231,8 +257,8 @@ namespace BalarinaAPI.Controllers.Interviewers
                     TwitterUrl = model.TwitterUrl,
                     WebsiteUrl = model.WebsiteUrl,
                     YoutubeUrl = model.YoutubeUrl,
-                    BirthDate = model.BirthDate,
-                    InterviewerCover = helper.UploadImage(model.InterviewerCover)
+                    BirthDate = EpisodePublishDate ,
+                    InterviewerCover = helper.UploadImage(model.InterviewerCover),
                 };
                 #endregion
 
@@ -249,7 +275,7 @@ namespace BalarinaAPI.Controllers.Interviewers
                 await unitOfWork.Complete();
                 #endregion
 
-                return Ok("INTERVIEWER CREATED SUCCESSFIILY ");
+                return StatusCode(StatusCodes.Status200OK);
             }
             catch (Exception ex)
             {
@@ -260,13 +286,21 @@ namespace BalarinaAPI.Controllers.Interviewers
         #endregion 
 
         #region Edit Interviewer
-        [Authorize]
+        //[ApiAuthentication]
         [HttpPut]
         [Route("putinterviewer")]
         public async Task<ActionResult<Interviewer>> putinterviewer([FromQuery] InterviewerToUpdate model)
         {
             try
             {
+                var InterviewerIamge = HttpContext.Request.Form.Files["InterviewerIamge"];
+                var InterviewerCover = HttpContext.Request.Form.Files["InterviewerCover"];
+
+                model.InterviewerPicture = InterviewerIamge;
+                model.InterviewerCover = InterviewerCover;
+
+                DateTime? BirthDate = new DateTime();
+
                 #region check Interviewer id exist
                 var _InterviewerObj = await unitOfWork.Interviewer.FindObjectAsync(model.InterviewerId);
                 if (_InterviewerObj == null)
@@ -280,6 +314,47 @@ namespace BalarinaAPI.Controllers.Interviewers
                 if (string.IsNullOrEmpty(model.InterviewerDescription))
                     model.InterviewerDescription = _InterviewerObj.InterviewerDescription;
 
+                //if (model.InterviewerPicture == null)
+                //    model.InterviewerPicturePath = _InterviewerObj.InterviewerPicture;
+
+                //if (model.InterviewerCover == null)
+                //    model.InterviewerCoverePath = _InterviewerObj.InterviewerCover;
+
+                if (string.IsNullOrEmpty(model.FacebookUrl))
+                    model.FacebookUrl = _InterviewerObj.FacebookUrl;
+
+                if (string.IsNullOrEmpty(model.InstgramUrl))
+                    model.InstgramUrl = _InterviewerObj.InstgramUrl;
+
+                if (string.IsNullOrEmpty(model.TwitterUrl))
+                    model.TwitterUrl = _InterviewerObj.TwitterUrl;
+
+                if (string.IsNullOrEmpty(model.YoutubeUrl))
+                    model.YoutubeUrl = _InterviewerObj.YoutubeUrl;
+
+                if (string.IsNullOrEmpty(model.LinkedInUrl))
+                    model.LinkedInUrl = _InterviewerObj.LinkedInUrl;
+
+                if (string.IsNullOrEmpty(model.WebsiteUrl))
+                    model.WebsiteUrl = _InterviewerObj.WebsiteUrl;
+
+                if (string.IsNullOrEmpty(model.TiktokUrl))
+                    model.TiktokUrl = _InterviewerObj.TiktokUrl;
+
+
+                if (model.BirthDate == null)
+                    BirthDate = _InterviewerObj.BirthDate;
+
+                if (model.BirthDate.Contains("T"))
+                {
+                    model.BirthDate = model.BirthDate.Substring(0, model.BirthDate.IndexOf("T"));
+                }
+
+                BirthDate = DateTime.ParseExact(model.BirthDate, "dd-MM-yyyy", null);
+
+
+
+
                 #region check if image updated or not 
 
                 if (model.InterviewerPicturePath == null && model.InterviewerPicture == null)
@@ -289,6 +364,18 @@ namespace BalarinaAPI.Controllers.Interviewers
                 if (model.InterviewerPicturePath == null)
                 {
                     model.InterviewerPicturePath =helper.UploadImage(model.InterviewerPicture);
+                }
+                #endregion
+
+                #region check if image updated or not 
+
+                if (model.InterviewerCoverePath == null && model.InterviewerCover == null)
+                {
+                    model.InterviewerCoverePath = _InterviewerObj.InterviewerCover;
+                }
+                if (model.InterviewerCoverePath == null)
+                {
+                    model.InterviewerCoverePath = helper.UploadImage(model.InterviewerCover);
                 }
                 #endregion
 
@@ -309,6 +396,7 @@ namespace BalarinaAPI.Controllers.Interviewers
                     TwitterUrl = model.TwitterUrl,
                     WebsiteUrl = model.WebsiteUrl,
                     YoutubeUrl = model.YoutubeUrl,
+                    BirthDate = BirthDate
                 };
                 #endregion
 
@@ -325,7 +413,7 @@ namespace BalarinaAPI.Controllers.Interviewers
                 await unitOfWork.Complete();
                 #endregion
 
-                return Ok("INTERVIEWER UPDATED SUCCESSFULLY");
+                return StatusCode(StatusCodes.Status200OK);
             }
             catch (Exception ex)
             {
@@ -336,7 +424,7 @@ namespace BalarinaAPI.Controllers.Interviewers
         #endregion
 
         #region Delete Interviewer
-        [Authorize]
+        //[Authorize]
         [HttpDelete("{ID}")]
         public async Task<ActionResult<Category>> deleteinterviewer(int ID)
         {
@@ -366,7 +454,7 @@ namespace BalarinaAPI.Controllers.Interviewers
                 #endregion
 
 
-                return Ok("INTERVIEWER DELETED SCCESSFULLY");
+                return StatusCode(StatusCodes.Status200OK);
             }
             catch (Exception ex)
             {

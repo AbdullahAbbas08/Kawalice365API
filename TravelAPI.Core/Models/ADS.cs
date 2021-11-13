@@ -11,22 +11,22 @@ namespace BalarinaAPI.Core.Model
     public class ADS
     {
         [Key]
-        public int AdId { get; set; }
+        public int      AdId                { get; set; }
         [Required]
-        public string AdTitle { get; set; }
+        public string   AdTitle             { get; set; }
         [Required]
-        public string ImagePath { get; set; }
+        public string   ImagePath           { get; set; }
         [Required]
-        public string URL { get; set; }
+        public string   URL                 { get; set; }
         [Required]
-        public int Views { get; set; }
-        public int PlaceHolderID { get; set; }
+        public int      Views               { get; set; }
+        public int      PlaceHolderID       { get; set; }
+        public string   ClientID            { get; set; }
+        [Required]
+        public DateTime PublishStartDate    { get; set; }
+        [Required]
+        public DateTime PublishEndDate      { get; set; }
 
-        public string ClientID { get; set; }
-        [Required]
-        public DateTime PublishStartDate { get; set; }
-        [Required]
-        public DateTime PublishEndDate { get; set; }
 
         [JsonIgnore]
         [ForeignKey("PlaceHolderID")]
