@@ -9,13 +9,13 @@ namespace BalarinaAPI.Core.Model
     public class ADSTYLES
     {
         [Key]
-        public int ADStyleId { get; set; }
+        public int          ADStyleId       { get; set; }
         [Required]
-        public string ADStyleTitle { get; set; }
+        public string       ADStyleTitle    { get; set; }
         [Required]
-        public float ADWidth { get; set; }
+        public float        ADWidth         { get; set; }
         [Required]
-        public float ADHeight  { get; set; }
+        public float        ADHeight        { get; set; }
         [JsonIgnore]
         public virtual ICollection<ADPLACEHOLDER> ADPLACEHOLDERS { get; set; }
     }

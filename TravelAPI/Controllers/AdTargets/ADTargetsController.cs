@@ -40,7 +40,7 @@ namespace BalarinaAPI.Controllers.ADTARGET
         /// <returns>
         /// List Of Advertisement Object that Contains ADTargetID , ADTargetTitle , ADTargetType and ItemID
         /// </returns>
-        [Authorize]
+        [ApiAuthentication]
         [HttpGet]
         [Route("getalladtargets")]
         public async Task<ActionResult<IEnumerable<ADTARGETS>>> getalladtargets()
@@ -121,7 +121,7 @@ namespace BalarinaAPI.Controllers.ADTARGET
         /// <returns>
         /// status of operation - Created Successfully - or Status500InternalServerError
         /// </returns>
-        [Authorize]
+        [ApiAuthentication]
         [HttpPost]
         [Route("createadtarget")]
         public async Task<ActionResult<AdvertisementTargetsModel>> createadtarget([FromQuery] AdvertisementTargetsModel model)
@@ -134,6 +134,16 @@ namespace BalarinaAPI.Controllers.ADTARGET
 
                 if (string.IsNullOrEmpty(model.ADTargetType))
                     return BadRequest("ADTarget Target Type cannot be null or empty");
+
+                try
+                {
+                   if(model.ItemID >0) { }
+                }
+                catch(Exception ex)
+                {
+                    return StatusCode(StatusCodes.Status406NotAcceptable);
+                }
+
                 #endregion
 
                 #region Fill ADTARGET object with values to insert
@@ -158,7 +168,7 @@ namespace BalarinaAPI.Controllers.ADTARGET
                 await unitOfWork.Complete();
                 #endregion
 
-                return Ok(" ADTARGET Created Successfully ");
+                return StatusCode(StatusCodes.Status200OK);
             }
             catch (Exception ex)
             {
@@ -178,7 +188,7 @@ namespace BalarinaAPI.Controllers.ADTARGET
         /// <returns>
         /// status of operation - Updated Successfully - or Status500InternalServerError
         /// </returns>
-        [Authorize]
+        [ApiAuthentication]
         [HttpPut]
         [Route("updateadtarget")]
         public async Task<ActionResult<AdvertisementTargetToUpdate>> updateadtarget([FromQuery] AdvertisementTargetToUpdate model)
@@ -225,7 +235,7 @@ namespace BalarinaAPI.Controllers.ADTARGET
                 await unitOfWork.Complete();
                 #endregion
 
-                return Ok(" ADTARGET Updated Successfully ");
+                return StatusCode(StatusCodes.Status200OK);
             }
             catch (Exception ex)
             {
@@ -236,7 +246,7 @@ namespace BalarinaAPI.Controllers.ADTARGET
         #endregion
 
         #region Delete Advertisement Target
-        [Authorize]
+        [ApiAuthentication]
         [HttpDelete("{ID}")]
         public async Task<ActionResult<ProgramType>> deleteadtarget(int ID)
         {
@@ -255,7 +265,7 @@ namespace BalarinaAPI.Controllers.ADTARGET
                 await unitOfWork.Complete();
                 #endregion 
 
-                return Ok(" ADTARGET Obj id deleted successfully ");
+                return StatusCode(StatusCodes.Status200OK);
             }
             catch (Exception ex)
             {

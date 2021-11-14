@@ -9,14 +9,13 @@ namespace BalarinaAPI.Core.Model
     public class ADTARGETS
     {
         [Key]
-        public int ADTargetID  { get; set; }
+        public int      ADTargetID      { get; set; }
         [Required]
-        public string ADTargetTitle   { get; set; }
+        public string   ADTargetTitle   { get; set; }
         [Required]
-        public string ADTargetType   { get; set; }
+        public string   ADTargetType   { get; set; }
         [Required]
-        public int ItemID   { get; set; }
-
+        public int      ItemID          { get; set; }
         [JsonIgnore]
         public virtual ICollection<ADPLACEHOLDER> ADPLACEHOLDERS { get; set; }
     }

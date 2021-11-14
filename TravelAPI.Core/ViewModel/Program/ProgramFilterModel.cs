@@ -24,5 +24,7 @@ namespace BalarinaAPI.Core.ViewModel
         public int ProgramTypeId { get; set; }
         public bool ProgramVisible { get; set; }
 
+        public int ProgramViews  { get; set; }
+
     }
 }

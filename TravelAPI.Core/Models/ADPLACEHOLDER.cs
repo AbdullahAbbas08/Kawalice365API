@@ -8,14 +8,14 @@ namespace BalarinaAPI.Core.Model
     public class ADPLACEHOLDER
     {
         [Key]
-        public int ADPlaceholderID { get; set; }
-        public int ADPlaceholderCode { get; set; }
-        public int AdStyleID  { get; set; }
-        public int AdTargetId   { get; set; }
+        public int      ADPlaceholderID     { get; set; }
+        public int      ADPlaceholderCode   { get; set; }
+        public int      AdStyleID           { get; set; }
+        public int      AdTargetId          { get; set; }
         [Required]
-        public string Title  { get; set; }
+        public string   Title               { get; set; }
         [Required]
-        public string ImagePath  { get; set; }
+        public string   ImagePath           { get; set; }
 
         [JsonIgnore]
         public virtual ADSTYLES ADStyles  { get; set; }

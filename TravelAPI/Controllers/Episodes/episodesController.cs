@@ -500,6 +500,124 @@ namespace BalarinaAPI.Controllers.Episodes
         }
         #endregion
 
+        #region Get Program Filter ForRecently
+        [ApiAuthentication]
+        [HttpGet]
+        [Route("Programfilterforrecently")]
+        public async Task<ActionResult<RetrieveData<ProgramFilterModel>>> Programfilterforrecently([FromQuery] EpisodesFilterForRecentlyInputs inputs)
+        {
+            try 
+            {
+                #region get Categories , Programs , ProgramTypes , Episodes
+                var Interviewers = await unitOfWork.Interviewer.GetObjects(x => x.InterviewerId == inputs.InterviewerID || inputs.InterviewerID == null); Interviewers.ToList();
+                var Categories = await unitOfWork.category.GetObjects(x => x.CategoryId == inputs.CategoryID || inputs.CategoryID == null); Categories.ToList();
+                var Programs = await unitOfWork.Program.GetObjects(x => x.ProgramId == inputs.ProgramID || inputs.ProgramID == null); Programs.ToList();
+                var ProgramTypes = await unitOfWork.ProgramType.GetObjects(x => x.ProgramTypeId == inputs.ProgramTypeID || inputs.ProgramTypeID == null); ProgramTypes.ToList();
+                var Episodes = await unitOfWork.Episode.GetObjects(x => x.EpisodePublishDate >= inputs.DateFrom || inputs.DateFrom == null &&
+                              x.EpisodePublishDate <= inputs.DateTo || inputs.DateTo == null); Episodes.ToList();
+                var Seasons = await unitOfWork.Season.GetObjects(); Seasons.ToList();
+                #endregion
+
+                #region declare list to fetch output 
+                List<ProgramFilterModel> episodesRelatedForRecently = new List<ProgramFilterModel>();
+                List<ProgramFilterModel> episodesRelatedForRecentlyOrdered = new List<ProgramFilterModel>();
+
+                #endregion
+
+                #region Apply Query in db 
+                var Result = (from category in Categories
+                              join program in Programs
+                              on category.CategoryId equals program.CategoryId
+                              join programType in ProgramTypes
+                              on program.ProgramTypeId equals programType.ProgramTypeId
+                              join interviewer in Interviewers
+                                on program.InterviewerId equals interviewer.InterviewerId
+                              join season in Seasons
+                              on program.ProgramId equals season.ProgramId
+                              join episode in Episodes
+                              on season.SessionId equals episode.SessionId
+                              //where (category.CategoryId == inputs.CategoryID || inputs.CategoryID is null) &&
+                              //      (programType.ProgramTypeId == inputs.ProgramTypeID || inputs.ProgramTypeID is null) &&
+                              //      (interviewer.InterviewerId == inputs.InterviewerID || inputs.InterviewerID is null) &&
+                              //      (program.ProgramId == inputs.ProgramID || inputs.ProgramID is null) &&
+                              //      (episode.EpisodePublishDate >= inputs.DateFrom || inputs.DateFrom is null) &&
+                              //      (episode.EpisodePublishDate <= inputs.DateTo || inputs.DateTo is null)
+                              select new
+                              {
+                                 program.ProgramId          ,
+                                 program.ProgramDescription ,
+                                 program.ProgramName        ,
+                                 program.ProgramImg         ,
+                                 program.ProgramPromoUrl    ,
+                                 program.ProgramVisible     ,
+                                 program.CategoryId         ,
+                                 program.ProgramStartDate   ,
+                                 program.InterviewerId      ,
+                                 program.ProgramOrder       ,
+                                 program.ProgramTypeId      ,
+                                 program.ProgramViews       ,
+                                 program.CreationDate       ,
+                                 category.CategoryTitle,
+                                 interviewer.InterviewerName,
+                                 programType.ProgramTypeTitle,
+
+
+                              }).Distinct().Take(trendingDuration.Top);
+                #endregion
+
+                #region Fill output List from returned list from db
+                foreach (var item in Result)
+                {
+                    ProgramFilterModel model = new ProgramFilterModel()
+                    {
+                        CategoryId = item.CategoryId,
+                        CreationDate = item.CreationDate,
+                        InterviewerId=item.InterviewerId,
+                        ProgramDescription = item.ProgramDescription,
+                        ProgramId = item.ProgramId,
+                        ProgramImg=item.ProgramImg,
+                        ProgramName=item.ProgramName,
+                        ProgramOrder=item.ProgramOrder,
+                        ProgramPromoUrl=item.ProgramPromoUrl,
+                        ProgramStartDate=item.ProgramStartDate,
+                        ProgramTypeId=item.ProgramTypeId,
+                        ProgramViews=item.ProgramViews,
+                        CategoryName = item.CategoryTitle,
+                        InterviewerName = item.InterviewerName,
+                        ProgramTypeName = item.ProgramTypeTitle,
+                        ProgramVisible=(Boolean)item.ProgramVisible
+                    };
+                    episodesRelatedForRecently.Add(model);
+                }
+                #endregion
+
+                #region check IsRecently condition
+
+                if (inputs.IsRecently == "desc" || inputs.IsRecently == "DESC")
+                {
+                    episodesRelatedForRecentlyOrdered = episodesRelatedForRecently.OrderByDescending(o => o.ProgramStartDate).ToList();
+                }
+                else
+                {
+                    episodesRelatedForRecentlyOrdered = episodesRelatedForRecently.OrderBy(o => o.ProgramStartDate).ToList();
+                }
+                #endregion
+
+                RetrieveData<ProgramFilterModel> RetrieveData = new RetrieveData<ProgramFilterModel>();
+                RetrieveData.DataList = episodesRelatedForRecentlyOrdered;
+                RetrieveData.Url = helper.LivePathImages;
+
+
+                return RetrieveData;
+            }
+            catch (Exception ex)
+            {
+                helper.LogError(ex);
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
+        #endregion
+
         #region Get Episodes Filter ForRecently2
 
         private async Task<ActionResult<RetrieveData<EpisodesRelatedForRecentlyModel>>> episodesfilterforrecently2()

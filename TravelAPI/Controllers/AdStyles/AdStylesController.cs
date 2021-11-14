@@ -40,7 +40,7 @@ namespace BalarinaAPI.Controllers.AdStyles
         /// <returns>
         /// List Of Advertisement Object that Contains ADStyleId , ADStyleTitle , ADWidth and ADHeight
         /// </returns>
-        [Authorize]
+        [ApiAuthentication]
         [HttpGet]
         [Route("getallstyles")]
         public async Task<ActionResult<IEnumerable<ADSTYLES>>> getallstyles()
@@ -121,7 +121,7 @@ namespace BalarinaAPI.Controllers.AdStyles
         /// <returns>
         /// status of operation - Created Successfully - or Status500InternalServerError
         /// </returns>
-        [Authorize]
+        [ApiAuthentication]
         [HttpPost]
         [Route("createadstyle")]
         public async Task<ActionResult<AdStyleInput>> createadstyle([FromQuery] AdStyleInput model)
@@ -155,7 +155,7 @@ namespace BalarinaAPI.Controllers.AdStyles
                 await unitOfWork.Complete();
                 #endregion
 
-                return Ok(" AD Style Created Successfully ");
+                return StatusCode(StatusCodes.Status200OK);
             }
             catch (Exception ex)
             {
@@ -175,7 +175,7 @@ namespace BalarinaAPI.Controllers.AdStyles
         /// <returns>
         /// status of operation - Created Successfully - or Status500InternalServerError
         /// </returns>
-        [Authorize]
+        [ApiAuthentication]
         [HttpPut]
         [Route("updateadstyle")]
         public async Task<ActionResult<AdStyleToUpdate>> updateadstyle([FromQuery] AdStyleToUpdate model)
@@ -222,7 +222,7 @@ namespace BalarinaAPI.Controllers.AdStyles
                 await unitOfWork.Complete();
                 #endregion
 
-                return Ok(" AD Style Updated Successfully ");
+                return StatusCode(StatusCodes.Status200OK);
             }
             catch (Exception ex)
             {
@@ -233,7 +233,7 @@ namespace BalarinaAPI.Controllers.AdStyles
         #endregion
 
         #region Delete Advertisement Style
-        [Authorize]
+        [ApiAuthentication]
         [HttpDelete("{ID}")]
         public async Task<ActionResult<ADSTYLES>> deleteadstyle(int ID)
         {
@@ -252,7 +252,7 @@ namespace BalarinaAPI.Controllers.AdStyles
                 await unitOfWork.Complete();
                 #endregion 
 
-                return Ok(" AD Style Obj deleted successfully ");
+                return StatusCode(StatusCodes.Status200OK);
             }
             catch (Exception ex)
             {
