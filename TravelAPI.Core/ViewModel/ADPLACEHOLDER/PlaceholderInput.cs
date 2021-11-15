@@ -9,8 +9,11 @@ namespace BalarinaAPI.Core.ViewModel.ADPLACEHOLDER
 {
     public  class PlaceholderInput
     {
-        public int AdStyleID { get; set; }
+        public int ADPlaceholderCode { get; set; }
+
         public int AdTargetId { get; set; }
+        public int AdStyleID { get; set; }
+
         public string Title { get; set; }
         public IFormFile Image { get; set; }
     }

@@ -1,6 +1,8 @@
 ﻿using BalarinaAPI.Authentication;
 using BalarinaAPI.Core.Model;
+using BalarinaAPI.Core.ViewModel;
 using BalarinaAPI.Core.ViewModel.AdvertisementTargets;
+using BalarinaAPI.Core.ViewModel.Category;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -81,6 +83,40 @@ namespace BalarinaAPI.Controllers.ADTARGET
                     return StatusCode(StatusCodes.Status500InternalServerError);
                 } 
             }
+        #endregion
+
+        #region Get All Target Name , ID 
+        /// <summary>
+        /// Get All categories Name , ID 
+        /// </summary>
+        /// <returns>
+        /// List of Object that Contains 
+        /// CategoryId , CategoryName
+        /// </returns>
+        [ApiAuthentication]
+        [HttpGet]
+        [Route("gettarget_id_name")]
+        public async Task<ActionResult<List<ListOfNameID<Object_ID_Name>>>> GetTarget_ID_Name()
+        {
+            try
+            {
+                var _Objects = await unitOfWork.ADTARGETS.GetObjects(); _Objects.ToList();
+      
+                List<ListOfNameID<Object_ID_Name>> Collection = new List<ListOfNameID<Object_ID_Name>>();
+                foreach (var item in _Objects)
+                {
+                    ListOfNameID<Object_ID_Name> obj = new ListOfNameID<Object_ID_Name>() { ID = item.ADTargetID, Name = item.ADTargetTitle };
+                    Collection.Add(obj);
+                }
+                return Collection;
+            }
+            catch (Exception ex)
+            {
+                // Log error in db
+                helper.LogError(ex);
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
         #endregion
 
         #region Find ADTarget By ADTargetID  ApiAuthentication

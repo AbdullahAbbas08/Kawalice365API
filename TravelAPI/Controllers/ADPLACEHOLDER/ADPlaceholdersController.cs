@@ -41,7 +41,7 @@ namespace BalarinaAPI.Controllers.ADPLACEHOLDERS
         /// <returns>
         /// List Of Advertisement Object that Contains  ADPlaceholderID , AdStyleID , AdTargetId , Title , ImagePath , 
         /// </returns>
-        [Authorize]
+        [ApiAuthentication]
         [HttpGet]
         [Route("getallads")]
         public async Task<ActionResult<RetrieveData<ADPLACEHOLDER>>> getallads()
@@ -132,7 +132,7 @@ namespace BalarinaAPI.Controllers.ADPLACEHOLDERS
         /// <returns>
         /// status of operation - Created Successfully - or Status500InternalServerError
         /// </returns>
-        [Authorize]
+        [ApiAuthentication]
         [HttpPost]
         [Route("createplaceholder")]
         public async Task<ActionResult<PlaceholderInput>> createplaceholder([FromQuery] PlaceholderInput model)
@@ -163,6 +163,7 @@ namespace BalarinaAPI.Controllers.ADPLACEHOLDERS
                     AdStyleID = model.AdStyleID,
                     AdTargetId = model.AdTargetId,
                     Title = model.Title,
+                    ADPlaceholderCode = model.ADPlaceholderCode,
                     ImagePath = helper.UploadImage(model.Image)
                 };
                 #endregion
@@ -180,7 +181,7 @@ namespace BalarinaAPI.Controllers.ADPLACEHOLDERS
                 await unitOfWork.Complete();
                 #endregion
 
-                return Ok(" ADS PLACEHOLDER Created Successfully ");
+                return StatusCode(StatusCodes.Status200OK);
             }
             catch (Exception ex)
             {
@@ -200,7 +201,7 @@ namespace BalarinaAPI.Controllers.ADPLACEHOLDERS
         /// <returns>
         /// status of operation - Updated Successfully - or Status500InternalServerError
         /// </returns>
-        [Authorize]
+        [ApiAuthentication]
         [HttpPut]
         [Route("updateplaceholder")]
         public async Task<ActionResult<PlaceholderToUpdate>> updateplaceholder([FromQuery] PlaceholderToUpdate model)
@@ -225,6 +226,9 @@ namespace BalarinaAPI.Controllers.ADPLACEHOLDERS
                     if (AdStyleID == null)
                         return BadRequest(" Ads Style ID not found ");
                 }
+
+                if (model.ADPlaceholderCode == null)
+                    model.ADPlaceholderCode = PlaceholderObj.ADPlaceholderCode;
 
                 if (model.AdTargetId == null)
                     model.AdTargetId = PlaceholderObj.AdTargetId;
@@ -253,6 +257,7 @@ namespace BalarinaAPI.Controllers.ADPLACEHOLDERS
                    AdStyleID = (int)model.AdStyleID,
                    AdTargetId = (int)model.AdTargetId,
                    Title = model.Title,
+                   ADPlaceholderCode = (int)model.ADPlaceholderCode,
                    ImagePath = model.ImagePath
                 };
                 #endregion
@@ -270,7 +275,7 @@ namespace BalarinaAPI.Controllers.ADPLACEHOLDERS
                 await unitOfWork.Complete();
                 #endregion
 
-                return Ok(" ADS PLACEHOLDER Updated Successfully ");
+                return StatusCode(StatusCodes.Status200OK);
             }
             catch (Exception ex)
             {
@@ -288,7 +293,7 @@ namespace BalarinaAPI.Controllers.ADPLACEHOLDERS
         /// <returns>
         /// status of operation - Deleted Successfully - or Status500InternalServerError
         /// </returns>
-        [Authorize] 
+        [ApiAuthentication] 
         [HttpDelete("{ID}")]
         public async Task<ActionResult<ADSTYLES>> deleteplaceholder(int ID)
         {

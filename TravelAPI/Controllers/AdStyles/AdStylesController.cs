@@ -1,6 +1,8 @@
 ﻿using BalarinaAPI.Authentication;
 using BalarinaAPI.Core.Model;
+using BalarinaAPI.Core.ViewModel;
 using BalarinaAPI.Core.ViewModel.AdStyles;
+using BalarinaAPI.Core.ViewModel.Category;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -77,6 +79,43 @@ namespace BalarinaAPI.Controllers.AdStyles
             }
             catch (Exception ex)
             {
+                helper.LogError(ex);
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
+        #endregion
+
+        #region Get All Style Name , ID 
+        /// <summary>
+        /// Get All categories Name , ID 
+        /// </summary>
+        /// <returns>
+        /// List of Object that Contains 
+        /// CategoryId , CategoryName
+        /// </returns>
+        [ApiAuthentication]
+        [HttpGet]
+        [Route("getstyle_id_name")]
+        public async Task<ActionResult<List<ListOfNameID<Object_ID_Name>>>> GetStyle_ID_Name()
+        {
+            try
+            {
+                var _Objects = await unitOfWork.ADSTYLES.GetObjects(); _Objects.ToList();
+                if (_Objects == null)
+                    return BadRequest("Categories list is empty ");
+                //Get All Programs 
+
+                List<ListOfNameID<Object_ID_Name>> Collection = new List<ListOfNameID<Object_ID_Name>>();
+                foreach (var item in _Objects)
+                {
+                    ListOfNameID<Object_ID_Name> obj = new ListOfNameID<Object_ID_Name>() { ID = item.ADStyleId, Name = item.ADStyleTitle };
+                    Collection.Add(obj);
+                }
+                return Collection;
+            }
+            catch (Exception ex)
+            {
+                // Log error in db
                 helper.LogError(ex);
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
