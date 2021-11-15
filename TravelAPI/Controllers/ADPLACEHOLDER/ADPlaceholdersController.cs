@@ -44,14 +44,48 @@ namespace BalarinaAPI.Controllers.ADPLACEHOLDERS
         [ApiAuthentication]
         [HttpGet]
         [Route("getallads")]
-        public async Task<ActionResult<RetrieveData<ADPLACEHOLDER>>> getallads()
+        public async Task<ActionResult<RetrieveData<PlacementModel>>> getallads()
         {
             try
             {
-                RetrieveData<ADPLACEHOLDER> Collection= new RetrieveData<ADPLACEHOLDER>();    
+                RetrieveData<PlacementModel> Collection= new RetrieveData<PlacementModel>();
+                
                 var _ADPLACEHOLDER = await unitOfWork.ADPLACEHOLDER.GetObjects();
+                var Style = await unitOfWork.ADSTYLES.GetObjects();
+                var Target = await unitOfWork.ADTARGETS.GetObjects();
+
+                var result = (from placement in _ADPLACEHOLDER
+                             join style in Style
+                             on placement.AdStyleID equals style.ADStyleId
+                             join target in Target
+                             on placement.AdTargetId equals target.ADTargetID
+                             select new
+                             {
+                                 placement.ADPlaceholderID,
+                                 placement.ADPlaceholderCode,
+                                 placement.Title,
+                                 placement.AdStyleID,
+                                 placement.AdTargetId,
+                                 placement.ImagePath,
+                                 style.ADStyleTitle,
+                                 target.ADTargetTitle
+                             }).ToList();
+                foreach (var item in result)
+                {
+                    PlacementModel model = new PlacementModel()
+                    {
+                        ADPlaceholderID = item.ADPlaceholderID,
+                        ADPlaceholderCode = item.ADPlaceholderCode,
+                        AdStyleID = item.AdStyleID,
+                        ADStyleTitle = item.ADStyleTitle,
+                        AdTargetId = item.AdTargetId,
+                        ADTargetTitle = item.ADTargetTitle,
+                        Title = item.Title,
+                        ImagePath = item.ImagePath
+                    };
+                    Collection.DataList.Add(model);
+                }
                 Collection.Url = helper.LivePathImages ;
-                Collection.DataList = _ADPLACEHOLDER.ToList();
                 return Collection; 
             }
             catch (Exception ex)
@@ -139,6 +173,8 @@ namespace BalarinaAPI.Controllers.ADPLACEHOLDERS
         {
             try
             {
+                 model.Image = HttpContext.Request.Form.Files["PlacementIamge"];
+
 
                 #region Check values of Advertisement is not null or empty
 
@@ -208,11 +244,15 @@ namespace BalarinaAPI.Controllers.ADPLACEHOLDERS
         {
             try
             {
+                model.Image = HttpContext.Request.Form.Files["PlacementIamge"];
+
+
                 #region Check If Placeholder id Exist or not
                 var PlaceholderObj = await unitOfWork.ADPLACEHOLDER.FindObjectAsync(model.ADPlaceholderID);
                 if (PlaceholderObj == null)
                     return BadRequest("Placeholder ID not found ");
                 #endregion
+
                 #region Check values of Advertisement is not null or empty
 
                 if (string.IsNullOrEmpty(model.Title))
@@ -317,7 +357,7 @@ namespace BalarinaAPI.Controllers.ADPLACEHOLDERS
 
                 await unitOfWork.Complete();
 
-                return Ok(" Placeholder Obj deleted successfully ");
+                return StatusCode(StatusCodes.Status200OK);
             }
             catch (Exception ex)
             {
