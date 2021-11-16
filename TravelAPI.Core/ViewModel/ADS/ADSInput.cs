@@ -15,7 +15,7 @@ namespace BalarinaAPI.Core.ViewModel.ADS
         public int Views { get; set; }
         public int PlaceHolderID { get; set; }
         public string ClientID { get; set; }
-        public DateTime PublishStartDate { get; set; }
-        public DateTime PublishEndDate { get; set; }
+        public string PublishStartDate { get; set; }
+        public string PublishEndDate { get; set; }
     }
 }

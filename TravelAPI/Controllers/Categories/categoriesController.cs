@@ -368,7 +368,7 @@ namespace BalarinaAPI.Controllers.Categories
         /// <returns>
         /// status of operation - Deleted Successfully - or Status500InternalServerError
         /// </returns>
-        //[Authorize]
+        [ApiAuthentication]
         [HttpDelete("{ID}")]
         public async Task<ActionResult<Category>> deletecategoryAsync(int ID)
         {

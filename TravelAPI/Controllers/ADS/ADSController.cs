@@ -292,13 +292,19 @@ namespace BalarinaAPI.Controllers.Advertisement
         /// <returns>
         /// status of operation - Created Successfully - or Status500InternalServerError
         /// </returns>
-        [Authorize]
+        [ApiAuthentication]
         [HttpPost]
         [Route("createads")]
         public async Task<ActionResult<ADSInput>> createads([FromQuery] ADSInput model)
         {
             try
             {
+                DateTime PublishStartDate = new DateTime();
+                DateTime PublishEndDate = new DateTime();
+
+
+                model.Image = HttpContext.Request.Form.Files["AdsImage"];
+
 
                 #region Check values of Advertisement is not null or empty
 
@@ -317,15 +323,30 @@ namespace BalarinaAPI.Controllers.Advertisement
                 if (user is null)
                     return BadRequest("Client ID NOt Found ");
 
-                if (!DateTime.TryParse((model.PublishStartDate).ToString(), out _))
-                    return BadRequest("Publish Start Date Not Invalid");
+                //if (!DateTime.TryParse((model.PublishStartDate).ToString(), out _))
+                //    return BadRequest("Publish Start Date Not Invalid");
 
-                if (!DateTime.TryParse((model.PublishEndDate).ToString(), out _))
-                    return BadRequest("Publish End Date Not Invalid");
+                //if (!DateTime.TryParse((model.PublishEndDate).ToString(), out _))
+                //    return BadRequest("Publish End Date Not Invalid");
 
                 if (model.Image == null)
                     return BadRequest("ADS Image NOT Valid");
+
+                if (model.PublishStartDate.Contains("T"))
+                {
+                    model.PublishStartDate = model.PublishStartDate.Substring(0, model.PublishStartDate.IndexOf("T"));
+                }
+                PublishStartDate = DateTime.ParseExact(model.PublishStartDate, "dd-MM-yyyy", null);
+
+                if (model.PublishEndDate.Contains("T"))
+                {
+                    model.PublishEndDate = model.PublishEndDate.Substring(0, model.PublishEndDate.IndexOf("T"));
+                }
+                PublishEndDate = DateTime.ParseExact(model.PublishEndDate, "dd-MM-yyyy", null);
+
                 #endregion
+
+
 
                 #region Fill ADTARGET object with values to insert
                 ADS _ADVS = new ADS()
@@ -334,8 +355,8 @@ namespace BalarinaAPI.Controllers.Advertisement
                     ImagePath = helper.UploadImage(model.Image),
                     ClientID = model.ClientID,
                     PlaceHolderID = model.PlaceHolderID,
-                    PublishStartDate = model.PublishStartDate,
-                    PublishEndDate = model.PublishEndDate,
+                    PublishStartDate = PublishStartDate,
+                    PublishEndDate = PublishEndDate,
                     URL = model.URL,
                     Views = model.Views,
                 };
@@ -354,7 +375,7 @@ namespace BalarinaAPI.Controllers.Advertisement
                 await unitOfWork.Complete();
                 #endregion
 
-                return Ok(" ADS Created Successfully ");
+                return StatusCode(StatusCodes.Status200OK);
             }
             catch (Exception ex)
             {
@@ -374,13 +395,19 @@ namespace BalarinaAPI.Controllers.Advertisement
         /// <returns>
         /// status of operation - Created Successfully - or Status500InternalServerError
         /// </returns>
-        [Authorize]
+        
+        [ApiAuthentication]
         [HttpPut]
         [Route("updateads")]
         public async Task<ActionResult<ADSToUpdate>> updateads([FromQuery] ADSToUpdate model)
         {
             try
             {
+                DateTime PublishStartDate = new DateTime();
+                DateTime PublishEndDate = new DateTime();
+
+                model.Image = HttpContext.Request.Form.Files["AdsImage"];
+
                 #region Check if ADS ID Exist or not 
                 var ADSObj = await unitOfWork.ADS.FindObjectAsync(model.AdId);
                 if (ADSObj == null)
@@ -410,16 +437,10 @@ namespace BalarinaAPI.Controllers.Advertisement
                     model.ClientID = ADSObj.ClientID;
 
                 if (model.PublishStartDate == null)
-                    model.PublishStartDate = ADSObj.PublishStartDate;
+                    PublishStartDate = ADSObj.PublishStartDate;
 
                 if (model.PublishEndDate == null)
-                    model.PublishEndDate = ADSObj.PublishEndDate;
-
-                if (!DateTime.TryParse((model.PublishStartDate).ToString(), out _))
-                    return BadRequest("Publish Start Date Not Invalid");
-
-                if (!DateTime.TryParse((model.PublishEndDate).ToString(), out _))
-                    return BadRequest("Publish End Date Not Invalid");
+                    PublishEndDate = ADSObj.PublishEndDate;
 
                 if(model.Views == null)
                     model.Views = ADSObj.Views;
@@ -433,6 +454,18 @@ namespace BalarinaAPI.Controllers.Advertisement
                 {
                     model.ImagePath = helper.UploadImage(model.Image);
                 }
+
+                if (model.PublishStartDate.Contains("T"))
+                {
+                    model.PublishStartDate = model.PublishStartDate.Substring(0, model.PublishStartDate.IndexOf("T"));
+                }
+                PublishStartDate = DateTime.ParseExact(model.PublishStartDate, "dd-MM-yyyy", null);
+
+                if (model.PublishEndDate.Contains("T"))
+                {
+                    model.PublishEndDate = model.PublishEndDate.Substring(0, model.PublishEndDate.IndexOf("T"));
+                }
+                PublishEndDate = DateTime.ParseExact(model.PublishEndDate, "dd-MM-yyyy", null);
                 #endregion
 
                 #region Fill ADTARGET object with values to insert
@@ -443,8 +476,8 @@ namespace BalarinaAPI.Controllers.Advertisement
                     ImagePath = model.ImagePath,
                     ClientID = model.ClientID,
                     PlaceHolderID = (int)model.PlaceHolderID,
-                    PublishStartDate = (DateTime) model.PublishStartDate,
-                    PublishEndDate = (DateTime) model.PublishEndDate,
+                    PublishStartDate = PublishStartDate,
+                    PublishEndDate = PublishEndDate,
                     URL = model.URL,
                     Views = (int)model.Views,
                 };
@@ -463,7 +496,7 @@ namespace BalarinaAPI.Controllers.Advertisement
                 await unitOfWork.Complete();
                 #endregion
 
-                return Ok(" ADS Updated Successfully ");
+                return StatusCode(StatusCodes.Status200OK);
             }
             catch (Exception ex)
             {
@@ -474,7 +507,7 @@ namespace BalarinaAPI.Controllers.Advertisement
         #endregion
 
         #region Delete Advertisement 
-        [Authorize]
+        [ApiAuthentication]
         [HttpDelete("{ID}")]
         public async Task<ActionResult<ADSTYLES>> deleteads(int ID)
         {
@@ -498,7 +531,7 @@ namespace BalarinaAPI.Controllers.Advertisement
 
                 await unitOfWork.Complete();
 
-                return Ok(" ADS  Obj deleted successfully ");
+                return StatusCode(StatusCodes.Status200OK);
             }
             catch (Exception ex)
             {
