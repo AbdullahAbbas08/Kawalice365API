@@ -237,7 +237,7 @@ namespace BalarinaAPI.Controllers.Interviewers
                     model.BirthDate = model.BirthDate.Substring(0, model.BirthDate.IndexOf("T"));
                 }
                
-                    EpisodePublishDate = DateTime.ParseExact(model.BirthDate, "dd-MM-yyyy", null);
+                    EpisodePublishDate = DateTime.ParseExact(model.BirthDate, "yyyy-MM-dd", null);
                
 
 
@@ -350,7 +350,7 @@ namespace BalarinaAPI.Controllers.Interviewers
                     model.BirthDate = model.BirthDate.Substring(0, model.BirthDate.IndexOf("T"));
                 }
 
-                BirthDate = DateTime.ParseExact(model.BirthDate, "dd-MM-yyyy", null);
+                BirthDate = DateTime.ParseExact(model.BirthDate, "yyyy-MM-dd", null);
 
 
 

@@ -23,6 +23,7 @@ using TravelAPI.Core.Helper;
 using BalarinaAPI.Core.Model;
 using BalarinaAPI.Core.Helper;
 using BalarinaAPI.Core.Services;
+using BalarinaAPI.Hub;
 
 namespace TravelAPI
 {
@@ -115,6 +116,7 @@ namespace TravelAPI
                 });
             #endregion
 
+            services.AddSignalR();
 
         }
 
@@ -147,6 +149,11 @@ namespace TravelAPI
             app.UseAuthentication();
 
             app.UseAuthorization();
+
+            app.UseEndpoints(endpoint =>
+            {
+                endpoint.MapHub<NotificationHub>("/notify");
+            });
 
             app.UseEndpoints(endpoints =>
             {

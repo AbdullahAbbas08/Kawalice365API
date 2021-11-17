@@ -23,6 +23,7 @@ namespace TravelAPI.Core
         IBaseRepository<ADPLACEHOLDER> ADPLACEHOLDER { get; }
         IBaseRepository<ADS> ADS { get; }
         IBaseRepository<ApplicationUser> ApplicationUser  { get; }
+        IBaseRepository<Notification> Notification { get; }
          
 
         Task<int> Complete(); 

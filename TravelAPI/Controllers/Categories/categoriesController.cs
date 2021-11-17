@@ -112,8 +112,6 @@ namespace BalarinaAPI.Controllers.Categories
         }
         #endregion
 
-
-
         #region Insert New Category 
         /// <summary>
         /// insert new category that have CategoryTitle,CategoryDescription,CategoryVisible,CategoryOrder

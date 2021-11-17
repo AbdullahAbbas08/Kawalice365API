@@ -4,14 +4,16 @@ using BalarinaAPI.Core.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace BalarinaAPI.Core.Migrations
 {
     [DbContext(typeof(BalarinaDatabaseContext))]
-    partial class BalarinaDbContextModelSnapshot : ModelSnapshot
+    [Migration("20211117143421_AlterNotificationEntity")]
+    partial class AlterNotificationEntity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -553,8 +555,8 @@ namespace BalarinaAPI.Core.Migrations
                     b.Property<string>("IMG")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("Visible")
-                        .HasColumnType("bit");
+                    b.Property<int>("Visible")
+                        .HasColumnType("int");
 
                     b.Property<string>("title")
                         .HasColumnType("nvarchar(max)");

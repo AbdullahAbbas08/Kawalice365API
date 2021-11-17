@@ -336,13 +336,13 @@ namespace BalarinaAPI.Controllers.Advertisement
                 {
                     model.PublishStartDate = model.PublishStartDate.Substring(0, model.PublishStartDate.IndexOf("T"));
                 }
-                PublishStartDate = DateTime.ParseExact(model.PublishStartDate, "dd-MM-yyyy", null);
+                PublishStartDate = DateTime.ParseExact(model.PublishStartDate, "yyyy-MM-dd", null);
 
                 if (model.PublishEndDate.Contains("T"))
                 {
                     model.PublishEndDate = model.PublishEndDate.Substring(0, model.PublishEndDate.IndexOf("T"));
                 }
-                PublishEndDate = DateTime.ParseExact(model.PublishEndDate, "dd-MM-yyyy", null);
+                PublishEndDate = DateTime.ParseExact(model.PublishEndDate, "yyyy-MM-dd", null);
 
                 #endregion
 
@@ -459,13 +459,13 @@ namespace BalarinaAPI.Controllers.Advertisement
                 {
                     model.PublishStartDate = model.PublishStartDate.Substring(0, model.PublishStartDate.IndexOf("T"));
                 }
-                PublishStartDate = DateTime.ParseExact(model.PublishStartDate, "dd-MM-yyyy", null);
+                PublishStartDate = DateTime.ParseExact(model.PublishStartDate, "yyyy-MM-dd", null);
 
                 if (model.PublishEndDate.Contains("T"))
                 {
                     model.PublishEndDate = model.PublishEndDate.Substring(0, model.PublishEndDate.IndexOf("T"));
                 }
-                PublishEndDate = DateTime.ParseExact(model.PublishEndDate, "dd-MM-yyyy", null);
+                PublishEndDate = DateTime.ParseExact(model.PublishEndDate, "yyyy-MM-dd", null);
                 #endregion
 
                 #region Fill ADTARGET object with values to insert

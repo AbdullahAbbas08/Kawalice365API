@@ -4,9 +4,11 @@ using BalarinaAPI.Core.ViewModel;
 using BalarinaAPI.Core.ViewModel.Category;
 using BalarinaAPI.Core.ViewModel.DetailsAPI;
 using BalarinaAPI.Core.ViewModel.Episode;
+using BalarinaAPI.Hub;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using System;
@@ -26,15 +28,17 @@ namespace BalarinaAPI.Controllers.Episodes
     {
         #region variables
         private readonly IUnitOfWork unitOfWork;
+        private readonly IHubContext<NotificationHub,IHubClient> hubClient;
         private readonly Helper helper;
         private readonly TrendingDuration trendingDuration;
 
         #endregion
 
         #region Constructor
-        public episodesController(IUnitOfWork _unitOfWork, IOptions<Helper> _helper, IOptions<TrendingDuration> _trendingDuration)
+        public episodesController(IUnitOfWork _unitOfWork, IOptions<Helper> _helper, IOptions<TrendingDuration> _trendingDuration,IHubContext<NotificationHub,IHubClient> hubClient)
         {
             unitOfWork = _unitOfWork;
+            this.hubClient = hubClient;
             this.helper = _helper.Value;
             this.trendingDuration = _trendingDuration.Value;
         }
@@ -190,7 +194,7 @@ namespace BalarinaAPI.Controllers.Episodes
                     model.EpisodePublishDate = model.EpisodePublishDate.Substring(0, model.EpisodePublishDate.IndexOf("T"));
                 }
             
-                    EpisodePublishDate = DateTime.ParseExact(model.EpisodePublishDate, "dd-MM-yyyy", null);
+                    EpisodePublishDate = DateTime.ParseExact(model.EpisodePublishDate, "yyyy-MM-dd", null);
               
 
                 #endregion
@@ -223,6 +227,9 @@ namespace BalarinaAPI.Controllers.Episodes
 
                 #region save changes in db
                 await unitOfWork.Complete();
+
+                await hubClient.Clients.All.BroadCastNotification();
+                
                 #endregion
 
                 return StatusCode(StatusCodes.Status200OK);
@@ -283,7 +290,7 @@ namespace BalarinaAPI.Controllers.Episodes
                     model.EpisodePublishDate = model.EpisodePublishDate.Substring(0, model.EpisodePublishDate.IndexOf("T"));
                 }
 
-                EpisodePublishDate = DateTime.ParseExact(model.EpisodePublishDate, "dd-MM-yyyy", null);
+                EpisodePublishDate = DateTime.ParseExact(model.EpisodePublishDate, "yyyy-MM-dd", null);
                 #endregion
 
                 #region check if image updated or not 

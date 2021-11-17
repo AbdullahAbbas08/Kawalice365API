@@ -19,14 +19,15 @@ namespace TravelAPI.EF
         public IBaseRepository<Keyword> Keyword { get; private set; }
         public IBaseRepository<Program> Program { get; private set; }
         public IBaseRepository<ProgramType> ProgramType { get; private set; }
-        public IBaseRepository<Seasons> Season  { get; private set; }
-        public IBaseRepository<Sliders> Slider  { get; private set; }
+        public IBaseRepository<Seasons> Season { get; private set; }
+        public IBaseRepository<Sliders> Slider { get; private set; }
 
         public IBaseRepository<ADTARGETS> ADTARGETS { get; private set; }
         public IBaseRepository<ADSTYLES> ADSTYLES { get; private set; }
         public IBaseRepository<ADPLACEHOLDER> ADPLACEHOLDER { get; private set; }
         public IBaseRepository<ADS> ADS { get; private set; }
-        public IBaseRepository<ApplicationUser> ApplicationUser  { get; private set; }
+        public IBaseRepository<ApplicationUser> ApplicationUser { get; private set; }
+        public IBaseRepository<Notification> Notification { get; private set; }
 
 
         public UnitOfWork(BalarinaDatabaseContext _context)
@@ -46,6 +47,7 @@ namespace TravelAPI.EF
             this.ADPLACEHOLDER = new BaseRepository<ADPLACEHOLDER>(_context);
             this.ADSTYLES = new BaseRepository<ADSTYLES>(_context);
             ApplicationUser = new BaseRepository<ApplicationUser>(_context);
+            this.Notification = new BaseRepository<Notification>(_context);
         }
 
         public void Dispose()

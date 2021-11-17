@@ -34,6 +34,7 @@ namespace BalarinaAPI.Core.Model
         public virtual DbSet<ADSTYLES> ADSTYLES { get; set; } 
         public virtual DbSet<ADPLACEHOLDER> ADPLACEHOLDER { get; set; } 
         public virtual DbSet<ADS> ADS  { get; set; }
+        public virtual DbSet<Notification> Notification { get; set; } 
 
         //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         //{

@@ -292,10 +292,9 @@ namespace BalarinaAPI.Controllers.Programs
                 if (model.ProgramVisible == null)
                     return BadRequest("Program Visible cannot be null ");
 
-                var ProgramStartDate = DateTime.ParseExact(model.ProgramStartDate, "dd-MM-yyyy", null);
-               
+                var ProgramStartDate = DateTime.ParseExact(model.ProgramStartDate, "yyyy-MM-dd", null);
 
-                Program _program = new Program()
+                 Program _program = new Program()
                 {
 
                     CreationDate = DateTime.Now,
@@ -554,7 +553,7 @@ namespace BalarinaAPI.Controllers.Programs
                     model.ProgramStartDate = model.ProgramStartDate.Substring(0, model.ProgramStartDate.IndexOf("T"));
                 }
                
-                    ProgramStartDate = DateTime.ParseExact(model.ProgramStartDate, "dd-MM-yyyy", null);
+                    ProgramStartDate = DateTime.ParseExact(model.ProgramStartDate, "yyyy-MM-dd", null);
               
                 
 
