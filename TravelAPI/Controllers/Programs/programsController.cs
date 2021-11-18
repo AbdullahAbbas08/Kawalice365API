@@ -51,36 +51,36 @@ namespace BalarinaAPI.Controllers.Programs
                 // Create ProgramsList to return It
                 List<ProgramFilterModel> _programsList = new List<ProgramFilterModel>();
                 //Get All Programs 
-                var ResultPrograms      = await unitOfWork.Program.GetObjects(); 
-                var ResultCategory      = await unitOfWork.category.GetObjects();
-                var ResultInterviewer   = await unitOfWork.Interviewer.GetObjects();
-                var ResulProgramType    = await unitOfWork.ProgramType.GetObjects();
+                var ResultPrograms = await unitOfWork.Program.GetObjects();
+                var ResultCategory = await unitOfWork.category.GetObjects();
+                var ResultInterviewer = await unitOfWork.Interviewer.GetObjects();
+                var ResulProgramType = await unitOfWork.ProgramType.GetObjects();
 
                 var Result = (from program in ResultPrograms
-                             join category in ResultCategory
-                             on program.CategoryId equals category.CategoryId
-                             join interviewer in ResultInterviewer
-                             on program.InterviewerId equals interviewer.InterviewerId
-                             join programtype in ResulProgramType
-                             on program.ProgramTypeId equals programtype.ProgramTypeId
-                             select new
-                             {
-                                 category.CategoryId,
-                                 category.CategoryTitle,
-                                 program.ProgramDescription,
-                                 program.ProgramId,
-                                 program.ProgramImg,
-                                 program.ProgramName,
-                                 program.ProgramPromoUrl,
-                                 program.ProgramOrder,
-                                 program.ProgramVisible,
-                                 program.ProgramStartDate,
-                                 program.CreationDate,
-                                 interviewer.InterviewerId,
-                                 interviewer.InterviewerName,
-                                 programtype.ProgramTypeId,
-                                 programtype.ProgramTypeTitle,
-                             }).OrderBy(x=>x.ProgramOrder);
+                              join category in ResultCategory
+                              on program.CategoryId equals category.CategoryId
+                              join interviewer in ResultInterviewer
+                              on program.InterviewerId equals interviewer.InterviewerId
+                              join programtype in ResulProgramType
+                              on program.ProgramTypeId equals programtype.ProgramTypeId
+                              select new
+                              {
+                                  category.CategoryId,
+                                  category.CategoryTitle,
+                                  program.ProgramDescription,
+                                  program.ProgramId,
+                                  program.ProgramImg,
+                                  program.ProgramName,
+                                  program.ProgramPromoUrl,
+                                  program.ProgramOrder,
+                                  program.ProgramVisible,
+                                  program.ProgramStartDate,
+                                  program.CreationDate,
+                                  interviewer.InterviewerId,
+                                  interviewer.InterviewerName,
+                                  programtype.ProgramTypeId,
+                                  programtype.ProgramTypeTitle,
+                              }).OrderBy(x => x.ProgramOrder);
                 //.Include(x => x.Category).Include(x => x.Interviewer).Include(x => x.ProgramType).OrderBy(x => x.ProgramOrder).ToList();
 
                 #region Fill ProgramsList and Handle Image Path For all Program
@@ -89,22 +89,22 @@ namespace BalarinaAPI.Controllers.Programs
                     // Create Category Object
                     ProgramFilterModel _program = new ProgramFilterModel()
                     {
-                        CategoryId          = item.CategoryId,
-                        InterviewerId       = item.InterviewerId,
-                        ProgramDescription  = item.ProgramDescription,
-                        ProgramId           = item.ProgramId,
-                        ProgramImg          = item.ProgramImg,
-                        ProgramName         = item.ProgramName,
-                        ProgramOrder        = item.ProgramOrder,
-                        ProgramStartDate    = item.ProgramStartDate,
-                        ProgramTypeId       = item.ProgramTypeId,
-                        ProgramVisible      = (bool)item.ProgramVisible ,
-                        CreationDate        = item.CreationDate,
-                        CategoryName        = item.CategoryTitle,
-                        InterviewerName     = item.InterviewerName,
-                        ProgramTypeName     = item.ProgramTypeTitle,
+                        CategoryId = item.CategoryId,
+                        InterviewerId = item.InterviewerId,
+                        ProgramDescription = item.ProgramDescription,
+                        ProgramId = item.ProgramId,
+                        ProgramImg = item.ProgramImg,
+                        ProgramName = item.ProgramName,
+                        ProgramOrder = item.ProgramOrder,
+                        ProgramStartDate = item.ProgramStartDate,
+                        ProgramTypeId = item.ProgramTypeId,
+                        ProgramVisible = (bool)item.ProgramVisible,
+                        CreationDate = item.CreationDate,
+                        CategoryName = item.CategoryTitle,
+                        InterviewerName = item.InterviewerName,
+                        ProgramTypeName = item.ProgramTypeTitle,
                         ProgramPromoUrl = item.ProgramPromoUrl
-                        
+
                     };
                     // Finally Add It Into Programs List
                     _programsList.Add(_program);
@@ -118,7 +118,7 @@ namespace BalarinaAPI.Controllers.Programs
                 return Collection;
             }
             catch (Exception ex)
-             {
+            {
                 helper.LogError(ex);
                 return StatusCode(StatusCodes.Status500InternalServerError);
                 // Log error in db
@@ -159,7 +159,7 @@ namespace BalarinaAPI.Controllers.Programs
                                   program.ProgramName,
                                   program.ProgramOrder,
                                   program.ProgramVisible,
-                                  program.ProgramPromoUrl,                                 
+                                  program.ProgramPromoUrl,
                                   program.ProgramStartDate,
                                   program.CreationDate,
                                   interviewer.InterviewerId,
@@ -189,7 +189,7 @@ namespace BalarinaAPI.Controllers.Programs
                         CategoryName = item.CategoryTitle,
                         InterviewerName = item.InterviewerName,
                         ProgramTypeName = item.ProgramTypeTitle,
-                        ProgramPromoUrl=item.ProgramPromoUrl
+                        ProgramPromoUrl = item.ProgramPromoUrl
                     };
                     // Finally Add It Into Programs List
                     _programsList.Add(_program);
@@ -211,7 +211,41 @@ namespace BalarinaAPI.Controllers.Programs
         }
         #endregion
 
-        #region Get All categories Name , ID 
+        #region Get All Program Name , ID  related with Category iD
+        /// <summary>
+        /// Get All categories Name , ID 
+        /// </summary>
+        /// <returns>
+        /// List of Object that Contains 
+        /// CategoryId , CategoryName
+        /// </returns>
+        [ApiAuthentication]
+        [HttpGet] 
+        [Route("getprogramidname_withcategoryid")]
+        public async Task<ActionResult<List<ListOfNameID<Object_ID_Name>>>> getprogramidname_withcategoryid(int ID)
+        {
+            try
+            {
+                var _ProgramsObject = await unitOfWork.Program.GetObjects(x=>x.CategoryId == ID); _ProgramsObject.ToList();
+
+                List<ListOfNameID<Object_ID_Name>> Collection = new List<ListOfNameID<Object_ID_Name>>();
+                foreach (var item in _ProgramsObject)
+                {
+                    ListOfNameID<Object_ID_Name> obj = new ListOfNameID<Object_ID_Name>() { ID = item.ProgramId, Name = item.ProgramName };
+                    Collection.Add(obj);
+                }
+                return Collection.ToList();
+            }
+            catch (Exception ex)
+            {
+                // Log error in db
+                helper.LogError(ex);
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
+        #endregion
+
+        #region Get All Program Name , ID 
         /// <summary>
         /// Get All categories Name , ID 
         /// </summary>

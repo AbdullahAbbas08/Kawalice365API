@@ -46,17 +46,60 @@ namespace BalarinaAPI.Controllers.sliders
             try
             {
                 #region Declaration
+                List<SliderModel> sliders = new List<SliderModel>();
                 var ResultSlider = await unitOfWork.Slider.GetObjects(); ResultSlider.OrderBy(x => x.SliderOrder).ToList();
+                var Episodes = await unitOfWork.Episode.GetObjects(); Episodes.ToList();
+                var Categories = await unitOfWork.category.GetObjects(); Categories.ToList();
+                var programs = await unitOfWork.Program.GetObjects(); programs.ToList();
+                var Seasons = await unitOfWork.Season.GetObjects(); Seasons.ToList();
                 #endregion
 
-                //foreach (var item in ResultSlider)
-                //{
-                //    item.SliderImagePath = helper.LivePathImages + item.SliderImagePath;
-                //}
-              
-                RetrieveData<Sliders> Collection = new RetrieveData<Sliders>();
+                var result = (from category in Categories
+                             join program in programs
+                             on category.CategoryId equals program.CategoryId
+                             join season in Seasons
+                             on program.ProgramId equals season.ProgramId
+                             join episode in Episodes
+                             on season.SessionId equals episode.SessionId
+                             join slider in ResultSlider
+                             on program.ProgramId equals slider.ProgramIDFk
+                             select new
+                             {
+                                 slider.SliderId           ,
+                                 slider.SliderTitle        ,
+                                 slider.SliderImagePath    ,
+                                 slider.SliderOrder        ,
+                                 slider.SliderViews        ,
+                                 slider.ProgramIDFk        ,
+                                 episode.EpisodeId         ,
+                                 category.CategoryId       ,
+                                 season.SessionId          ,
+                                 program.ProgramName       ,
+                                 episode.YoutubeUrl        
+                             }).ToList();
+
+                foreach (var item in result)
+                {
+                    SliderModel slider = new SliderModel()
+                    {
+                        CategoryId = item.CategoryId,
+                        EpisodeId = item.EpisodeId,
+                        ProgramIDFk = item.ProgramIDFk,
+                        ProgramName= item.ProgramName,
+                        SessionId= item.SessionId,
+                        SliderId = item.SliderId,
+                        SliderImagePath = item.SliderImagePath,
+                        SliderOrder = item.SliderOrder,
+                        SliderTitle = item.SliderTitle,
+                        SliderViews = item.SliderViews,
+                        YoutubeUrl = item.YoutubeUrl
+                    };
+                    sliders.Add(slider);
+                }
+
+                RetrieveData <SliderModel> Collection = new RetrieveData<SliderModel>();
                 Collection.Url = helper.LivePathImages;
-                Collection.DataList = ResultSlider.ToList();
+                Collection.DataList = sliders.ToList();
                 return Ok(Collection);
             }
             catch (Exception ex)

@@ -111,17 +111,17 @@ namespace BalarinaAPI.Controllers.Season
         }
         #endregion
 
-        #region Get All categories Name , ID 
+        #region Get All season Name , ID 
         /// <summary>
-        /// Get All categories Name , ID 
+        /// Get All season Name , ID 
         /// </summary>
         /// <returns>
         /// List of Object that Contains 
-        /// CategoryId , CategoryName
+        /// Id , Name
         /// </returns>
         [ApiAuthentication]
         [HttpGet]
-        [Route("getcategories_id_name")]
+        [Route("getseason_id_name")]
         public async Task<ActionResult<List<ListOfNameID<Object_ID_Name>>>> GetSeason_ID_Name()
         {
             try
@@ -149,6 +149,41 @@ namespace BalarinaAPI.Controllers.Season
         }
         #endregion
 
+        #region Get All Season Name , ID  related with Program ID
+        /// <summary>
+        /// Get All Season Name , ID 
+        /// </summary>
+        /// <returns>
+        /// List of Object that Contains 
+        /// Id , Name
+        /// </returns>
+        [ApiAuthentication]
+        [HttpGet]
+        [Route("getseasonidname_withprogramid")] 
+        public async Task<ActionResult<List<ListOfNameID<Object_ID_Name>>>> getseasonidname_withprogramid(int ID)
+        {
+            try
+            {
+                //check If Category ID If Exist
+                var _SeasonObject = await unitOfWork.Season.GetObjects(x=>x.ProgramId == ID); _SeasonObject.ToList();
+                //Get All Programs 
+
+                List<ListOfNameID<Object_ID_Name>> Collection = new List<ListOfNameID<Object_ID_Name>>();
+                foreach (var item in _SeasonObject)
+                {
+                    ListOfNameID<Object_ID_Name> obj = new ListOfNameID<Object_ID_Name>() { ID = item.SessionId, Name = item.SessionTitle };
+                    Collection.Add(obj);
+                }
+                return Collection;
+            }
+            catch (Exception ex)
+            {
+                // Log error in db
+                helper.LogError(ex);
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
+        #endregion
 
         #region Get All Season Related With ProgramID API Key Authentication
         [ApiAuthentication]

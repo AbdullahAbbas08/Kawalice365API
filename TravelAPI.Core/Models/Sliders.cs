@@ -13,13 +13,13 @@ namespace BalarinaAPI.Core.Models
     public class Sliders
     {
         [Key]
-        public int SliderId { get; set; }
-        public string SliderTitle { get; set; }
-        public string SliderImagePath { get; set; }
-        public int SliderOrder { get; set; }
+        public int      SliderId            { get; set; }
+        public string   SliderTitle         { get; set; }
+        public string   SliderImagePath     { get; set; }
+        public int      SliderOrder         { get; set; }
         [JsonIgnore]
-        public int SliderViews   { get; set; }
-        public int ProgramIDFk  { get; set; }
+        public int      SliderViews         { get; set; }
+        public int      ProgramIDFk          { get; set; }
 
         [JsonIgnore]
         [ForeignKey("ProgramIDFk")]

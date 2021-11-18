@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,7 +11,7 @@ namespace BalarinaAPI.Core.ViewModel
     {
         public string title { get; set; }
         public string Descriptions { get; set; }
-        public string IMG { get; set; }
+        public IFormFile IMG { get; set; }
         public int EpisodeID { get; set; }
         public bool Visible { get; set; }
     }

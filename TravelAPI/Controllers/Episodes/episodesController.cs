@@ -28,17 +28,15 @@ namespace BalarinaAPI.Controllers.Episodes
     {
         #region variables
         private readonly IUnitOfWork unitOfWork;
-        private readonly IHubContext<NotificationHub,IHubClient> hubClient;
         private readonly Helper helper;
         private readonly TrendingDuration trendingDuration;
 
         #endregion
 
         #region Constructor
-        public episodesController(IUnitOfWork _unitOfWork, IOptions<Helper> _helper, IOptions<TrendingDuration> _trendingDuration,IHubContext<NotificationHub,IHubClient> hubClient)
+        public episodesController(IUnitOfWork _unitOfWork, IOptions<Helper> _helper, IOptions<TrendingDuration> _trendingDuration)
         {
             unitOfWork = _unitOfWork;
-            this.hubClient = hubClient;
             this.helper = _helper.Value;
             this.trendingDuration = _trendingDuration.Value;
         }
@@ -72,6 +70,40 @@ namespace BalarinaAPI.Controllers.Episodes
                 helper.LogError(ex);
                 return StatusCode(StatusCodes.Status500InternalServerError);
                 // Log error in db
+            }
+        }
+        #endregion
+
+        #region Get All Episode Name , ID  related with Season id
+        /// <summary>
+        /// Get All Episode Name , ID 
+        /// </summary>
+        /// <returns>
+        /// List of Object that Contains 
+        /// Id , Name
+        /// </returns>
+        [ApiAuthentication]
+        [Route("getepisode_id_name")]
+        [HttpGet]
+        public async Task<ActionResult<List<ListOfNameID<Object_ID_Name>>>> GetEpisode_ID_Name(int ID)
+        {
+            try
+            {
+                var _Objects = await unitOfWork.Episode.GetObjects(x=>x.SessionId == ID); _Objects.ToList();
+
+                List<ListOfNameID<Object_ID_Name>> Collection = new List<ListOfNameID<Object_ID_Name>>();
+                foreach (var item in _Objects)
+                {
+                    ListOfNameID<Object_ID_Name> obj = new ListOfNameID<Object_ID_Name>() { ID = item.EpisodeId, Name = item.EpisodeTitle };
+                    Collection.Add(obj);
+                }
+                return Collection.ToList();
+            }
+            catch (Exception ex)
+            {
+                // Log error in db
+                helper.LogError(ex);
+                return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
         #endregion
@@ -227,8 +259,6 @@ namespace BalarinaAPI.Controllers.Episodes
 
                 #region save changes in db
                 await unitOfWork.Complete();
-
-                await hubClient.Clients.All.BroadCastNotification();
                 
                 #endregion
 
