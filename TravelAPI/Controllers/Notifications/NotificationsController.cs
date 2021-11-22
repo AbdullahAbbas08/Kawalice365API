@@ -115,7 +115,7 @@ namespace BalarinaAPI.Controllers.Notifications
                 model.IMG = Image;
 
                 #region Check values of Notification is not null or empty
-                var episodeId = unitOfWork.Episode.FindObjectAsync(model.EpisodeID);
+                var episodeId =await unitOfWork.Episode.FindObjectAsync(model.EpisodeID);
 
                 if (episodeId == null)
                     return BadRequest("Episode ID Not Found ");
