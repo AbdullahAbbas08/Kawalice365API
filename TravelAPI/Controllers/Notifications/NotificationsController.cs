@@ -39,8 +39,7 @@ namespace BalarinaAPI.Controllers.Notifications
         #region CREUD OPERATION
 
         #region Get All Notification 
-
-        [ApiAuthentication]
+        //[ApiAuthentication]
         [HttpGet]
         [Route("getallnotification")]
         public async Task<ActionResult<RetrieveData<NotificationModel>>> getallnotification()
@@ -103,7 +102,7 @@ namespace BalarinaAPI.Controllers.Notifications
         #endregion
 
         #region Insert New Notifications 
-        [ApiAuthentication]
+        //[ApiAuthentication]
         [HttpPost]
         [Route("createnotification")]
         public async Task<ActionResult<CategoryModelInput>> createnotification([FromQuery] NotificationsInsert model)
@@ -160,7 +159,7 @@ namespace BalarinaAPI.Controllers.Notifications
                 #endregion
 
                 #region Send Notification
-                await hubClient.Clients.All.BroadCastNotification();
+                await hubClient.Clients.All.BroadCastNotification(notification);
                 #endregion
 
                 return StatusCode(StatusCodes.Status200OK);

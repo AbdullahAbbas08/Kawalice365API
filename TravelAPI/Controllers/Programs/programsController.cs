@@ -220,13 +220,13 @@ namespace BalarinaAPI.Controllers.Programs
         /// CategoryId , CategoryName
         /// </returns>
         [ApiAuthentication]
-        [HttpGet] 
+        [HttpGet]
         [Route("getprogramidname_withcategoryid")]
         public async Task<ActionResult<List<ListOfNameID<Object_ID_Name>>>> getprogramidname_withcategoryid(int ID)
         {
             try
             {
-                var _ProgramsObject = await unitOfWork.Program.GetObjects(x=>x.CategoryId == ID); _ProgramsObject.ToList();
+                var _ProgramsObject = await unitOfWork.Program.GetObjects(x => x.CategoryId == ID); _ProgramsObject.ToList();
 
                 List<ListOfNameID<Object_ID_Name>> Collection = new List<ListOfNameID<Object_ID_Name>>();
                 foreach (var item in _ProgramsObject)
@@ -284,23 +284,23 @@ namespace BalarinaAPI.Controllers.Programs
         //[ApiAuthentication]
         [HttpPost]
         [Route("createprogram")]
-        public async Task<ActionResult<ProgramViewModel>> createprogram([FromQuery]ProgramViewModel model)
+        public async Task<ActionResult<ProgramViewModel>> createprogram([FromQuery] ProgramViewModel model)
         {
-            try 
-            {  
+            try
+            {
                 var ProgramImage = HttpContext.Request.Form.Files["ProgramImage"];
                 DateTime ProgramStartDate = new DateTime();
 
 
-                var typeID = unitOfWork.ProgramType.GetObjects(x=>x.ProgramTypeId == model.ProgramTypeId);
+                var typeID = unitOfWork.ProgramType.GetObjects(x => x.ProgramTypeId == model.ProgramTypeId);
                 if (typeID == null)
                     return BadRequest("program type ID Not Found ");
 
-                var CategoryID = unitOfWork.category.GetObjects(Obj=>Obj.CategoryId == model.CategoryId);
+                var CategoryID = unitOfWork.category.GetObjects(Obj => Obj.CategoryId == model.CategoryId);
                 if (CategoryID == null)
                     return BadRequest("Category ID ID Not Found ");
 
-                var interviewerID = unitOfWork.Interviewer.GetObjects(Obj=>Obj.InterviewerId == model.InterviewerId);
+                var interviewerID = unitOfWork.Interviewer.GetObjects(Obj => Obj.InterviewerId == model.InterviewerId);
                 if (interviewerID == null)
                     return BadRequest("Interviewer ID ID Not Found ");
 
@@ -383,7 +383,7 @@ namespace BalarinaAPI.Controllers.Programs
                 #endregion
 
                 //Get All Programs 
-                var ResultPrograms = await unitOfWork.Program.GetObjects(x=>x.CategoryId == ID);
+                var ResultPrograms = await unitOfWork.Program.GetObjects(x => x.CategoryId == ID);
                 var ResultCategory = await unitOfWork.category.GetObjects();
                 var ResultInterviewer = await unitOfWork.Interviewer.GetObjects();
                 var ResulProgramType = await unitOfWork.ProgramType.GetObjects();
@@ -476,7 +476,7 @@ namespace BalarinaAPI.Controllers.Programs
                         InterviewerId = item.InterviewerId,
                         ProgramDescription = item.ProgramDescription,
                         ProgramId = item.ProgramId,
-                        ProgramImg =  item.ProgramImg,
+                        ProgramImg = item.ProgramImg,
                         ProgramName = item.ProgramName,
                         ProgramOrder = item.ProgramOrder,
                         ProgramStartDate = item.ProgramStartDate,
@@ -488,7 +488,7 @@ namespace BalarinaAPI.Controllers.Programs
                     _programsList.Add(_program);
                 }
                 #endregion
-                RetrieveData< ProgramFilterModel> Collection = new RetrieveData< ProgramFilterModel>();
+                RetrieveData<ProgramFilterModel> Collection = new RetrieveData<ProgramFilterModel>();
                 Collection.Url = helper.LivePathImages;
                 Collection.DataList = _programsList;
                 return Collection;
@@ -504,22 +504,22 @@ namespace BalarinaAPI.Controllers.Programs
 
         #region Edit Program
         //[Authorize]
-        //[ApiAuthentication]
+        [ApiAuthentication]
         [HttpPut]
         [Route("putprogram")]
-        public async Task<ActionResult<ProgramInsertModel>> putprogram([FromQuery] ProgramInsertModel model )
+        public async Task<ActionResult<ProgramInsertModel>> putprogram([FromQuery] ProgramInsertModel model)
         {
             try
             {
                 DateTime ProgramStartDate = new DateTime();
                 var ProgramImage = HttpContext.Request.Form.Files["ProgramImage"];
-
-                model.ProgramImg = ProgramImage;
+                if (ProgramImage != null)
+                    model.ProgramImg = ProgramImage;
 
                 if (model.ProgramId == null)
                     return BadRequest("Program ID Invalid !! ");
 
-                var _programObject = await unitOfWork.Program.FindObjectAsync( (int)model.ProgramId);
+                var _programObject = await unitOfWork.Program.FindObjectAsync((int)model.ProgramId);
                 if (_programObject == null)
                     return BadRequest("Program ID Not Found !! ");
 
@@ -527,7 +527,7 @@ namespace BalarinaAPI.Controllers.Programs
                     model.InterviewerId = _programObject.InterviewerId;
                 else
                 {
-                    var _InterviewerObject =await unitOfWork.Interviewer.FindObjectAsync( (int)model.InterviewerId);
+                    var _InterviewerObject = await unitOfWork.Interviewer.FindObjectAsync((int)model.InterviewerId);
                     if (_InterviewerObject == null)
                         return BadRequest("Interviewer ID Not Found !! ");
                 }
@@ -536,7 +536,7 @@ namespace BalarinaAPI.Controllers.Programs
                     model.ProgramTypeId = _programObject.ProgramTypeId;
                 else
                 {
-                    var _ProgramTypeObject =await unitOfWork.ProgramType.FindObjectAsync((int)model.ProgramTypeId) ;
+                    var _ProgramTypeObject = await unitOfWork.ProgramType.FindObjectAsync((int)model.ProgramTypeId);
                     if (_ProgramTypeObject == null)
                         return BadRequest("program type ID Not Found !! ");
                 }
@@ -546,12 +546,12 @@ namespace BalarinaAPI.Controllers.Programs
                     model.CategoryId = _programObject.CategoryId;
                 else
                 {
-                    var _CategoryObject =await  unitOfWork.category.FindObjectAsync( (int)model.CategoryId) ;
+                    var _CategoryObject = await unitOfWork.category.FindObjectAsync((int)model.CategoryId);
                     if (_CategoryObject == null)
                         return BadRequest("Category ID Not Found !! ");
                 }
 
-                if(model.ProgramDescription == null)
+                if (model.ProgramDescription == null)
                     model.ProgramDescription = _programObject.ProgramDescription;
 
                 if (model.ProgramName == null)
@@ -560,9 +560,9 @@ namespace BalarinaAPI.Controllers.Programs
                 #region check if image updated or not 
 
                 if (model.ProgramImgPath == null)
-                 {
-                    if(model.ProgramImg != null)
-                    model.ProgramImgPath =helper.UploadImage(model.ProgramImg);
+                {
+                    if (model.ProgramImg != null)
+                        model.ProgramImgPath = helper.UploadImage(model.ProgramImg);
                 }
                 if (model.ProgramImgPath == null && model.ProgramImg == null)
                 {
@@ -581,22 +581,17 @@ namespace BalarinaAPI.Controllers.Programs
                 if (model.ProgramViews == null)
                     model.ProgramViews = _programObject.ProgramViews;
 
-               
-
                 if (model.ProgramStartDate == null)
-                    ProgramStartDate = _programObject.ProgramStartDate;
+                    model.ProgramStartDate =_programObject.ProgramStartDate.ToString();
 
-                if(model.ProgramStartDate.Contains("T"))
+                else if (model.ProgramStartDate.Contains("T"))
                 {
                     model.ProgramStartDate = model.ProgramStartDate.Substring(0, model.ProgramStartDate.IndexOf("T"));
                 }
 
-                //ProgramStartDate = DateTime.ParseExact(model.ProgramStartDate, "yyyy-MM-dd", null);
-                model.ProgramStartDate += model.Hour; 
-                model.ProgramStartDate += model.Minute; 
-                ProgramStartDate = DateTime.ParseExact( model.ProgramStartDate , "dd-MM-yyyy HH:mm", null);
-              
-                
+                ProgramStartDate = DateTime.ParseExact(model.ProgramStartDate, "yyyy-MM-dd", null);
+                ProgramStartDate = ProgramStartDate.AddHours(model.Hour);
+                ProgramStartDate = ProgramStartDate.AddMinutes(model.Minute);
 
                 #region Handle Order Update 
                 await UpdateOrder(model, _programObject.ProgramOrder);
@@ -604,18 +599,18 @@ namespace BalarinaAPI.Controllers.Programs
 
                 Program _program = new Program()
                 {
-                    ProgramId           = (int)   model.ProgramId,
-                    CategoryId          = (int)   model.CategoryId,
-                    InterviewerId       = (int)   model.InterviewerId,
-                    ProgramTypeId       = (int)   model.ProgramTypeId,
-                    ProgramDescription  =         model.ProgramDescription,
-                    ProgramImg          =         model.ProgramImgPath,
-                    ProgramName         =         model.ProgramName,
-                    ProgramOrder        = (int)   model.ProgramOrder,
-                    ProgramStartDate    = ProgramStartDate,
-                    ProgramVisible      = (bool)  model.ProgramVisible,
-                    CreationDate        =         DateTime.Now,
-                    ProgramViews        = (int)model.ProgramViews
+                    ProgramId = (int)model.ProgramId,
+                    CategoryId = (int)model.CategoryId,
+                    InterviewerId = (int)model.InterviewerId,
+                    ProgramTypeId = (int)model.ProgramTypeId,
+                    ProgramDescription = model.ProgramDescription,
+                    ProgramImg = model.ProgramImgPath,
+                    ProgramName = model.ProgramName,
+                    ProgramOrder = (int)model.ProgramOrder,
+                    ProgramStartDate = ProgramStartDate,
+                    ProgramVisible = (bool)model.ProgramVisible,
+                    CreationDate = DateTime.Now,
+                    ProgramViews = (int)model.ProgramViews
                 };
 
                 bool result = unitOfWork.Program.Update(_program);
@@ -625,7 +620,7 @@ namespace BalarinaAPI.Controllers.Programs
 
                 await unitOfWork.Complete();
 
-                return StatusCode(StatusCodes.Status200OK) ;
+                return StatusCode(StatusCodes.Status200OK);
             }
             catch (Exception ex)
             {
@@ -726,7 +721,7 @@ namespace BalarinaAPI.Controllers.Programs
                         InterviewerId = item.InterviewerId,
                         ProgramDescription = item.ProgramDescription,
                         ProgramId = item.ProgramId,
-                        ProgramImg =helper.LivePathImages+ item.ProgramImg,
+                        ProgramImg = helper.LivePathImages + item.ProgramImg,
                         ProgramOrder = item.ProgramOrder,
                         ProgramStartDate = item.ProgramStartDate,
                         ProgramTypeId = item.ProgramTypeId
@@ -765,7 +760,7 @@ namespace BalarinaAPI.Controllers.Programs
                 #endregion
 
                 #region Fetch All Seasons from db
-                var SeasonList = await  unitOfWork.Season.GetObjects(); SeasonList.ToList();
+                var SeasonList = await unitOfWork.Season.GetObjects(); SeasonList.ToList();
                 #endregion
 
                 #region Iterate on Seasons to calculate Top Views 
@@ -797,12 +792,12 @@ namespace BalarinaAPI.Controllers.Programs
                 #endregion
 
                 #region get seasons Objects Sorted
-                List<(Seasons,int)> seasons = new List<(Seasons,int)>();
+                List<(Seasons, int)> seasons = new List<(Seasons, int)>();
                 int count = SeasonSorted.Count;
                 foreach (var item in SeasonSorted)
                 {
-                    var _season =await  unitOfWork.Season.FindObjectAsync(item.Item1);
-                    seasons.Add(((Seasons, int))(_season,item.Item2));
+                    var _season = await unitOfWork.Season.FindObjectAsync(item.Item1);
+                    seasons.Add(((Seasons, int))(_season, item.Item2));
                 }
                 #endregion
 
@@ -816,7 +811,7 @@ namespace BalarinaAPI.Controllers.Programs
                     int SumSeasonViews = 0;
                     foreach (var item in seasons)
                     {
-                        if(item.Item1.ProgramId == ProgramItem.ProgramId)
+                        if (item.Item1.ProgramId == ProgramItem.ProgramId)
                         {
                             SumSeasonViews += item.Item2;
                             //seasons.Remove((item.Item1, item.Item2));
@@ -874,7 +869,7 @@ namespace BalarinaAPI.Controllers.Programs
                             ProgramTypeId = item.Item1.ProgramTypeId,
                             ProgramVisible = (bool)item.Item1.ProgramVisible,
                             Views = item.Item2,
-                            ProgramImg =  item.Item1.ProgramImg
+                            ProgramImg = item.Item1.ProgramImg
                         };
                         mostViewsModels.Add(model);
                     }
@@ -883,7 +878,7 @@ namespace BalarinaAPI.Controllers.Programs
 
                 RetrieveData<ProgramsMostViewsModel> Collection = new RetrieveData<ProgramsMostViewsModel>();
                 Collection.Url = helper.LivePathImages;
-                Collection.DataList = mostViewsModels ;
+                Collection.DataList = mostViewsModels;
 
                 return Collection;
             }
@@ -909,11 +904,11 @@ namespace BalarinaAPI.Controllers.Programs
             try
             {
                 #region check category id exist
-                var _EntityObj = await unitOfWork.Program.FindObjectAsync( (int)model.ProgramId);
+                var _EntityObj = await unitOfWork.Program.FindObjectAsync((int)model.ProgramId);
                 if (_EntityObj == null)
                     return NotFound("Entity ID Not Found");
                 #endregion
-                var MaxOrder =await unitOfWork.category.GetObjects(); 
+                var MaxOrder = await unitOfWork.category.GetObjects();
                 int _MaxOrder = MaxOrder.Count();
                 string messege = "Order Update Cannot be Greater than Max Order " + _MaxOrder;
                 if (model.ProgramOrder > _MaxOrder)
@@ -924,7 +919,7 @@ namespace BalarinaAPI.Controllers.Programs
 
                 #region Handle Order Update
                 //Get Max Order
-                var __Entities =await unitOfWork.Program.GetObjects(); __Entities.OrderBy(Obj => Obj.ProgramOrder).ToList();
+                var __Entities = await unitOfWork.Program.GetObjects(); __Entities.OrderBy(Obj => Obj.ProgramOrder).ToList();
                 //int _MaxOrder = _categories.Count();
 
                 //var category = unitOfWork.Program.GetObjects(obj => obj.ProgramId == (int)model.ProgramId).AsNoTracking<Program>().FirstOrDefault();

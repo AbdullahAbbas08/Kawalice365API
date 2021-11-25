@@ -168,6 +168,9 @@ namespace BalarinaAPI.Controllers.ProgramTypes
         {
             try
             {
+                var Image = HttpContext.Request.Form.Files["ProgramTypeImage"];
+                model.ProgramTypeImg = Image;
+
                 if (model.ProgramTypeId == null)
                     return BadRequest("Program Type ID Invalid !! ");
 

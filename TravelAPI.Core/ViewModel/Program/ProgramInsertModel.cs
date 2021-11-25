@@ -19,9 +19,10 @@ namespace BalarinaAPI.Core.ViewModel
         public string    ProgramImgPath     { get; set; }
         public IFormFile ProgramImg         { get; set; }
         public bool?     ProgramVisible     { get; set; }
+
         public string ProgramStartDate   { get; set; }
-        public string Hour { get; set; } = "00";
-        public string Minute { get; set; } = "00";
+        public double Hour { get; set; } = 0;
+        public double Minute { get; set; } = 0;
         public int?      ProgramViews       { get; set; }
 
     }
