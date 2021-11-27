@@ -332,6 +332,9 @@ namespace BalarinaAPI.Controllers.Programs
                 ProgramStartDate = ProgramStartDate.AddHours(model.Hour);
                 ProgramStartDate = ProgramStartDate.AddMinutes(model.Minute);
 
+                var s = ProgramStartDate.Day;
+
+
                 Program _program = new Program()
                 {
 

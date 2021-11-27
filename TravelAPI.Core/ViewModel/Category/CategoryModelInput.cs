@@ -14,7 +14,7 @@ namespace BalarinaAPI.Core.ViewModel
         public string CategoryDescription { get; set; }
         public bool CategoryVisible { get; set; }
         public int CategoryOrder { get; set; }
-        public int CategoryViews { get; set; }
+        //public int CategoryViews { get; set; }
         public string CategoryImgPath { get; set; }
 
     }

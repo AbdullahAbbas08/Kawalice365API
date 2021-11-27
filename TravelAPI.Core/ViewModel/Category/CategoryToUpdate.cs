@@ -8,6 +8,7 @@ namespace BalarinaAPI.Core.ViewModel
 {
     public class CategoryToUpdate : CategoryModelInput
     {
+
         public int CategoryID { get; set; }
         //public int? CategoryViews { get; set; }
     }

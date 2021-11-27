@@ -54,20 +54,26 @@ namespace BalarinaAPI.Controllers.Categories
             try
             {
                 //check If Category ID If Exist
-                var _CategoryID = unitOfWork.category.FindObjectAsync(CategoryID);
+                var _CategoryID = await unitOfWork.category.FindObjectAsync(CategoryID);
                 if (_CategoryID == null)
                     return BadRequest("Category ID Not Exist !!");
                 //Get All Programs 
                 var ResultPrograms = await unitOfWork.Program.GetObjects(x => x.CategoryId == CategoryID); ResultPrograms.ToList();
 
                 RetrieveData<Program> Collection = new RetrieveData<Program>();
-                Collection.Url = helper.LivePathImages;
+                Collection.Url = helper.LivePathImages;          
                 Collection.DataList = ResultPrograms.ToList();
+
+                #region Update Category Views
+                 _CategoryID.CategoryViews += 1;
+                await unitOfWork.Complete();
+                #endregion
+
                 return Collection;
             }
             catch (Exception ex)
             {
-                // Log error in db
+                // Log error in  
                 helper.LogError(ex);
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
@@ -157,7 +163,7 @@ namespace BalarinaAPI.Controllers.Categories
                     CreationDate = DateTime.Now,
                     CategoryVisible = model.CategoryVisible,
                     CategoryImg = helper.UploadImage(model.CategoryImg),
-                    CategoryViews = model.CategoryViews
+                    CategoryViews =0
                 };
                 #endregion
 
@@ -232,8 +238,7 @@ namespace BalarinaAPI.Controllers.Categories
                     model.CategoryImgPath = helper.UploadImage(model.CategoryImg);
                 }
 
-                    model.CategoryViews = _categoryObj.CategoryViews;
-
+                    //model.CategoryViews = _categoryObj.CategoryViews;
 
                 #endregion
 
@@ -251,7 +256,7 @@ namespace BalarinaAPI.Controllers.Categories
                     CreationDate = DateTime.Now,
                     CategoryVisible = model.CategoryVisible,
                     CategoryImg = model.CategoryImgPath,
-                    CategoryViews = (int)model.CategoryViews
+                    CategoryViews = _categoryObj.CategoryViews
                 };
                 #endregion
 

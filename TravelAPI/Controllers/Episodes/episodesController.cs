@@ -1448,6 +1448,14 @@ namespace BalarinaAPI.Controllers.Episodes
                 collection.Url = helper.LivePathImages;
                 collection.DataList = ResultCategories.ToList();
 
+                #region Update Category Views
+                foreach (var item in ResultCategories)
+                {
+                    item.CategoryViews += 1;
+                }
+                await unitOfWork.Complete();
+                #endregion
+
                 return Ok(collection);
             }
             catch (Exception ex)
@@ -1459,7 +1467,7 @@ namespace BalarinaAPI.Controllers.Episodes
         }
         #endregion
 
-        #region Get All Categories
+        #region Get All Categories => Dashboard API 
         /// <summary>
         /// get all categories with Bearer Toacken
         /// </summary>
@@ -1479,6 +1487,10 @@ namespace BalarinaAPI.Controllers.Episodes
                 var ResultCategories = await unitOfWork.category.GetOrderedObjects(x => x.CategoryOrder);
                 foreach (var item in ResultCategories)
                 {
+                    #region Update Category Views
+                    item.CategoryViews += 1;
+                    #endregion
+
                     var ProgramsCount = await unitOfWork.Program.GetObjects(x => x.CategoryId == item.CategoryId); ProgramsCount.ToList();
                     CategoryModel category = new CategoryModel()
                     {
@@ -1495,9 +1507,10 @@ namespace BalarinaAPI.Controllers.Episodes
                     categories.Add(category);
                 };
 
-
                 collection.Url = helper.LivePathImages;
                 collection.DataList = categories;
+
+                await unitOfWork.Complete();
 
                 return Ok(collection);
             }
@@ -1509,7 +1522,7 @@ namespace BalarinaAPI.Controllers.Episodes
             }
         }
         #endregion
-
+         
         #endregion
 
     }
