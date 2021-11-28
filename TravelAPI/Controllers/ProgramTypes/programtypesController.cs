@@ -39,7 +39,7 @@ namespace BalarinaAPI.Controllers.ProgramTypes
 
         #region CRUD OPERATIONS 
 
-        #region Get All ProgramsTypes
+        #region Get All ProgramsTypes => Dashboard , API 
         [ApiAuthentication]
         [HttpGet]
         [Route("getallprogramTypes")]
@@ -49,6 +49,8 @@ namespace BalarinaAPI.Controllers.ProgramTypes
             try
             {
                 List<programTypesOutput> programTypesOutputs = new List<programTypesOutput>();
+                RetrieveData<programTypesOutput> Collection = new RetrieveData<programTypesOutput>();
+
                 var programTypes = await unitOfWork.ProgramType.GetObjects(); programTypes.ToList();
 
                 foreach (var item in programTypes)
@@ -62,13 +64,11 @@ namespace BalarinaAPI.Controllers.ProgramTypes
                         ProgramTypeTitle = item.ProgramTypeTitle,
                         ProgramCount = _Programs.Count()
                     };
+
                     programTypesOutputs.Add(programTypes1);
+                    Collection.DataList = programTypesOutputs.OrderBy(x => x.ProgramTypeOrder).ToList();
                 }
-
-                RetrieveData<programTypesOutput> Collection = new RetrieveData<programTypesOutput>();
-                Collection.DataList = programTypesOutputs;
                 Collection.Url = helper.LivePathImages;
-
                 return Ok(Collection);
             }
             catch (Exception ex)

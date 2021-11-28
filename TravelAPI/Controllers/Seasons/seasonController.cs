@@ -90,17 +90,49 @@ namespace BalarinaAPI.Controllers.Season
         }
         #endregion
 
-        #region Get All Season
-        [Authorize]
+        #region Get All Season => Dashboard
+        [ApiAuthentication]
         [HttpGet]
         [Route("getallseasons")] 
-        public async Task<ActionResult<List<Seasons>>> getallseasonsAsync()
+        public async Task<ActionResult<List<SeasonModel>>> getallseasonsAsync()
         {
             try
             {
+                List<SeasonModel> seasons = new List<SeasonModel>();
                 //Get All Programs 
                 var ResultSeasons = await unitOfWork.Season.GetObjects(); ResultSeasons.ToList();
-                return Ok(ResultSeasons);
+                var ResultPrograms = await unitOfWork.Program.GetObjects(); ResultPrograms.ToList();
+
+                var result = (from program in ResultPrograms
+                              join season in ResultSeasons
+                                on program.ProgramId equals season.ProgramId
+                              select new
+                              {
+                                  season.SessionId,
+                                  season.SessionTitle,
+                                  season.CreationDate,
+                                  season.SeasonViews,
+                                  program.ProgramId,
+                                  program.ProgramName
+                              }).ToList();
+                foreach (var item in result)
+                {
+                    var EpisodesRelated = await unitOfWork.Episode.GetObjects(x => x.SessionId == item.SessionId);
+                    int SeasonViews = EpisodesRelated.Sum(x => x.EpisodeViews);
+
+                    SeasonModel model = new SeasonModel()
+                    {
+                        SessionId = item.SessionId,
+                        ProgramId = item.ProgramId,
+                        CreationDate = item.CreationDate,
+                        SeasonViews = SeasonViews,
+                        SessionTitle = item.SessionTitle,
+                        ProgramName = item.ProgramName,
+                        EpisodesCount = EpisodesRelated.Count()
+                    };
+                    seasons.Add(model);
+                }
+                return seasons;
             }
             catch (Exception ex)
             {

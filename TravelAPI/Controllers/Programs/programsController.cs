@@ -126,16 +126,16 @@ namespace BalarinaAPI.Controllers.Programs
         }
         #endregion
 
-        #region Get All Programs
-        [Authorize]
+        #region Get All Programs =>  Dashboard
+        [ApiAuthentication]
         [HttpGet]
         [Route("getallprograms")]
-        public async Task<ActionResult<RetrieveData<ProgramFilterModel>>> getallprogramsAsync()
+        public async Task<ActionResult<RetrieveData<GetProgramModel>>> getallprograms()
         {
             try
             {
                 // Create ProgramsList to return It
-                List<ProgramFilterModel> _programsList = new List<ProgramFilterModel>();
+                List<GetProgramModel> _programsList = new List<GetProgramModel>();
                 //Get All Programs 
                 var ResultPrograms = await unitOfWork.Program.GetObjects();
                 var ResultCategory = await unitOfWork.category.GetObjects();
@@ -157,9 +157,9 @@ namespace BalarinaAPI.Controllers.Programs
                                   program.ProgramId,
                                   program.ProgramImg,
                                   program.ProgramName,
+                                  program.ProgramPromoUrl,
                                   program.ProgramOrder,
                                   program.ProgramVisible,
-                                  program.ProgramPromoUrl,
                                   program.ProgramStartDate,
                                   program.CreationDate,
                                   interviewer.InterviewerId,
@@ -172,8 +172,11 @@ namespace BalarinaAPI.Controllers.Programs
                 #region Fill ProgramsList and Handle Image Path For all Program
                 foreach (var item in Result)
                 {
+                    string ConvertedDate = item.ProgramStartDate.ToString();
+                    string date = ConvertedDate.Substring(0, ConvertedDate.IndexOf(" "));
+
                     // Create Category Object
-                    ProgramFilterModel _program = new ProgramFilterModel()
+                    GetProgramModel _program = new GetProgramModel()
                     {
                         CategoryId = item.CategoryId,
                         InterviewerId = item.InterviewerId,
@@ -189,14 +192,17 @@ namespace BalarinaAPI.Controllers.Programs
                         CategoryName = item.CategoryTitle,
                         InterviewerName = item.InterviewerName,
                         ProgramTypeName = item.ProgramTypeTitle,
-                        ProgramPromoUrl = item.ProgramPromoUrl
+                        ProgramPromoUrl = item.ProgramPromoUrl,
+                        Hour = item.ProgramStartDate.Hour,
+                        Minute = item.ProgramStartDate.Minute,
+                        Date = date
                     };
                     // Finally Add It Into Programs List
                     _programsList.Add(_program);
                 }
                 #endregion
 
-                RetrieveData<ProgramFilterModel> Collection = new RetrieveData<ProgramFilterModel>();
+                RetrieveData<GetProgramModel> Collection = new RetrieveData<GetProgramModel>();
                 Collection.Url = helper.LivePathImages;
                 Collection.DataList = _programsList;
 
@@ -332,7 +338,7 @@ namespace BalarinaAPI.Controllers.Programs
                 ProgramStartDate = ProgramStartDate.AddHours(model.Hour);
                 ProgramStartDate = ProgramStartDate.AddMinutes(model.Minute);
 
-                var s = ProgramStartDate.Day;
+
 
 
                 Program _program = new Program()
