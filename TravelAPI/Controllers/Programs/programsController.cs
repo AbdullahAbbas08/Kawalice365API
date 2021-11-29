@@ -593,14 +593,24 @@ namespace BalarinaAPI.Controllers.Programs
                 if (model.ProgramStartDate == null)
                     model.ProgramStartDate =_programObject.ProgramStartDate.ToString();
 
-                else if (model.ProgramStartDate.Contains("T"))
+                if (model.changeDate != true)
                 {
-                    model.ProgramStartDate = model.ProgramStartDate.Substring(0, model.ProgramStartDate.IndexOf("T"));
+                    ProgramStartDate = _programObject.ProgramStartDate;
+                    ProgramStartDate = ProgramStartDate.AddHours(-ProgramStartDate.Hour);
+                    ProgramStartDate = ProgramStartDate.AddHours(model.Hour);
+                    ProgramStartDate = ProgramStartDate.AddMinutes(-ProgramStartDate.Minute);
+                    ProgramStartDate = ProgramStartDate.AddMinutes(model.Minute);
+                }
+                else
+                {
+                    if (model.ProgramStartDate.Contains("T"))
+                        model.ProgramStartDate = model.ProgramStartDate.Substring(0, model.ProgramStartDate.IndexOf("T"));
+
+                    ProgramStartDate = DateTime.ParseExact(model.ProgramStartDate, "yyyy-MM-dd", null);
+                    ProgramStartDate = ProgramStartDate.AddHours(model.Hour);
+                    ProgramStartDate = ProgramStartDate.AddMinutes(model.Minute);
                 }
 
-                ProgramStartDate = DateTime.ParseExact(model.ProgramStartDate, "yyyy-MM-dd", null);
-                ProgramStartDate = ProgramStartDate.AddHours(model.Hour);
-                ProgramStartDate = ProgramStartDate.AddMinutes(model.Minute);
 
                 #region Handle Order Update 
                 await UpdateOrder(model, _programObject.ProgramOrder);

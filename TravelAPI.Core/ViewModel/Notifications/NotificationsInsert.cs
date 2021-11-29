@@ -13,7 +13,6 @@ namespace BalarinaAPI.Core.ViewModel
         public string Descriptions { get; set; }
         public IFormFile IMG { get; set; }
         public int EpisodeID { get; set; }
-        public bool Visible { get; set; }
     }
 } 
  

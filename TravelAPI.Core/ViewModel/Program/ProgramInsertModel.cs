@@ -24,6 +24,8 @@ namespace BalarinaAPI.Core.ViewModel
         public double Hour { get; set; } = 0;
         public double Minute { get; set; } = 0;
         public int?      ProgramViews       { get; set; }
+        public Boolean changeDate { get; set; }
+
 
     }
 }

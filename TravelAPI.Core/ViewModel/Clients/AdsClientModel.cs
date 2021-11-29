@@ -19,5 +19,11 @@ namespace BalarinaAPI.Core.ViewModel.Clients
         public string ClientName { get; set; }
         public DateTime PublishStartDate { get; set; }
         public DateTime PublishEndDate { get; set; }
+        public string Dates { get; set; }
+        public string Dated { get; set; }
+        public double Minutes { get; set; }
+        public double Minuted { get; set; }
+        public double Hours { get; set; }
+        public double Hourd { get; set; }
     }
 }

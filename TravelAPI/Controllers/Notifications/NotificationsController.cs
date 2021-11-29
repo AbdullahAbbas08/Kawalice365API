@@ -141,7 +141,7 @@ namespace BalarinaAPI.Controllers.Notifications
                     IMG = ImagePath,
                     EpisodeID = model.EpisodeID,
                     Descriptions = model.Descriptions,
-                    Visible = model.Visible
+                    Visible =true
                 };
                 #endregion
 
@@ -173,87 +173,9 @@ namespace BalarinaAPI.Controllers.Notifications
         }
         #endregion
 
-        #region Edit Notification
+        #region Delete Notifications
+
         [ApiAuthentication]
-        [HttpPut]
-        [Route("putnotification")]
-        public async Task<ActionResult<NotificationUpdate>> putnotification([FromQuery] NotificationUpdate model)
-        {
-            try
-            {
-                string ImageName;
-                var Image = HttpContext.Request.Form.Files["NotificationImg"];
-
-                model.IMG = Image;
-
-                #region check category id exist
-                var Objects = await unitOfWork.Notification.FindObjectAsync(model.ID);
-                if (Objects == null)
-                    return NotFound("Notification ID Not Found");
-
-                if (model.EpisodeID != null)
-                {
-                    int id = (int)model.EpisodeID;
-                    var EpisodeID = await unitOfWork.Episode.FindObjectAsync(id);
-                    if (EpisodeID == null)
-                        return NotFound("Episode ID Not Found");
-                }
-
-                #endregion
-
-                #region Check values of Notification is not null or empty
-
-                if (string.IsNullOrEmpty(model.title))
-                    model.title = Objects.title;
-
-                if (string.IsNullOrEmpty(model.Descriptions))
-                    model.Descriptions = Objects.Descriptions;
-
-                if (Image != null)
-                    ImageName = helper.UploadImage(Image);
-                else
-                    ImageName = Objects.IMG;
-
-                #endregion
-
-                Notification notification = new Notification()
-                {
-                    title = model.title,
-                    IMG = ImageName,
-                    EpisodeID = (int)model.EpisodeID,
-                    Descriptions = model.Descriptions,
-                    Visible = model.Visible
-                };
-
-
-                #region update operation
-                bool result = unitOfWork.Notification.Update(notification);
-                #endregion
-
-                #region check operation is updated successed
-                if (!result)
-                    return BadRequest("Create Operation Failed");
-                #endregion
-
-                #region save changes into db
-                await unitOfWork.Complete();
-                #endregion
-
-
-                return StatusCode(StatusCodes.Status200OK);
-            }
-            catch (Exception ex)
-            {
-                helper.LogError(ex);
-                return StatusCode(StatusCodes.Status500InternalServerError);
-            }
-        }
-
-        #endregion
-
-        #region Delete Episode
-
-        //[Authorize]
         [HttpDelete("{ID}")]
         public async Task<ActionResult<Notification>> deleteNotification(int ID)
         {
@@ -262,7 +184,7 @@ namespace BalarinaAPI.Controllers.Notifications
                 #region Check ID If Exist
                 var checkIDIfExist = await unitOfWork.Notification.FindObjectAsync(ID);
                 if (checkIDIfExist == null)
-                    return NotFound("Notification ID Not Found");
+                    return BadRequest("Notification ID Not Found");
                 #endregion
 
                 #region Delete Operation
@@ -271,7 +193,7 @@ namespace BalarinaAPI.Controllers.Notifications
 
                 #region check Delete Operation  successed
                 if (!result)
-                    return NotFound("DELETE OPERATION FAILED ");
+                    return BadRequest("DELETE OPERATION FAILED ");
                 #endregion
 
                 #region save changes in db

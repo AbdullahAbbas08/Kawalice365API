@@ -34,7 +34,7 @@ namespace BalarinaAPI.Controllers.ADPLACEHOLDERS
 
         #region CRUD OPERATIONS
 
-        #region Get All AD Placeholders  Authorize
+        #region Get All AD Placeholders  => Dashboard
         /// <summary>
         /// Reteive All Data in Placeholders 
         /// </summary>
@@ -51,8 +51,8 @@ namespace BalarinaAPI.Controllers.ADPLACEHOLDERS
                 RetrieveData<PlacementModel> Collection= new RetrieveData<PlacementModel>();
                 
                 var _ADPLACEHOLDER = await unitOfWork.ADPLACEHOLDER.GetObjects();
-                var Style = await unitOfWork.ADSTYLES.GetObjects();
-                var Target = await unitOfWork.ADTARGETS.GetObjects();
+                var Style          = await unitOfWork.ADSTYLES.GetObjects();
+                var Target         = await unitOfWork.ADTARGETS.GetObjects();
 
                 var result = (from placement in _ADPLACEHOLDER
                              join style in Style
@@ -262,7 +262,7 @@ namespace BalarinaAPI.Controllers.ADPLACEHOLDERS
                     model.AdStyleID = PlaceholderObj.AdStyleID;
                 else
                 {
-                    var AdStyleID = unitOfWork.ADPLACEHOLDER.FindObjectAsync((int)model.AdStyleID);
+                    var AdStyleID =await unitOfWork.ADSTYLES.FindObjectAsync((int)model.AdStyleID);
                     if (AdStyleID == null)
                         return BadRequest(" Ads Style ID not found ");
                 }
@@ -274,18 +274,19 @@ namespace BalarinaAPI.Controllers.ADPLACEHOLDERS
                     model.AdTargetId = PlaceholderObj.AdTargetId;
                 else
                 {
-                    var AdTargetId = unitOfWork.ADPLACEHOLDER.FindObjectAsync((int)model.AdTargetId);
+                    var AdTargetId =await unitOfWork.ADTARGETS.FindObjectAsync((int)model.AdTargetId);
                     if (AdTargetId == null)
                         return BadRequest("Ads Target Id ID not found ");
                 }
 
-                if (model.ImagePath == null && model.Image == null)
-                {
-                    model.ImagePath = PlaceholderObj.ImagePath;
-                }
-                if (model.ImagePath == null)
+              
+                if (model.Image != null)
                 {
                     model.ImagePath = helper.UploadImage(model.Image);
+                }
+                else
+                {
+                    model.ImagePath = PlaceholderObj.ImagePath;
                 }
 
                 #endregion

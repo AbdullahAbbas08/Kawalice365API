@@ -19,5 +19,8 @@ namespace BalarinaAPI.Core.ViewModel.Episode
         public int       SeasonId           { get; set; }
         public IFormFile EpisodeIamge       { get; set; }
         public string  EpisodePublishDate { get; set; }
+        public double Hour { get; set; }
+        public double Minute { get; set; }
+
     }
 }

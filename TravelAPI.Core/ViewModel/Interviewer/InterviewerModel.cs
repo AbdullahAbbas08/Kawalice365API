@@ -20,5 +20,6 @@ namespace BalarinaAPI.Core.ViewModel
         public string WebsiteUrl { get; set; }
         public DateTime? CreationDate { get; set; }
         public string TiktokUrl { get; set; }
+        public string Date  { get; set; }
     }
 }

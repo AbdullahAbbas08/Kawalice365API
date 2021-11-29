@@ -19,6 +19,9 @@ namespace BalarinaAPI.Core.Model
        // public DateTime CreationDate { get; set; }
         public int? SeasonId { get; set; }
         public string EpisodePublishDate { get; set; }
+        public double Hour { get; set; } 
+        public double Minute { get; set; }
+        public Boolean changeDate { get; set; } 
 
-    }
+    } 
 }

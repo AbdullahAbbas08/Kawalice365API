@@ -40,7 +40,7 @@ namespace BalarinaAPI.Controllers.Advertisement
 
         #region CRUD OPERATIONS
 
-        #region Get All Advertisement 
+        #region Get All Advertisement => Dashboard
         /// <summary>
         /// Reteive All Data in Advertisement 
         /// </summary>
@@ -49,8 +49,8 @@ namespace BalarinaAPI.Controllers.Advertisement
         /// </returns>
         [ApiAuthentication]
         [HttpGet]
-        [Route("getallads")]
-        public async Task<ActionResult<RetrieveData<AdsClientModel>>> getallads()
+        [Route("adsDashboard")]
+        public async Task<ActionResult<RetrieveData<AdsClientModel>>> adsDashboard()
         {
             try
             {
@@ -68,7 +68,7 @@ namespace BalarinaAPI.Controllers.Advertisement
                              {
                                  ads.AdId,
                                  ads.AdTitle,
-                                 ads.ClientID,
+                                 ads.ClientID, 
                                  ads.ImagePath,
                                  ads.PlaceHolderID,
                                  ads.PublishEndDate,
@@ -81,6 +81,12 @@ namespace BalarinaAPI.Controllers.Advertisement
                              }).ToList();
                 foreach (var item in Result)
                 {
+                    string ConvertedDate = item.PublishStartDate.ToString();
+                    string dates = ConvertedDate.Substring(0, ConvertedDate.IndexOf(" "));
+
+                    string ConvertedDate2 = item.PublishEndDate.ToString();
+                    string dated = ConvertedDate2.Substring(0, ConvertedDate2.IndexOf(" "));
+
                     AdsClientModel model = new AdsClientModel()
                     {
                         AdId = item.AdId,
@@ -93,7 +99,13 @@ namespace BalarinaAPI.Controllers.Advertisement
                         PublishStartDate=item.PublishStartDate,
                         URL=item.URL,
                         Views=item.Views,
-                        PlaceHolderCode = item.ADPlaceholderCode
+                        PlaceHolderCode = item.ADPlaceholderCode,
+                        Dates = dates,
+                        Dated = dated,
+                        Hours = item.PublishStartDate.Hour,
+                        Hourd = item.PublishEndDate.Hour,
+                        Minutes = item.PublishStartDate.Minute,
+                        Minuted = item.PublishEndDate.Minute
                     };
                     Collection.DataList.Add(model);
                 }
@@ -446,26 +458,48 @@ namespace BalarinaAPI.Controllers.Advertisement
                     model.Views = ADSObj.Views;
                
 
-                if (model.ImagePath == null && model.Image == null)
-                {
+                if (model.Image == null)
                     model.ImagePath = ADSObj.ImagePath;
-                }
-                if (model.ImagePath == null)
-                {
+                else
                     model.ImagePath = helper.UploadImage(model.Image);
+
+
+                if (model.changeDates != true)
+                {
+                    PublishStartDate = ADSObj.PublishStartDate;
+                    PublishStartDate = PublishStartDate.AddHours(-PublishStartDate.Hour);
+                    PublishStartDate = PublishStartDate.AddHours(model.Hours);
+                    PublishStartDate = PublishStartDate.AddMinutes(-PublishStartDate.Minute);
+                    PublishStartDate = PublishStartDate.AddMinutes(model.Minutes);
+                }
+                else
+                {
+                    if (model.PublishStartDate.Contains("T"))
+                        model.PublishStartDate = model.PublishStartDate.Substring(0, model.PublishStartDate.IndexOf("T"));
+
+                    PublishStartDate = DateTime.ParseExact(model.PublishStartDate, "yyyy-MM-dd", null);
+                    PublishStartDate = PublishStartDate.AddHours(model.Hours);
+                    PublishStartDate = PublishStartDate.AddMinutes(model.Minutes);
                 }
 
-                if (model.PublishStartDate.Contains("T"))
+                if (model.changeDated != true) 
                 {
-                    model.PublishStartDate = model.PublishStartDate.Substring(0, model.PublishStartDate.IndexOf("T"));
+                    PublishEndDate = ADSObj.PublishEndDate;
+                    PublishEndDate = PublishEndDate.AddHours(-PublishEndDate.Hour);
+                    PublishEndDate = PublishEndDate.AddHours(model.Hourd);
+                    PublishEndDate = PublishEndDate.AddMinutes(-PublishEndDate.Minute);
+                    PublishEndDate = PublishEndDate.AddMinutes(model.Minuted);
                 }
-                PublishStartDate = DateTime.ParseExact(model.PublishStartDate, "yyyy-MM-dd", null);
+                else
+                {
+                    if (model.PublishEndDate.Contains("T"))
+                        model.PublishEndDate = model.PublishEndDate.Substring(0, model.PublishEndDate.IndexOf("T"));
 
-                if (model.PublishEndDate.Contains("T"))
-                {
-                    model.PublishEndDate = model.PublishEndDate.Substring(0, model.PublishEndDate.IndexOf("T"));
+                    PublishEndDate = DateTime.ParseExact(model.PublishEndDate, "yyyy-MM-dd", null);
+                    PublishEndDate = PublishEndDate.AddHours(model.Hourd);
+                    PublishEndDate = PublishEndDate.AddMinutes(model.Minuted);
                 }
-                PublishEndDate = DateTime.ParseExact(model.PublishEndDate, "yyyy-MM-dd", null);
+
                 #endregion
 
                 #region Fill ADTARGET object with values to insert

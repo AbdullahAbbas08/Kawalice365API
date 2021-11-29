@@ -45,19 +45,41 @@ namespace BalarinaAPI.Controllers.Interviewers
         #region CRUD Operations For Interviewers
 
         #region Get All Interviewer 
-        [Authorize]
+        [ApiAuthentication]
         [HttpGet]
         [Route("getalliterviewers")]
-        public async Task<ActionResult<RetrieveData<Interviewer>>> getalliterviewers()
+        public async Task<ActionResult<RetrieveData<InterviewerModel>>> getalliterviewers()
         {
             try
             {
+                RetrieveData<InterviewerModel> Collection = new RetrieveData<InterviewerModel>();
+
                 //Get All Interviewer 
                 var ResultInterviewers = await unitOfWork.Interviewer.GetObjects();
-                RetrieveData<Interviewer> Collection = new RetrieveData<Interviewer>();
-                Collection.Url = helper.LivePathImages;
-                Collection.DataList = ResultInterviewers.ToList();
+                foreach (var item in ResultInterviewers)
+                {
+                    string ConvertedDate = item.BirthDate.ToString();
+                    string date = ConvertedDate.Substring(0, ConvertedDate.IndexOf(" "));
 
+                    InterviewerModel model = new InterviewerModel()
+                    {
+                        InterviewerName = item.InterviewerName,
+                        CreationDate = item.CreationDate,
+                        FacebookUrl = item.FacebookUrl,
+                        InstgramUrl = item.InstgramUrl,
+                        InterviewerDescription = item.InterviewerDescription,
+                        InterviewerId = item.InterviewerId,
+                        InterviewerPicture = item.InterviewerPicture,
+                        LinkedInUrl = item.LinkedInUrl,
+                        TiktokUrl = item.TiktokUrl,
+                        TwitterUrl = item.TwitterUrl,
+                        WebsiteUrl = item.WebsiteUrl,
+                        YoutubeUrl = item.YoutubeUrl,
+                        Date = date
+                    };
+                    Collection.DataList.Add(model);
+                }
+                Collection.Url = helper.LivePathImages;
                 return Collection;
             }
             catch (Exception ex)
@@ -293,13 +315,15 @@ namespace BalarinaAPI.Controllers.Interviewers
         {
             try
             {
+                DateTime? BirthDate = new DateTime();
+                string picture, cover;
+
                 var InterviewerIamge = HttpContext.Request.Form.Files["InterviewerIamge"];
                 var InterviewerCover = HttpContext.Request.Form.Files["InterviewerCover"];
 
                 model.InterviewerPicture = InterviewerIamge;
                 model.InterviewerCover = InterviewerCover;
 
-                DateTime? BirthDate = new DateTime();
 
                 #region check Interviewer id exist
                 var _InterviewerObj = await unitOfWork.Interviewer.FindObjectAsync(model.InterviewerId);
@@ -345,39 +369,61 @@ namespace BalarinaAPI.Controllers.Interviewers
                 if (model.BirthDate == null)
                     BirthDate = _InterviewerObj.BirthDate;
 
-                if (model.BirthDate.Contains("T"))
+                //if (model.BirthDate.Contains("T"))
+                //{
+                //    model.BirthDate = model.BirthDate.Substring(0, model.BirthDate.IndexOf("T"));
+                //}
+
+                //BirthDate = DateTime.ParseExact(model.BirthDate, "yyyy-MM-dd", null);
+
+                if (model.changeDate != true)
                 {
-                    model.BirthDate = model.BirthDate.Substring(0, model.BirthDate.IndexOf("T"));
+                    BirthDate = _InterviewerObj.BirthDate;
+                }
+                else
+                {
+                    if (model.BirthDate.Contains("T"))
+                        model.BirthDate = model.BirthDate.Substring(0, model.BirthDate.IndexOf("T"));
+
+                    BirthDate = DateTime.ParseExact(model.BirthDate, "yyyy-MM-dd", null);
                 }
 
-                BirthDate = DateTime.ParseExact(model.BirthDate, "yyyy-MM-dd", null);
 
+                #region check if picture updated or not 
 
-
-
-                #region check if image updated or not 
-
-                if (model.InterviewerPicturePath == null && model.InterviewerPicture == null)
+                if ( model.InterviewerPicture == null)
                 {
-                    model.InterviewerPicturePath = _InterviewerObj.InterviewerPicture;
+                    picture = _InterviewerObj.InterviewerPicture;
                 }
-                if (model.InterviewerPicturePath == null)
+                else
                 {
-                    model.InterviewerPicturePath =helper.UploadImage(model.InterviewerPicture);
+                   picture = helper.UploadImage(model.InterviewerPicture);
+                }
+                #endregion
+
+                #region check if Cover updated or not 
+
+                if (model.InterviewerCover == null)
+                {
+                    cover = _InterviewerObj.InterviewerPicture;
+                }
+                else
+                {
+                    cover = helper.UploadImage(model.InterviewerCover);
                 }
                 #endregion
 
-                #region check if image updated or not 
+                //#region check if image updated or not 
 
-                if (model.InterviewerCoverePath == null && model.InterviewerCover == null)
-                {
-                    model.InterviewerCoverePath = _InterviewerObj.InterviewerCover;
-                }
-                if (model.InterviewerCoverePath == null)
-                {
-                    model.InterviewerCoverePath = helper.UploadImage(model.InterviewerCover);
-                }
-                #endregion
+                //if (model.InterviewerCoverePath == null && model.InterviewerCover == null)
+                //{
+                //    model.InterviewerCoverePath = _InterviewerObj.InterviewerCover;
+                //}
+                //if (model.InterviewerCoverePath == null)
+                //{
+                //    model.InterviewerCoverePath = helper.UploadImage(model.InterviewerCover);
+                //}
+                //#endregion
 
                 #endregion
 
@@ -386,7 +432,8 @@ namespace BalarinaAPI.Controllers.Interviewers
                 {
                     InterviewerId = model.InterviewerId,
                     InterviewerName = model.InterviewerName,
-                    InterviewerPicture = model.InterviewerPicturePath,
+                    InterviewerPicture = picture,
+                    InterviewerCover = cover,
                     CreationDate = DateTime.Now,
                     InterviewerDescription = model.InterviewerDescription,
                     FacebookUrl = model.FacebookUrl,
@@ -835,7 +882,6 @@ namespace BalarinaAPI.Controllers.Interviewers
             }
         }
         #endregion
-
 
         #region Get All Iterviewer Sorted by Views API Key Authentication
         /// <summary>

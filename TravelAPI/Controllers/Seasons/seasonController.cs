@@ -161,7 +161,7 @@ namespace BalarinaAPI.Controllers.Season
                 //check If Category ID If Exist
                 var _SeasonObject = await unitOfWork.Season.GetObjects(); _SeasonObject.ToList();
                 if (_SeasonObject == null)
-                    return BadRequest("Categories list is empty ");
+                    return BadRequest("Season list is empty ");
                 //Get All Programs 
 
                 List<ListOfNameID<Object_ID_Name>> Collection = new List<ListOfNameID<Object_ID_Name>>();

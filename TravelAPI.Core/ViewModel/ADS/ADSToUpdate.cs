@@ -15,5 +15,14 @@ namespace BalarinaAPI.Core.ViewModel.ADS
         public string ClientID { get; set; }
         public string PublishStartDate { get; set; }
         public string PublishEndDate { get; set; }
+        public Boolean changeDates { get; set; }
+        public Boolean changeDated { get; set; }
+        public string Dates { get; set; }
+        public string Dated { get; set; }
+        public double Minutes { get; set; }
+        public double Minuted { get; set; }
+        public double Hours { get; set; }
+        public double Hourd { get; set; }
+
     }
-}
+} 
