@@ -19,5 +19,8 @@ namespace BalarinaAPI.Core.Model
         public bool     CategoryVisible     { get; set; }
         public int      CategoryOrder       { get; set; }
         public int      CategoryViews       { get; set; }
+
+        [JsonIgnore]
+        public virtual ICollection<Program> Programs { get; set; }
     }
 }

@@ -152,6 +152,11 @@ namespace BalarinaAPI.Core.Model
                 entity.Property(e => e.CreationDate)
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
+
+                //entity.HasOne(d => d.Category)
+                //    .WithMany(p => p.Programs)
+                //    .HasForeignKey(d => d.CategoryId)
+                //    .HasConstraintName("FK_Programs_Categories");
             });
 
             modelBuilder.Entity<Episode>(entity =>
@@ -292,10 +297,6 @@ namespace BalarinaAPI.Core.Model
                     .HasDefaultValueSql("((1))")
                     .HasComment("(0) non-Visible - (1) Visible");
 
-                //entity.HasOne(d => d.Category)
-                //    .WithMany(p => p.Programs)
-                //    .HasForeignKey(d => d.CategoryId)
-                //    .HasConstraintName("FK_Programs_Categories");
 
                 entity.HasOne(d => d.Interviewer)
                     .WithMany(p => p.Programs)

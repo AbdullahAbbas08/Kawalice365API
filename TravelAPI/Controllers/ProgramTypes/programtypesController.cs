@@ -244,7 +244,7 @@ namespace BalarinaAPI.Controllers.ProgramTypes
                 #region Apply Operation In Db
                 bool result = await unitOfWork.ProgramType.DeleteObject(ID);
                 if (!result)
-                    return NotFound("Program type Not Exist");
+                    return BadRequest("Program Type Not Found");
                 await unitOfWork.Complete();
                 #endregion 
 

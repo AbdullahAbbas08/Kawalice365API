@@ -311,12 +311,15 @@ namespace BalarinaAPI.Controllers.Advertisement
         {
             try
             {
+
+                #region Create Object DateTime ( Start , End => PublishDate )
                 DateTime PublishStartDate = new DateTime();
                 DateTime PublishEndDate = new DateTime();
+                #endregion
 
-
+                #region Fetch Img From Http
                 model.Image = HttpContext.Request.Form.Files["AdsImage"];
-
+                #endregion
 
                 #region Check values of Advertisement is not null or empty
 
@@ -349,16 +352,17 @@ namespace BalarinaAPI.Controllers.Advertisement
                     model.PublishStartDate = model.PublishStartDate.Substring(0, model.PublishStartDate.IndexOf("T"));
                 }
                 PublishStartDate = DateTime.ParseExact(model.PublishStartDate, "yyyy-MM-dd", null);
+                PublishStartDate = PublishStartDate.AddHours(model.Hours);
+                PublishStartDate = PublishStartDate.AddMinutes(model.Minutes);
 
                 if (model.PublishEndDate.Contains("T"))
                 {
                     model.PublishEndDate = model.PublishEndDate.Substring(0, model.PublishEndDate.IndexOf("T"));
                 }
                 PublishEndDate = DateTime.ParseExact(model.PublishEndDate, "yyyy-MM-dd", null);
-
+                PublishEndDate = PublishEndDate.AddHours(model.Hourd);
+                PublishEndDate = PublishEndDate.AddMinutes(model.Minuted);
                 #endregion
-
-
 
                 #region Fill ADTARGET object with values to insert
                 ADS _ADVS = new ADS()
