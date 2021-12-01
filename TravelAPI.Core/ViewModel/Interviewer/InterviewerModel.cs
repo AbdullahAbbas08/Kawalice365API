@@ -11,6 +11,7 @@ namespace BalarinaAPI.Core.ViewModel
         public int InterviewerId { get; set; }
         public string InterviewerName { get; set; }
         public string InterviewerPicture { get; set; }
+        public string InterviewerCover { get; set; }
         public string InterviewerDescription { get; set; }
         public string FacebookUrl { get; set; }
         public string InstgramUrl { get; set; }
