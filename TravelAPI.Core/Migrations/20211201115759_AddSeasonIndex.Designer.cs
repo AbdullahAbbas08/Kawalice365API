@@ -4,14 +4,16 @@ using BalarinaAPI.Core.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace BalarinaAPI.Core.Migrations
 {
     [DbContext(typeof(BalarinaDatabaseContext))]
-    partial class BalarinaDbContextModelSnapshot : ModelSnapshot
+    [Migration("20211201115759_AddSeasonIndex")]
+    partial class AddSeasonIndex
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -454,7 +456,7 @@ namespace BalarinaAPI.Core.Migrations
                     b.Property<DateTime>("ProgramStartDate")
                         .HasColumnType("datetime");
 
-                    b.Property<int?>("ProgramTypeId")
+                    b.Property<int>("ProgramTypeId")
                         .HasColumnType("int")
                         .HasColumnName("ProgramTypeID");
 
@@ -871,7 +873,7 @@ namespace BalarinaAPI.Core.Migrations
                         .WithMany("Episodes")
                         .HasForeignKey("SessionId")
                         .HasConstraintName("Episodes_Sessions_FK")
-                        .OnDelete(DeleteBehavior.NoAction);
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("Session");
                 });
@@ -900,15 +902,14 @@ namespace BalarinaAPI.Core.Migrations
                     b.HasOne("BalarinaAPI.Core.Model.Category", "Category")
                         .WithMany("Programs")
                         .HasForeignKey("CategoryId")
-                        .HasConstraintName("FK_Programs_Categories")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("BalarinaAPI.Core.Model.Interviewer", "Interviewer")
                         .WithMany("Programs")
                         .HasForeignKey("InterviewerId")
                         .HasConstraintName("FK_Programs_Interviewers")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("BalarinaAPI.Core.Models.Sliders", null)
@@ -919,7 +920,8 @@ namespace BalarinaAPI.Core.Migrations
                         .WithMany("Programs")
                         .HasForeignKey("ProgramTypeId")
                         .HasConstraintName("FK_Programs_ProgramTypes")
-                        .OnDelete(DeleteBehavior.NoAction);
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
 
                     b.Navigation("Category");
 
@@ -934,7 +936,7 @@ namespace BalarinaAPI.Core.Migrations
                         .WithMany("Sessions")
                         .HasForeignKey("ProgramId")
                         .HasConstraintName("FK_Sessions_Programs")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Program");

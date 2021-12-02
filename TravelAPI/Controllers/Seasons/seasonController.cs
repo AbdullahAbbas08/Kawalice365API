@@ -61,7 +61,8 @@ namespace BalarinaAPI.Controllers.Season
                                      season.CreationDate,
                                      season.SeasonViews,
                                      program.ProgramId,
-                                     program.ProgramName     
+                                     program.ProgramName  ,
+                                     season.SeasonIndex
                                  }).ToList();
                 foreach (var item in result)
                 {
@@ -75,7 +76,8 @@ namespace BalarinaAPI.Controllers.Season
                         SeasonViews =item.SeasonViews,
                         SessionTitle = item.SessionTitle,
                         ProgramName = item.ProgramName,
-                        EpisodesCount = EpisodesRelated.Count()
+                        EpisodesCount = EpisodesRelated.Count() ,
+                        SeasonIndex = item.SeasonIndex
                     };
                     seasons.Add(model);
                 }
@@ -281,6 +283,10 @@ namespace BalarinaAPI.Controllers.Season
                      CreationDate = DateTime.Now,
                      SeasonViews = model.SeasonViews
                 };
+                var Seasons = await unitOfWork.Season.GetObjects();
+                if (Seasons.Where(x => x.ProgramId == model.ProgramId).Count() == 0)
+                    _season.SeasonIndex = Seasons.Where(x => x.ProgramId == model.ProgramId).Count();
+                else  _season.SeasonIndex = Seasons.Where(x => x.ProgramId == model.ProgramId).Count() - 1;
 
                 bool result = await unitOfWork.Season.Create(_season);
 

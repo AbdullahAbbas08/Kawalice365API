@@ -24,7 +24,7 @@ namespace BalarinaAPI.Core.Model
         public DateTime ProgramStartDate    { get; set; }
         public int      InterviewerId       { get; set; }
         public int      ProgramOrder        { get; set; }
-        public int      ProgramTypeId       { get; set; }
+        public int?      ProgramTypeId       { get; set; }
         public int      ProgramViews        { get; set; }
         public DateTime CreationDate        { get; set; }
 

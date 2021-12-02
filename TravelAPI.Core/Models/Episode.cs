@@ -13,18 +13,18 @@ namespace BalarinaAPI.Core.Model
         {
             EpisodesKeywords = new HashSet<EpisodesKeyword>();
         }
-        public int EpisodeId { get; set; }
-        public string EpisodeTitle { get; set; }
-        public string EpisodeDescription { get; set; }
-        public string YoutubeUrl { get; set; }
-        public string EpisodeIamgePath { get; set; }
-        public bool EpisodeVisible { get; set; }
-        public DateTime CreationDate { get; set; }
-        public int? LikeRate { get; set; }
-        public int? DislikeRate { get; set; }
-        public int EpisodeViews { get; set; }
-        public DateTime EpisodePublishDate { get; set; }
-        public int? SessionId { get; set; }
+        public int      EpisodeId           { get; set; }
+        public string   EpisodeTitle        { get; set; }
+        public string   EpisodeDescription { get; set; }
+        public string   YoutubeUrl          { get; set; }
+        public string   EpisodeIamgePath    { get; set; }
+        public bool     EpisodeVisible      { get; set; }
+        public DateTime CreationDate        { get; set; }
+        public int?     LikeRate            { get; set; }
+        public int?     DislikeRate         { get; set; }
+        public int      EpisodeViews        { get; set; }
+        public DateTime EpisodePublishDate  { get; set; }
+        public int?     SessionId           { get; set; }
 
         [JsonIgnore]
         public virtual Seasons Session { get; set; }

@@ -14,10 +14,11 @@ namespace BalarinaAPI.Core.Model
             Episodes = new HashSet<Episode>();
             CreationDate = DateTime.Now;
         }
-        public int SessionId { get; set; }
-        public string SessionTitle { get; set; }
-        public int ProgramId { get; set; }
-        public int SeasonViews  { get; set; }
+        public int      SessionId       { get; set; }
+        public string   SessionTitle    { get; set; }
+        public int      ProgramId       { get; set; }
+        public int      SeasonViews     { get; set; }
+        public int      SeasonIndex     { get; set; }
         public DateTime CreationDate  { get; set; }
 
         [JsonIgnore]

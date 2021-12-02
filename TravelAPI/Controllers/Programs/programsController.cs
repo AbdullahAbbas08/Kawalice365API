@@ -489,7 +489,7 @@ namespace BalarinaAPI.Controllers.Programs
                         ProgramName = item.ProgramName,
                         ProgramOrder = item.ProgramOrder,
                         ProgramStartDate = item.ProgramStartDate,
-                        ProgramTypeId = item.ProgramTypeId,
+                        ProgramTypeId = (int)item.ProgramTypeId,
                         ProgramVisible = (bool)item.ProgramVisible,
                         CreationDate = item.CreationDate,
                     };
@@ -743,7 +743,7 @@ namespace BalarinaAPI.Controllers.Programs
                         ProgramImg = helper.LivePathImages + item.ProgramImg,
                         ProgramOrder = item.ProgramOrder,
                         ProgramStartDate = item.ProgramStartDate,
-                        ProgramTypeId = item.ProgramTypeId
+                        ProgramTypeId = (int)item.ProgramTypeId
                     };
                     ProgramFilter.Add(model);
                 }
@@ -863,7 +863,7 @@ namespace BalarinaAPI.Controllers.Programs
                                 ProgramName = item.Item1.ProgramName,
                                 ProgramOrder = item.Item1.ProgramOrder,
                                 ProgramStartDate = item.Item1.ProgramStartDate,
-                                ProgramTypeId = item.Item1.ProgramTypeId,
+                                ProgramTypeId = (int)item.Item1.ProgramTypeId,
                                 ProgramVisible = (bool)item.Item1.ProgramVisible,
                                 Views = item.Item2,
                                 ProgramImg = item.Item1.ProgramImg
@@ -885,12 +885,16 @@ namespace BalarinaAPI.Controllers.Programs
                             ProgramName = item.Item1.ProgramName,
                             ProgramOrder = item.Item1.ProgramOrder,
                             ProgramStartDate = item.Item1.ProgramStartDate,
-                            ProgramTypeId = item.Item1.ProgramTypeId,
+                            ProgramTypeId = (int)item.Item1.ProgramTypeId,
                             ProgramVisible = (bool)item.Item1.ProgramVisible,
                             Views = item.Item2,
                             ProgramImg = item.Item1.ProgramImg
                         };
                         mostViewsModels.Add(model);
+
+                        /*
+                         (item is not null)
+                         */
                     }
                 }
                 #endregion

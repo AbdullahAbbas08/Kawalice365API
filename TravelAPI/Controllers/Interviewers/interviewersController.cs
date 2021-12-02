@@ -838,7 +838,7 @@ namespace BalarinaAPI.Controllers.Interviewers
                                 ProgramName = item.Item1.ProgramName,
                                 ProgramOrder = item.Item1.ProgramOrder,
                                 ProgramStartDate = item.Item1.ProgramStartDate,
-                                ProgramTypeId = item.Item1.ProgramTypeId,
+                                ProgramTypeId = (int)item.Item1.ProgramTypeId,
                                 ProgramVisible = (bool)item.Item1.ProgramVisible,
                                 Views = item.Item2,
                                 ProgramImg =helper.LivePathImages+ item.Item1.ProgramImg
@@ -861,7 +861,7 @@ namespace BalarinaAPI.Controllers.Interviewers
                             ProgramName = item.Item1.ProgramName,
                             ProgramOrder = item.Item1.ProgramOrder,
                             ProgramStartDate = item.Item1.ProgramStartDate,
-                            ProgramTypeId = item.Item1.ProgramTypeId,
+                            ProgramTypeId = (int)item.Item1.ProgramTypeId,
                             ProgramVisible = (bool)item.Item1.ProgramVisible,
                             Views = item.Item2,
                             ProgramImg =helper.LivePathImages+ item.Item1.ProgramImg

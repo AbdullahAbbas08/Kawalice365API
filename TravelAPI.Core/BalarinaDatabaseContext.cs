@@ -182,7 +182,7 @@ namespace BalarinaAPI.Core.Model
                 entity.HasOne(d => d.Session)
                     .WithMany(p => p.Episodes)
                     .HasForeignKey(d => d.SessionId)
-                    .OnDelete(DeleteBehavior.Cascade)
+                    .OnDelete(DeleteBehavior.NoAction)
                     .HasConstraintName("Episodes_Sessions_FK");
             });
 
@@ -298,10 +298,17 @@ namespace BalarinaAPI.Core.Model
                     .HasComment("(0) non-Visible - (1) Visible");
 
 
+                entity.HasOne(d => d.Category)
+                    .WithMany(p => p.Programs)
+                    .HasForeignKey(d => d.CategoryId)
+                    .HasConstraintName("FK_Programs_Categories")
+                    .OnDelete(DeleteBehavior.NoAction);
+
                 entity.HasOne(d => d.Interviewer)
                     .WithMany(p => p.Programs)
                     .HasForeignKey(d => d.InterviewerId)
-                    .HasConstraintName("FK_Programs_Interviewers");
+                    .HasConstraintName("FK_Programs_Interviewers")
+                    .OnDelete(DeleteBehavior.NoAction);
 
                 entity.HasOne(d => d.ProgramType)
                     .WithMany(p => p.Programs)
@@ -330,7 +337,8 @@ namespace BalarinaAPI.Core.Model
                 entity.HasOne(d => d.Program)
                     .WithMany(p => p.Sessions)
                     .HasForeignKey(d => d.ProgramId)
-                    .HasConstraintName("FK_Sessions_Programs");
+                    .HasConstraintName("FK_Sessions_Programs")
+                    .OnDelete(DeleteBehavior.NoAction);
             });
 
             //OnModelCreatingPartial(modelBuilder);

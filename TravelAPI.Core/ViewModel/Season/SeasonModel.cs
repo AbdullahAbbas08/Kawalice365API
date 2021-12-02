@@ -11,5 +11,6 @@ namespace BalarinaAPI.Core.ViewModel.Season
         public DateTime CreationDate { get; set; }
         public string ProgramName { get; set; }
         public int EpisodesCount  { get; set; }
+        public int SeasonIndex   { get; set; }
     }
 }

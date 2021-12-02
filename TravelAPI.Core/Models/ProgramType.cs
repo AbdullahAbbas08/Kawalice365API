@@ -13,11 +13,11 @@ namespace BalarinaAPI.Core.Model
         {
             Programs = new HashSet<Program>();
         }
-        public int ProgramTypeId { get; set; }
-        public string ProgramTypeTitle { get; set; }
+        public int    ProgramTypeId         { get; set; }
+        public string ProgramTypeTitle      { get; set; }
         public string ProgramTypeImgPath  { get; set; }
-        public int ProgramTypeOrder  { get; set; }
-        public int ProgramTypeViews  { get; set; }
+        public int    ProgramTypeOrder      { get; set; }
+        public int    ProgramTypeViews   { get; set; }
 
 
         [JsonIgnore]

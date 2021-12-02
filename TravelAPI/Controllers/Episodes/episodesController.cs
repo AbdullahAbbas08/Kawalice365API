@@ -752,7 +752,7 @@ namespace BalarinaAPI.Controllers.Episodes
                         ProgramOrder = item.ProgramOrder,
                         ProgramPromoUrl = item.ProgramPromoUrl,
                         ProgramStartDate = item.ProgramStartDate,
-                        ProgramTypeId = item.ProgramTypeId,
+                        ProgramTypeId = (int)item.ProgramTypeId,
                         ProgramViews = item.ProgramViews,
                         CategoryName = item.CategoryTitle,
                         InterviewerName = item.InterviewerName,
