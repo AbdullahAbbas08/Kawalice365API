@@ -41,7 +41,7 @@ namespace BalarinaAPI.Controllers.sliders
         [ApiAuthentication]
         [HttpGet]
         [Route("getallslidersapikey")]
-        public async Task<ActionResult<RetrieveData<Sliders>>> getallslidersapikeyAsync()
+        public async Task<ActionResult<RetrieveData<SliderModel>>> getallslidersapikeyAsync()
         {
             try
             {
@@ -100,7 +100,7 @@ namespace BalarinaAPI.Controllers.sliders
                 RetrieveData <SliderModel> Collection = new RetrieveData<SliderModel>();
                 Collection.Url = helper.LivePathImages;
                 Collection.DataList = sliders.ToList();
-                return Ok(Collection);
+                return Collection;
             }
             catch (Exception ex)
             {

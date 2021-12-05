@@ -9,8 +9,6 @@ namespace BalarinaAPI.Core.ViewModel
     public class ProgramFilterModel
     {
         public int ProgramId { get; set; }
-        public int FirstSeasonID { get; set; } 
-        public int FirstEpisodeID  { get; set; }
         public string ProgramDescription { get; set; }
         public string ProgramName { get; set; }
         public string CategoryName { get; set; }

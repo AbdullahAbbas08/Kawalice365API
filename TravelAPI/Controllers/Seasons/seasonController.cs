@@ -261,6 +261,41 @@ namespace BalarinaAPI.Controllers.Season
         }
         #endregion
 
+        #region Get First Season , First Episode Related With ProgramID 
+        [ApiAuthentication]
+        [HttpGet]
+        [Route("getfirstseasonsbyprogramid")]
+        public async Task<ActionResult<IEnumerable<FirstSeasonInProgram>>> getfirstseasonsbyprogramid(int ID)
+        { 
+            try
+            {
+                
+                #region Check Program ID Exist or Not
+                var programObj = await unitOfWork.Program.FindObjectAsync(ID);
+                if (programObj == null)
+                    return BadRequest("Program ID Not Found ");
+                #endregion
+                //Get All Programs 
+                var ResultSeasons = await unitOfWork.Season.GetObjects(x => x.ProgramId == ID);
+                FirstSeasonInProgram firstSeason = new FirstSeasonInProgram()
+                {
+                    FirstSeasonID = ResultSeasons.
+                }
+
+
+
+
+                return ResultSeasons.ToList();
+            }
+            catch (Exception ex)
+            {
+                helper.LogError(ex);
+                return StatusCode(StatusCodes.Status500InternalServerError);
+                // Log error in db
+            }
+        }
+        #endregion
+
         #region Insert New Season 
         [ApiAuthentication]
         [HttpPost]

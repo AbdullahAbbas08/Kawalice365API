@@ -682,12 +682,11 @@ namespace BalarinaAPI.Controllers.Episodes
             try
             {
                 #region get Categories , Programs , ProgramTypes , Episodes
-                var Interviewers = await unitOfWork.Interviewer.GetObjects(x => x.InterviewerId == inputs.InterviewerID || inputs.InterviewerID == null); Interviewers.ToList();
-                var Categories = await unitOfWork.category.GetObjects(x => x.CategoryId == inputs.CategoryID || inputs.CategoryID == null); Categories.ToList();
-                var Programs = await unitOfWork.Program.GetObjects(x => x.ProgramId == inputs.ProgramID || inputs.ProgramID == null); Programs.ToList();
-                var ProgramTypes = await unitOfWork.ProgramType.GetObjects(x => x.ProgramTypeId == inputs.ProgramTypeID || inputs.ProgramTypeID == null); ProgramTypes.ToList();
-                var Episodes = await unitOfWork.Episode.GetObjects(x => x.EpisodePublishDate >= inputs.DateFrom || inputs.DateFrom == null &&
-                              x.EpisodePublishDate <= inputs.DateTo || inputs.DateTo == null); Episodes.ToList();
+                var Interviewers = await unitOfWork.Interviewer.GetObjects(); Interviewers.ToList();
+                var Categories = await unitOfWork.category.GetObjects(); Categories.ToList();
+                var Programs = await unitOfWork.Program.GetObjects(); Programs.ToList();
+                var ProgramTypes = await unitOfWork.ProgramType.GetObjects(); ProgramTypes.ToList();
+                var Episodes = await unitOfWork.Episode.GetObjects(); Episodes.ToList();
                 var Seasons = await unitOfWork.Season.GetObjects(); Seasons.ToList();
                 #endregion
 
@@ -705,10 +704,16 @@ namespace BalarinaAPI.Controllers.Episodes
                               on program.ProgramTypeId equals programType.ProgramTypeId
                               join interviewer in Interviewers
                                 on program.InterviewerId equals interviewer.InterviewerId
-                              join season in Seasons
-                              on program.ProgramId equals season.ProgramId
-                              join episode in Episodes
-                              on season.SessionId equals episode.SessionId
+                              //join season in Seasons
+                              //on program.ProgramId equals season.ProgramId
+                              //join episode in Episodes
+                              //on season.SessionId equals episode.SessionId
+                              where (category.CategoryId == inputs.CategoryID || inputs.CategoryID == null) &&
+                                    (program.ProgramId == inputs.ProgramID || inputs.ProgramID == null) &&
+                                    (interviewer.InterviewerId == inputs.InterviewerID || inputs.InterviewerID == null) &&
+                                    (programType.ProgramTypeId == inputs.ProgramTypeID || inputs.ProgramTypeID == null) 
+                                    //(season.SessionId == inputs.SeasonID || inputs.SeasonID == null) &&
+                                    //(episode.EpisodePublishDate >= inputs.DateFrom || inputs.DateFrom == null && episode.EpisodePublishDate <= inputs.DateTo || inputs.DateTo == null)
                               select new
                               {
                                   program.ProgramId,
@@ -727,7 +732,8 @@ namespace BalarinaAPI.Controllers.Episodes
                                   category.CategoryTitle,
                                   interviewer.InterviewerName,
                                   programType.ProgramTypeTitle,
-                                  season.SessionId
+                                  //season.SessionId
+
                               }).Distinct().Take(trendingDuration.Top);
                 #endregion
 
@@ -735,14 +741,14 @@ namespace BalarinaAPI.Controllers.Episodes
                 foreach (var item in Result)
                 {
                     var LocalSeasons = await unitOfWork.Season.GetObjects(x => x.ProgramId == item.ProgramId);
-                    var _FirstSeasonID = LocalSeasons.OrderBy(x=>x.CreationDate).FirstOrDefault();
+                    var _FirstSeasonID = LocalSeasons.OrderBy(x => x.CreationDate).FirstOrDefault();
 
-                    var LocalEpisodes = await unitOfWork.Episode.GetObjects(x => x.SessionId == item.SessionId);
-                    var _FirstEpisodeID = LocalEpisodes.OrderBy(x => x.CreationDate).FirstOrDefault();
+                    //var LocalEpisodes = await unitOfWork.Episode.GetObjects(x => x.SessionId == item.SessionId);
+                    //var _FirstEpisodeID = LocalEpisodes.OrderBy(x => x.CreationDate).FirstOrDefault();
 
                     ProgramFilterModel model = new ProgramFilterModel()
                     {
-                    CategoryId = item.CategoryId,
+                        CategoryId = item.CategoryId,
                         CreationDate = item.CreationDate,
                         InterviewerId = item.InterviewerId,
                         ProgramDescription = item.ProgramDescription,
@@ -758,8 +764,8 @@ namespace BalarinaAPI.Controllers.Episodes
                         InterviewerName = item.InterviewerName,
                         ProgramTypeName = item.ProgramTypeTitle,
                         ProgramVisible = (Boolean)item.ProgramVisible,
-                        FirstSeasonID = _FirstSeasonID.SessionId,
-                        FirstEpisodeID = _FirstEpisodeID.EpisodeId
+                        //FirstSeasonID = _FirstSeasonID.SessionId,
+                        ////FirstEpisodeID = _FirstEpisodeID.EpisodeId
                     };
                     episodesRelatedForRecently.Add(model);
                 }
