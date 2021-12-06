@@ -857,6 +857,7 @@ namespace BalarinaAPI.Controllers.Episodes
                               select new
                               {
                                   season.SessionId,
+                                  season.SessionTitle,
 
                                   episode.EpisodeId,
                                   episode.EpisodeTitle,
@@ -864,6 +865,7 @@ namespace BalarinaAPI.Controllers.Episodes
                                   episode.EpisodeIamgePath,
                                   episode.YoutubeUrl,
                                   episode.EpisodePublishDate,
+                                  episode.EpisodeDescription,
 
                                   program.ProgramId,
                                   program.ProgramName,
@@ -896,7 +898,9 @@ namespace BalarinaAPI.Controllers.Episodes
                         ProgramTypeId = item.ProgramTypeId,
                         ProgramTypeTitle = item.ProgramTypeTitle,
                         EpisodeUrl = item.YoutubeUrl,
-                        EpisodeImg = item.EpisodeIamgePath
+                        EpisodeImg = item.EpisodeIamgePath,
+                        EpisodeDescription = item.EpisodeDescription,
+                        SeasonTitle = item.SessionTitle
                     };
                     episodesRelatedForRecently.Add(model);
                 }
@@ -1141,7 +1145,8 @@ namespace BalarinaAPI.Controllers.Episodes
                     ProgramTypeID = model.ProgramTypeID,
                     DateFrom = DateTime.Now.AddMonths(trendingDuration.MostViewedMonth),
                     DateTo = DateTime.Now,
-                    IsRecently = "DESC"
+                    IsRecently = "DESC" , 
+                    
                 };
                 return await episodesfilterforviews(episodesFilterForRecentlyInputs);
             }
