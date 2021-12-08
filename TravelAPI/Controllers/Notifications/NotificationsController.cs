@@ -2,13 +2,19 @@
 using BalarinaAPI.Core.Models;
 using BalarinaAPI.Core.ViewModel;
 using BalarinaAPI.Hub;
+using FirebaseAdmin.Messaging;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Text;
 using System.Threading.Tasks;
 using TravelAPI.Core;
 using TravelAPI.Core.Helper;
@@ -101,118 +107,150 @@ namespace BalarinaAPI.Controllers.Notifications
         }
         #endregion
 
-        #region Insert New Notifications 
+        //#region Insert New Notifications 
+        ////[ApiAuthentication]
+        //[HttpPost]
+        //[Route("createnotification")]
+        //public async Task<ActionResult<CategoryModelInput>> createnotification([FromQuery] NotificationsInsert model)
+        //{
+        //    try
+        //    {
+        //        string ImagePath = null;
+        //        var Image = HttpContext.Request.Form.Files["NotificationImg"];
+        //        model.IMG = Image;
+
+        //        #region Check values of Notification is not null or empty
+        //        var episodeId =await unitOfWork.Episode.FindObjectAsync(model.EpisodeID);
+
+        //        if (episodeId == null)
+        //            return BadRequest("Episode ID Not Found ");
+
+        //        if (string.IsNullOrEmpty(model.title))
+        //            return BadRequest("Notifications Title cannot be null or empty");
+
+        //        if (string.IsNullOrEmpty(model.Descriptions))
+        //            return BadRequest("Notifications Description cannot be null or empty");
+
+        //        if (model.IMG != null)
+        //            ImagePath = helper.UploadImage(model.IMG);
+
+        //        if (Image == null)
+        //            return BadRequest("Notifications Image cannot be null ");
+
+        //        #endregion
+
+        //        #region Fill notification object with values to insert
+
+        //        Notification notification = new Notification()
+        //        {
+        //            title = model.title,
+        //            IMG = ImagePath,
+        //            EpisodeID = model.EpisodeID,
+        //            Descriptions = model.Descriptions,
+        //            Visible =true
+        //        };
+        //        #endregion
+
+        //        #region Create Operation
+        //        bool result = await unitOfWork.Notification.Create(notification);
+        //        #endregion
+
+        //        #region check if Create Operation successed
+        //        if (!result)
+        //            return BadRequest("Create Operation Failed");
+        //        #endregion
+
+        //        #region save changes in db
+        //        await unitOfWork.Complete();
+        //        #endregion
+
+        //        #region Send Notification
+        //        await hubClient.Clients.All.BroadCastNotification(notification);
+        //        #endregion
+
+        //        return StatusCode(StatusCodes.Status200OK);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        helper.LogError(ex);
+        //        return StatusCode(StatusCodes.Status500InternalServerError);
+        //    }
+
+        //}
+        //#endregion
+
+        //#region Delete Notifications
+
         //[ApiAuthentication]
+        //[HttpDelete("{ID}")]
+        //public async Task<ActionResult<Notification>> deleteNotification(int ID)
+        //{
+        //    try
+        //    {
+        //        #region Check ID If Exist
+        //        var checkIDIfExist = await unitOfWork.Notification.FindObjectAsync(ID);
+        //        if (checkIDIfExist == null)
+        //            return BadRequest("Notification ID Not Found");
+        //        #endregion
+
+        //        #region Delete Operation
+        //        bool result = await unitOfWork.Notification.DeleteObject(ID);
+        //        #endregion
+
+        //        #region check Delete Operation  successed
+        //        if (!result)
+        //            return BadRequest("DELETE OPERATION FAILED ");
+        //        #endregion
+
+        //        #region save changes in db
+        //        await unitOfWork.Complete();
+        //        #endregion
+
+        //        #region Delete image File From Specified Directory 
+        //        helper.DeleteFiles(checkIDIfExist.IMG);
+        //        #endregion
+
+        //        return StatusCode(StatusCodes.Status200OK);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        helper.LogError(ex);
+        //        return StatusCode(StatusCodes.Status500InternalServerError);
+        //    }
+        //}
+        //#endregion
+
+
         [HttpPost]
-        [Route("createnotification")]
-        public async Task<ActionResult<CategoryModelInput>> createnotification([FromQuery] NotificationsInsert model)
+        public async Task<bool> SendNotificationAsync( string title, string body )
         {
-            try
+            using (var client = new HttpClient())
             {
-                string ImagePath = null;
-                var Image = HttpContext.Request.Form.Files["NotificationImg"];
-                model.IMG = Image;
+                var firebaseOptionsServerId = "AAAAxbycLY4:APA91bEaJoJH_-EMUGPxPWhqogGouvqB-qRkZjje_lhdnkRm359dfv0wFy6VT2c6qaAh9-kC7jc0HzXMUdfTSx7jua9x79UeBayrt6qwMvYgEkZILfsaTc_ZiUGh78yb0c9YESlhAa3i";
+                var firebaseOptionsSenderId = "849272909198";
 
-                #region Check values of Notification is not null or empty
-                var episodeId =await unitOfWork.Episode.FindObjectAsync(model.EpisodeID);
-
-                if (episodeId == null)
-                    return BadRequest("Episode ID Not Found ");
-
-                if (string.IsNullOrEmpty(model.title))
-                    return BadRequest("Notifications Title cannot be null or empty");
-
-                if (string.IsNullOrEmpty(model.Descriptions))
-                    return BadRequest("Notifications Description cannot be null or empty");
-
-                if (model.IMG != null)
-                    ImagePath = helper.UploadImage(model.IMG);
-
-                if (Image == null)
-                    return BadRequest("Notifications Image cannot be null ");
-
-                #endregion
-
-                #region Fill notification object with values to insert
-
-                Notification notification = new Notification()
+                client.BaseAddress = new Uri("https://fcm.googleapis.com");
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                client.DefaultRequestHeaders.TryAddWithoutValidation("Authorization",
+                    $"key={firebaseOptionsServerId}");
+                client.DefaultRequestHeaders.TryAddWithoutValidation("Sender", $"id={firebaseOptionsSenderId}");
+                var data = new
                 {
-                    title = model.title,
-                    IMG = ImagePath,
-                    EpisodeID = model.EpisodeID,
-                    Descriptions = model.Descriptions,
-                    Visible =true
+                    to = "/topics/Apps",
+                    notification = new
+                    {
+                        body = body,
+                        title = title,
+                    }
                 };
-                #endregion
 
-                #region Create Operation
-                bool result = await unitOfWork.Notification.Create(notification);
-                #endregion
+                var json = JsonConvert.SerializeObject(data);
+                var httpContent = new StringContent(json, Encoding.UTF8, "application/json");
+                var result = await client.PostAsync("/fcm/send", httpContent);
+                return result.StatusCode.Equals(HttpStatusCode.OK);
 
-                #region check if Create Operation successed
-                if (!result)
-                    return BadRequest("Create Operation Failed");
-                #endregion
-
-                #region save changes in db
-                await unitOfWork.Complete();
-                #endregion
-
-                #region Send Notification
-                await hubClient.Clients.All.BroadCastNotification(notification);
-                #endregion
-
-                return StatusCode(StatusCodes.Status200OK);
-            }
-            catch (Exception ex)
-            {
-                helper.LogError(ex);
-                return StatusCode(StatusCodes.Status500InternalServerError);
-            }
-
-        }
-        #endregion
-
-        #region Delete Notifications
-
-        [ApiAuthentication]
-        [HttpDelete("{ID}")]
-        public async Task<ActionResult<Notification>> deleteNotification(int ID)
-        {
-            try
-            {
-                #region Check ID If Exist
-                var checkIDIfExist = await unitOfWork.Notification.FindObjectAsync(ID);
-                if (checkIDIfExist == null)
-                    return BadRequest("Notification ID Not Found");
-                #endregion
-
-                #region Delete Operation
-                bool result = await unitOfWork.Notification.DeleteObject(ID);
-                #endregion
-
-                #region check Delete Operation  successed
-                if (!result)
-                    return BadRequest("DELETE OPERATION FAILED ");
-                #endregion
-
-                #region save changes in db
-                await unitOfWork.Complete();
-                #endregion
-
-                #region Delete image File From Specified Directory 
-                helper.DeleteFiles(checkIDIfExist.IMG);
-                #endregion
-
-                return StatusCode(StatusCodes.Status200OK);
-            }
-            catch (Exception ex)
-            {
-                helper.LogError(ex);
-                return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
-        #endregion
 
         #endregion
     }

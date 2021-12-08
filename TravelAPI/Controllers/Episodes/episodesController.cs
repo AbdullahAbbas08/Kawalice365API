@@ -570,7 +570,7 @@ namespace BalarinaAPI.Controllers.Episodes
                 var ProgramTypes = await unitOfWork.ProgramType.GetObjects(x => x.ProgramTypeId == inputs.ProgramTypeID || inputs.ProgramTypeID == null); ProgramTypes.ToList();
                 var Episodes = await unitOfWork.Episode.GetObjects(x => x.EpisodePublishDate >= inputs.DateFrom || inputs.DateFrom == null &&
                               x.EpisodePublishDate <= inputs.DateTo || inputs.DateTo == null); Episodes.ToList();
-                var Seasons = await unitOfWork.Season.GetObjects(); Seasons.ToList();
+                var Seasons = await unitOfWork.Season.GetObjects(x=>x.SessionId == inputs.SeasonID || inputs.SeasonID ==null ); Seasons.ToList();
                 #endregion
 
                 #region declare list to fetch output 
@@ -900,7 +900,7 @@ namespace BalarinaAPI.Controllers.Episodes
                         EpisodeUrl = item.YoutubeUrl,
                         EpisodeImg = item.EpisodeIamgePath,
                         EpisodeDescription = item.EpisodeDescription,
-                        SeasonTitle = item.SessionTitle
+                        SeasonTitle = item.SessionTitle,
                     };
                     episodesRelatedForRecently.Add(model);
                 }
