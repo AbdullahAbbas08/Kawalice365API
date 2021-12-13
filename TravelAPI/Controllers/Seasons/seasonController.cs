@@ -265,7 +265,7 @@ namespace BalarinaAPI.Controllers.Season
         [ApiAuthentication]
         [HttpGet]
         [Route("getfirstseasonsbyprogramid")]
-        public async Task<ActionResult<IEnumerable<FirstSeasonInProgram>>> getfirstseasonsbyprogramid(int ID)
+        public async Task<ActionResult<FirstSeasonInProgram>> getfirstseasonsbyprogramid(int ID)
         { 
             try
             {
@@ -275,17 +275,32 @@ namespace BalarinaAPI.Controllers.Season
                 if (programObj == null)
                     return BadRequest("Program ID Not Found ");
                 #endregion
-                //Get All Programs 
+
+                #region Get First Season 
                 var ResultSeasons = await unitOfWork.Season.GetObjects(x => x.ProgramId == ID);
-                FirstSeasonInProgram firstSeason = new FirstSeasonInProgram()
+                if (ResultSeasons.Count() == 0)
+                    return NoContent();
+                int SeasonID = ResultSeasons.OrderBy(x => x.CreationDate).FirstOrDefault().SessionId;
+                #endregion
+
+                #region Get First Episode
+                var ResultEpisode = await unitOfWork.Episode.GetObjects(x => x.SessionId == SeasonID);
+                if (ResultSeasons.Count() == 0)
+                    return NoContent();
+                int EpisodeID = ResultEpisode.OrderBy(x => x.CreationDate).FirstOrDefault().EpisodeId;
+                #endregion
+
+                #region Prepare object ti return 
+                FirstSeasonInProgram firstSeasonEpisode = new FirstSeasonInProgram()
                 {
-                    FirstSeasonID = ResultSeasons.
-                }
+                    FirstSeasonID = SeasonID,
+                    FirstEpisodeID = EpisodeID
+                };
+                #endregion
 
-
-
-
-                return ResultSeasons.ToList();
+                #region Return Object
+                return firstSeasonEpisode;
+                #endregion
             }
             catch (Exception ex)
             {
