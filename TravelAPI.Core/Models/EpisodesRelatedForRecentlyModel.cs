@@ -10,6 +10,7 @@ namespace BalarinaAPI.Core.Model
     {
         public int      SessionId           { get; set; }  
         public string      SeasonTitle           { get; set; }  
+        public int SeasonIndex { get; set; }  
         public int      EpisodeId           { get; set; }
         public string   EpisodeTitle        { get; set; }
         public string EpisodeDescription { get; set; }
@@ -26,4 +27,5 @@ namespace BalarinaAPI.Core.Model
         public string   EpisodeUrl          { get; set; }
         public Boolean EpisodeVisible       { get; set; }
     }
+
 }

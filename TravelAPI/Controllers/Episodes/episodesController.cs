@@ -569,7 +569,7 @@ namespace BalarinaAPI.Controllers.Episodes
                 var Programs = await unitOfWork.Program.GetObjects(x => x.ProgramId == inputs.ProgramID || inputs.ProgramID == null); Programs.ToList();
                 var ProgramTypes = await unitOfWork.ProgramType.GetObjects(x => x.ProgramTypeId == inputs.ProgramTypeID || inputs.ProgramTypeID == null); ProgramTypes.ToList();
                 var Episodes = await unitOfWork.Episode.GetObjects(x => x.EpisodePublishDate >= inputs.DateFrom || inputs.DateFrom == null &&
-                              x.EpisodePublishDate <= inputs.DateTo || inputs.DateTo == null); Episodes.ToList();
+                              x.EpisodePublishDate <= inputs.DateTo || inputs.DateTo == null && x.EpisodeId == inputs.EpisodeID ||  inputs.EpisodeID == null); Episodes.ToList();
                 var Seasons = await unitOfWork.Season.GetObjects(x=>x.SessionId == inputs.SeasonID || inputs.SeasonID ==null ); Seasons.ToList();
                 #endregion
 
@@ -601,6 +601,7 @@ namespace BalarinaAPI.Controllers.Episodes
                               {
                                   season.SessionId,
                                   season.SessionTitle,
+                                  season.SeasonIndex,
                                   episode.EpisodeId,
                                   episode.EpisodeTitle,
                                   episode.EpisodeDescription,
@@ -640,7 +641,8 @@ namespace BalarinaAPI.Controllers.Episodes
                         EpisodeImg = item.EpisodeIamgePath,
                         EpisodeUrl = item.YoutubeUrl,
                         EpisodeDescription = item.EpisodeDescription,
-                        EpisodeVisible = item.EpisodeVisible
+                        EpisodeVisible = item.EpisodeVisible ,
+                        SeasonIndex = item.SeasonIndex
                     };
                     episodesRelatedForRecently.Add(model);
                 }
@@ -672,6 +674,100 @@ namespace BalarinaAPI.Controllers.Episodes
             }
         }
         #endregion
+
+        #region Get Episodes Filter For Seasons
+        [ApiAuthentication]
+        [HttpGet] 
+        [Route("episodesfilterforseasons")]
+        public async Task<ActionResult<RetrieveData<EpisodesRelatedForSeasons>>> episodesfilterforseasons([FromQuery] EpisodesFilterForRecentlyInputs inputs)
+        {
+            try
+            {
+                #region get Categories , Programs , ProgramTypes , Episodes
+                var Interviewers = await unitOfWork.Interviewer.GetObjects(x => x.InterviewerId == inputs.InterviewerID || inputs.InterviewerID == null); Interviewers.ToList();
+                var Categories = await unitOfWork.category.GetObjects(x => x.CategoryId == inputs.CategoryID || inputs.CategoryID == null); Categories.ToList();
+                var Programs = await unitOfWork.Program.GetObjects(x => x.ProgramId == inputs.ProgramID || inputs.ProgramID == null); Programs.ToList();
+                var ProgramTypes = await unitOfWork.ProgramType.GetObjects(x => x.ProgramTypeId == inputs.ProgramTypeID || inputs.ProgramTypeID == null); ProgramTypes.ToList();
+                var Episodes = await unitOfWork.Episode.GetObjects(x => x.EpisodePublishDate >= inputs.DateFrom || inputs.DateFrom == null &&
+                              x.EpisodePublishDate <= inputs.DateTo || inputs.DateTo == null && x.EpisodeId == inputs.EpisodeID || inputs.EpisodeID == null); Episodes.ToList();
+                var Seasons = await unitOfWork.Season.GetObjects(x => x.SessionId == inputs.SeasonID || inputs.SeasonID == null); Seasons.ToList();
+                #endregion
+
+                #region declare list to fetch output 
+                List<EpisodesRelatedForSeasons> episodesRelatedForRecently = new List<EpisodesRelatedForSeasons>();
+                List<EpisodesRelatedForSeasons> episodesRelatedForRecentlyOrdered = new List<EpisodesRelatedForSeasons>();
+
+                #endregion
+
+                #region Apply Query in db 
+                var Result = (from category in Categories
+                              join program in Programs
+                              on category.CategoryId equals program.CategoryId
+                              join programType in ProgramTypes
+                              on program.ProgramTypeId equals programType.ProgramTypeId
+                              join interviewer in Interviewers
+                                on program.InterviewerId equals interviewer.InterviewerId
+                              join season in Seasons
+                              on program.ProgramId equals season.ProgramId
+                              join episode in Episodes
+                              on season.SessionId equals episode.SessionId
+                              //where (category.CategoryId == inputs.CategoryID || inputs.CategoryID is null) &&
+                              //      (programType.ProgramTypeId == inputs.ProgramTypeID || inputs.ProgramTypeID is null) &&
+                              //      (interviewer.InterviewerId == inputs.InterviewerID || inputs.InterviewerID is null) &&
+                              //      (program.ProgramId == inputs.ProgramID || inputs.ProgramID is null) &&
+                              //      (episode.EpisodePublishDate >= inputs.DateFrom || inputs.DateFrom is null) &&
+                              //      (episode.EpisodePublishDate <= inputs.DateTo || inputs.DateTo is null)
+                              select new
+                              {
+                                  season.SessionId,
+                                  season.SessionTitle,
+                                  season.SeasonIndex,
+                                  program.ProgramId,
+                                  program.ProgramName,
+                                  program.ProgramImg,
+                                  category.CategoryId,
+                                  category.CategoryTitle,
+                                  programType.ProgramTypeId,
+                                  programType.ProgramTypeTitle,
+                              }).Distinct().Take(trendingDuration.Top);
+                #endregion
+
+                #region Fill output List from returned list from db
+                foreach (var item in Result)
+                {
+                    EpisodesRelatedForSeasons model = new EpisodesRelatedForSeasons()
+                    {
+                        SessionId = item.SessionId,
+                        SeasonTitle = item.SessionTitle,
+                        CategoryId = item.CategoryId,
+                        CategoryTitle = item.CategoryTitle,
+                        ProgramId = item.ProgramId,
+                        ProgramImg = item.ProgramImg,
+                        ProgramName = item.ProgramName,
+                        ProgramTypeId = item.ProgramTypeId,
+                        ProgramTypeTitle = item.ProgramTypeTitle,
+                        SeasonIndex = item.SeasonIndex
+                    };
+                    episodesRelatedForRecently.Add(model);
+                }
+                #endregion
+
+
+                RetrieveData<EpisodesRelatedForSeasons> RetrieveData = new RetrieveData<EpisodesRelatedForSeasons>();
+                RetrieveData.DataList = episodesRelatedForRecently;
+                RetrieveData.Url = helper.LivePathImages;
+
+
+                return RetrieveData;
+            }
+            catch (Exception ex)
+            {
+                helper.LogError(ex);
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
+        #endregion
+
 
         #region Get Program Filter ForRecently
         [ApiAuthentication]
@@ -858,6 +954,7 @@ namespace BalarinaAPI.Controllers.Episodes
                               {
                                   season.SessionId,
                                   season.SessionTitle,
+                                  season.SeasonIndex,
 
                                   episode.EpisodeId,
                                   episode.EpisodeTitle,
@@ -901,6 +998,7 @@ namespace BalarinaAPI.Controllers.Episodes
                         EpisodeImg = item.EpisodeIamgePath,
                         EpisodeDescription = item.EpisodeDescription,
                         SeasonTitle = item.SessionTitle,
+                        SeasonIndex = item.SeasonIndex
                     };
                     episodesRelatedForRecently.Add(model);
                 }
@@ -1005,6 +1103,8 @@ namespace BalarinaAPI.Controllers.Episodes
                              {
                                  season.SessionId,
                                  episode.EpisodeId,
+                                 season.SeasonIndex,
+                                 season.SessionTitle,
                                  episode.EpisodeTitle,
                                  episode.EpisodeViews,
                                  episode.EpisodePublishDate,
@@ -1038,7 +1138,9 @@ namespace BalarinaAPI.Controllers.Episodes
                         ProgramTypeId = item.ProgramTypeId,
                         ProgramTypeTitle = item.ProgramTypeTitle,
                         EpisodeImg = item.EpisodeIamgePath,
-                        EpisodeUrl = item.YoutubeUrl
+                        EpisodeUrl = item.YoutubeUrl , 
+                        SeasonIndex = item.SeasonIndex,
+                        SeasonTitle = item.SessionTitle
 
                     };
                     episodesRelatedForRecently.Add(model);
@@ -1235,8 +1337,7 @@ namespace BalarinaAPI.Controllers.Episodes
             }
         }
         #endregion
-
-       
+  
 
         #region Detail API
         /// <summary>

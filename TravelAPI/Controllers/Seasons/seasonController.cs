@@ -332,10 +332,11 @@ namespace BalarinaAPI.Controllers.Season
                      CreationDate = DateTime.Now,
                      SeasonViews = model.SeasonViews
                 };
+
                 var Seasons = await unitOfWork.Season.GetObjects();
                 if (Seasons.Where(x => x.ProgramId == model.ProgramId).Count() == 0)
                     _season.SeasonIndex = Seasons.Where(x => x.ProgramId == model.ProgramId).Count();
-                else  _season.SeasonIndex = Seasons.Where(x => x.ProgramId == model.ProgramId).Count() - 1;
+                else  _season.SeasonIndex = Seasons.Where(x => x.ProgramId == model.ProgramId).Count() - 1 ;
 
                 bool result = await unitOfWork.Season.Create(_season);
 
