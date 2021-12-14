@@ -14,6 +14,6 @@ namespace BalarinaAPI.Core.ViewModel.Slider
         public string SliderImagePath { get; set; }
         public string SliderTitle  { get; set; }
         public int? SliderOrder       { get; set; }
-        public int? ProgramID          { get; set; }
+        public int? EpisodeID          { get; set; }
     }
 }

@@ -1355,6 +1355,13 @@ namespace BalarinaAPI.Controllers.Episodes
         {
             try
             {
+
+                #region Check If Episode Exist Or Not --
+                var Episode = await unitOfWork.Episode.FindObjectAsync(EPISODEID);
+                if (Episode == null)
+                    return NoContent();
+                #endregion
+
                 #region get Categories , Programs , ProgramTypes , Episodes
                 var Categories = await unitOfWork.category.GetObjects(); Categories.ToList();
                 var Programs = await unitOfWork.Program.GetObjects(); Programs.ToList();
@@ -1407,7 +1414,7 @@ namespace BalarinaAPI.Controllers.Episodes
                               }).Distinct();
                 #endregion
 
-                #region Season Count that episode id exist in it
+                #region Number Of Episodes In Season that episode id exist on it
                 var episodeObj = await unitOfWork.Episode.FindObjectAsync(EPISODEID);
 
                 var SeasonCount = await unitOfWork.Episode.GetObjects(x => x.SessionId == episodeObj.SessionId);
@@ -1448,10 +1455,28 @@ namespace BalarinaAPI.Controllers.Episodes
 
                 #region Increase Episode Views 
                 episodeObj.EpisodeViews += 1;
+                unitOfWork.Episode.Update(episodeObj);
+                #endregion
+
+                #region Increase Season Views
+                var Season = await unitOfWork.Season.FindObjectAsync((int)episodeObj.SessionId);
+                Season.SeasonViews += 1;
+                 unitOfWork.Season.Update(Season);
+                #endregion
+
+                #region Increase program Views
+                var Program = await unitOfWork.Program.FindObjectAsync(Season.ProgramId);
+                Program.ProgramViews += 1;
+                unitOfWork.Program.Update(Program);
+                #endregion
+
+                #region Increase Category Views
+                var Category = await unitOfWork.category.FindObjectAsync(Program.CategoryId);
+                Category.CategoryViews += 1;
+                unitOfWork.category.Update(Category);
                 #endregion
 
                 #region update operation
-                bool result = unitOfWork.Episode.Update(episodeObj);
                 await unitOfWork.Complete();
                 #endregion
 

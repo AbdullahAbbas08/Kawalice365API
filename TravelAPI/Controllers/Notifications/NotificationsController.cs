@@ -1,6 +1,7 @@
 ﻿using BalarinaAPI.Authentication;
 using BalarinaAPI.Core.Models;
 using BalarinaAPI.Core.ViewModel;
+using BalarinaAPI.Core.ViewModel.Notifications;
 using BalarinaAPI.Hub;
 using FirebaseAdmin.Messaging;
 using Microsoft.AspNetCore.Http;
@@ -62,7 +63,7 @@ namespace BalarinaAPI.Controllers.Notifications
                               join episode in _EpisodeObjects
                               on notify.EpisodeID equals episode.EpisodeId
                               join season in _SeasonObjects
-                              on  episode.SessionId equals season.SessionId
+                              on episode.SessionId equals season.SessionId
                               join program in _ProgramObjects
                               on season.ProgramId equals program.ProgramId
                               select new
@@ -222,8 +223,9 @@ namespace BalarinaAPI.Controllers.Notifications
 
 
         [HttpPost]
-        public async Task<bool> SendNotificationAsync( string title, string body )
+        public async Task<bool> SendNotificationAsync(NotificationCollectionData Model)
         {
+
             using (var client = new HttpClient())
             {
                 var firebaseOptionsServerId = "AAAAxbycLY4:APA91bEaJoJH_-EMUGPxPWhqogGouvqB-qRkZjje_lhdnkRm359dfv0wFy6VT2c6qaAh9-kC7jc0HzXMUdfTSx7jua9x79UeBayrt6qwMvYgEkZILfsaTc_ZiUGh78yb0c9YESlhAa3i";
@@ -239,19 +241,49 @@ namespace BalarinaAPI.Controllers.Notifications
                     to = "/topics/Apps",
                     notification = new
                     {
-                        body = body,
-                        title = title,
+                        body = Model.notification.body,
+                        title = Model.notification.title,
+                        image = Model.notification.image
+                    },
+                    data = new
+                    {
+                      EpisodeId           = Model.data.EpisodeId,
+                      EpisodePublishDate  = Model.data.EpisodePublishDate,
+                      EpisodeTitle        = Model.data.EpisodeTitle,
+                      EpisodeDescription  = Model.data.EpisodeDescription,
+                      EpisodeImg          = Model.data.EpisodeImg,
+                      EpisodeUrl          = Model.data.EpisodeUrl,
+                      EpisodeViews        = Model.data.EpisodeViews,
+                      SessionId           = Model.data.SessionId,
+                      SeasonTitle         = Model.data.SeasonTitle,
+                      ProgramId           = Model.data.ProgramId,
+                      ProgramName         = Model.data.ProgramName,
+                      ProgramImg          = Model.data.ProgramImg,
+                      ProgramTypeId       = Model.data.ProgramTypeId,
+                      ProgramTypeTitle    = Model.data.ProgramTypeTitle,
+                      CategoryId          = Model.data.CategoryId,
+                      CategoryTitle       = Model.data.CategoryTitle,
                     }
                 };
-
                 var json = JsonConvert.SerializeObject(data);
                 var httpContent = new StringContent(json, Encoding.UTF8, "application/json");
                 var result = await client.PostAsync("/fcm/send", httpContent);
                 return result.StatusCode.Equals(HttpStatusCode.OK);
-
+                //return StatusCode(StatusCodes.Status200OK);
             }
         }
 
         #endregion
     }
 }
+
+/*
+  to = "/topics/Apps",
+                    notification = new
+                    {
+                        //body = body,
+                        //title = title,
+                        Model.Header,
+                        Model.Data 
+                    }
+ */

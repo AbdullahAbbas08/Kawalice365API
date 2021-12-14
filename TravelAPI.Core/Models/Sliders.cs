@@ -19,10 +19,10 @@ namespace BalarinaAPI.Core.Models
         public int      SliderOrder         { get; set; }
         [JsonIgnore]
         public int      SliderViews         { get; set; }
-        public int      ProgramIDFk          { get; set; }
-
+        public int      EpisodeID          { get; set; }
         [JsonIgnore]
-        [ForeignKey("ProgramIDFk")]
-        public virtual ICollection<Program> Programs { get; set; }
+        [ForeignKey("EpisodeID")]
+        public virtual ICollection<Episode> Episodes { get; set; }
     }
 }
+ 
