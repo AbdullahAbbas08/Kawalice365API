@@ -62,7 +62,7 @@ namespace BalarinaAPI.Controllers.sliders
                              join episode in Episodes
                              on season.SessionId equals episode.SessionId
                              join slider in ResultSlider
-                             on program.ProgramId equals slider.ProgramIDFk
+                             on episode.EpisodeId equals slider.EpisodeID
                              select new
                              {
                                  slider.SliderId           ,
@@ -70,29 +70,30 @@ namespace BalarinaAPI.Controllers.sliders
                                  slider.SliderImagePath    ,
                                  slider.SliderOrder        ,
                                  slider.SliderViews        ,
-                                 slider.ProgramIDFk        ,
+                                 program.ProgramId        ,
                                  episode.EpisodeId         ,
                                  category.CategoryId       ,
                                  season.SessionId          ,
                                  program.ProgramName       ,
-                                 episode.YoutubeUrl        
+                                 episode.YoutubeUrl
+
                              }).ToList();
 
                 foreach (var item in result)
                 {
                     SliderModel slider = new SliderModel()
                     {
-                        CategoryId = item.CategoryId,
-                        EpisodeId = item.EpisodeId,
-                        ProgramIDFk = item.ProgramIDFk,
-                        ProgramName= item.ProgramName,
-                        SessionId= item.SessionId,
                         SliderId = item.SliderId,
                         SliderImagePath = item.SliderImagePath,
-                        SliderOrder = item.SliderOrder,
                         SliderTitle = item.SliderTitle,
                         SliderViews = item.SliderViews,
-                        YoutubeUrl = item.YoutubeUrl
+                        SliderOrder = item.SliderOrder,
+                        EpisodeId = item.EpisodeId,
+                        YoutubeUrl = item.YoutubeUrl,
+                        SessionId = item.SessionId,
+                        ProgramIDFk = item.ProgramId,
+                        ProgramName = item.ProgramName,
+                        CategoryId  = item.CategoryId   
                     };
                     sliders.Add(slider);
                 }
@@ -124,13 +125,13 @@ namespace BalarinaAPI.Controllers.sliders
                 var _SliderObj = await unitOfWork.Slider.FindObjectAsync(model.SliderId);
 
                 if (_SliderObj == null)
-                    return NotFound("Slider ID Not Found");
+                    return NoContent();
                 #endregion
 
                 #region Check values of Slider is not null or empty
 
-                if (model.ProgramID == null)
-                    model.ProgramID = _SliderObj.ProgramIDFk;
+                if (model.EpisodeID == null)
+                    model.EpisodeID = _SliderObj.EpisodeID;
 
                 if (model.SliderTitle == null)
                     model.SliderTitle = _SliderObj.SliderTitle;
@@ -153,7 +154,7 @@ namespace BalarinaAPI.Controllers.sliders
                 Sliders _slider = new Sliders()
                 {
                     SliderId = model.SliderId,
-                   ProgramIDFk = (int)model.ProgramID,
+                    EpisodeID = (int)model.EpisodeID,
                     SliderImagePath = model.SliderImagePath ,
                     SliderOrder = (int)model.SliderOrder,
                     SliderTitle = model.SliderTitle,

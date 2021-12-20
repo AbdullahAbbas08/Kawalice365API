@@ -268,39 +268,23 @@ namespace BalarinaAPI.Controllers.Season
         public async Task<ActionResult<FirstSeasonInProgram>> getfirstseasonsbyprogramid(int ID)
         { 
             try
-            {
-                
+            {   
                 #region Check Program ID Exist or Not
                 var programObj = await unitOfWork.Program.FindObjectAsync(ID);
                 if (programObj == null)
                     return BadRequest("Program ID Not Found ");
                 #endregion
-
-                #region Get First Season 
+                //Get All Programs 
                 var ResultSeasons = await unitOfWork.Season.GetObjects(x => x.ProgramId == ID);
-                if (ResultSeasons.Count() == 0)
-                    return NoContent();
-                int SeasonID = ResultSeasons.OrderBy(x => x.CreationDate).FirstOrDefault().SessionId;
-                #endregion
-
-                #region Get First Episode
-                var ResultEpisode = await unitOfWork.Episode.GetObjects(x => x.SessionId == SeasonID);
-                if (ResultSeasons.Count() == 0)
-                    return NoContent();
-                int EpisodeID = ResultEpisode.OrderBy(x => x.CreationDate).FirstOrDefault().EpisodeId;
-                #endregion
-
-                #region Prepare object ti return 
-                FirstSeasonInProgram firstSeasonEpisode = new FirstSeasonInProgram()
+                FirstSeasonInProgram firstSeason = new FirstSeasonInProgram()
                 {
-                    FirstSeasonID = SeasonID,
-                    FirstEpisodeID = EpisodeID
-                };
-                #endregion
+                    FirstSeasonID = ResultSeasons.
+                }
 
-                #region Return Object
-                return firstSeasonEpisode;
-                #endregion
+
+
+
+                return ResultSeasons.ToList();
             }
             catch (Exception ex)
             {
@@ -333,10 +317,11 @@ namespace BalarinaAPI.Controllers.Season
                      CreationDate = DateTime.Now,
                      SeasonViews = model.SeasonViews
                 };
+
                 var Seasons = await unitOfWork.Season.GetObjects();
                 if (Seasons.Where(x => x.ProgramId == model.ProgramId).Count() == 0)
                     _season.SeasonIndex = Seasons.Where(x => x.ProgramId == model.ProgramId).Count();
-                else  _season.SeasonIndex = Seasons.Where(x => x.ProgramId == model.ProgramId).Count() - 1;
+                else  _season.SeasonIndex = Seasons.Where(x => x.ProgramId == model.ProgramId).Count() - 1 ;
 
                 bool result = await unitOfWork.Season.Create(_season);
 
